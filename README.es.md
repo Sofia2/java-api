@@ -32,8 +32,8 @@ Durante el proceso de compilación, se generará un fichero JAR que contiene el 
 <raíz de su copia del repositorio>/target/ssap-standalone-with-deps-<API-version>.jar
 ```
 
-## Contact information
+## Información de contacto
 
-If you need support from us, please feel free to contact us at [plataformasofia2@indra.es](mailto:plataformasofia2@indra.es) or at www.sofia2.com.
+Si necesita recibir soporte, puede contactar con nosotros en www.sofia2.com o enviando un correo electrónico a [plataformasofia2@indra.es](mailto:plataformasofia2@indra.es).
 
-And if you want to contribute, send us a pull request.
+Además, si desea contribuir al API, no dude en enviarnos una pull request.
