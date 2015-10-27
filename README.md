@@ -34,4 +34,4 @@ During the compilation process, a "fat" JAR containing the API and its dependenc
 
 Si necesita recibir soporte, puede contactar con nosotros en sofia2.com o enviando un correo electrónico a [plataformasofia2@indra.es](mailto:plataformasofia2@indra.es).
 
-Además, si desea contribuir al API C, no dude en enviarnos una pull request.
+Además, si desea contribuir al API, no dude en enviarnos una pull request.
