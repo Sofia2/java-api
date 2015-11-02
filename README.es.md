@@ -1,6 +1,6 @@
 # Sofia2, API Java
 
-*Ver en otros idiomas: [English](README.md), [Spanish](README.es.md).*
+*Ver en otros idiomas: [Inglés](README.md), [Español](README.es.md).*
 
 ## Copyright
 
