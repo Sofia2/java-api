@@ -52,8 +52,6 @@ public abstract class KpToExtend implements Kp, IConnectorMessageListener {
 	 */
 
 	private ExecutorService indicationThreadPool;
-	
-
 
 	/**
 	 * Registra los listeners para mensaje de notificacion del Sib
@@ -74,12 +72,11 @@ public abstract class KpToExtend implements Kp, IConnectorMessageListener {
 	 * Listeners for notifications of Status request
 	 */
 	protected Listener4SIBIndicationNotifications listener4StatusControlRequestNotifications;
-	
-	
+
 	/**
 	 * ConnectionListener
 	 */
-	private ConnectionListener connectionListener;
+	private ConnectionListener connectionEventsListener;
 
 	/**
 	 * Estado conexion
@@ -140,110 +137,99 @@ public abstract class KpToExtend implements Kp, IConnectorMessageListener {
 	}
 
 	@Override
-	public void addListener4SIBNotifications(
-			Listener4SIBIndicationNotifications listener) {
+	public void addListener4SIBNotifications(Listener4SIBIndicationNotifications listener) {
 		subscriptionListeners.add(listener);
 	}
-	
+
 	@Override
 	public void removeListener4SIBNotifications() {
 		subscriptionListeners.clear();
 	}
 
 	@Override
-	public void removeListener4SIBNotifications(
-			Listener4SIBIndicationNotifications listener) {
+	public void removeListener4SIBNotifications(Listener4SIBIndicationNotifications listener) {
 		subscriptionListeners.remove(listener);
 	}
 
 	@Override
-	public void addListener4SIBCommandMessageNotifications(
-			Listener4SIBCommandMessageNotifications listener) {
+	public void addListener4SIBCommandMessageNotifications(Listener4SIBCommandMessageNotifications listener) {
 		subscriptionCommandMessagesListener.add(listener);
 	}
 
 	@Override
-	public void removeListener4SIBCommandMessageNotifications(
-			Listener4SIBCommandMessageNotifications listener) {
+	public void removeListener4SIBCommandMessageNotifications(Listener4SIBCommandMessageNotifications listener) {
 		subscriptionCommandMessagesListener.remove(listener);
 	}
 
 	@Override
-	public void setListener4BaseCommandRequestNotifications(
-			Listener4SIBIndicationNotifications listener) {
+	public void setListener4BaseCommandRequestNotifications(Listener4SIBIndicationNotifications listener) {
 		listener4BaseCommandRequestNotifications = listener;
 	}
 
 	@Override
-	public void setListener4StatusControlRequestNotifications(
-			Listener4SIBIndicationNotifications listener) {
+	public void setListener4StatusControlRequestNotifications(Listener4SIBIndicationNotifications listener) {
 		listener4StatusControlRequestNotifications = listener;
 	}
-	
-	
+
 	@Override
-	public void setConnectionListener(ConnectionListener connectionListener){
-		this.connectionListener=connectionListener;
-	}
-	
-	
-	@Override
-	public void removeConnectionListener(){
-		this.connectionListener=null;
+	public void setConnectionListener(ConnectionListener connectionListener) {
+		this.connectionEventsListener = connectionListener;
 	}
 
-	protected void executeIndicationTasks(
-			Collection<IndicationTask> indicationTasks) {
+	@Override
+	public void removeConnectionListener() {
+		this.connectionEventsListener = null;
+	}
+	
+	@Override
+	public void messageReceived(byte[] message) {
+	}
+
+	protected void executeIndicationTasks(Collection<IndicationTask> indicationTasks) {
 		for (IndicationTask task : indicationTasks) {
 			this.indicationThreadPool.submit(task);
 		}
 	}
 
 	protected void initializeIndicationPool() {
-		this.indicationThreadPool = Executors.newFixedThreadPool(config
-				.getSubscriptionListenersPoolSize());
+		log.info("Initializing INDICATION listener thread pool.");
+		this.indicationThreadPool = Executors.newFixedThreadPool(config.getSubscriptionListenersPoolSize());
 	}
 
-	protected void destroyIndicationPool() {		
-		if(this.indicationThreadPool!=null && !this.indicationThreadPool.isShutdown()){
+	protected void destroyIndicationPool() {
+		if (this.indicationThreadPool != null && !this.indicationThreadPool.isShutdown()) {
 			try {
 				this.indicationThreadPool.shutdown();
 			} catch (Throwable e) {
-				log.error("Error deteniendo el ThreadPool de notificaciones", e);
+				log.error("Unable to stop indication thread pool.", e);
 				try {
 					this.indicationThreadPool.shutdownNow();
 				} catch (Throwable e1) {
-					log.error("Error deteniendo tareas pendientes. Las tareas finalizaran de acuerdo a su código", e1);		
+					log.error("Unable to stop pending tasks. These tasks will end according to their code.", e1);
 				}
 			}
 		}
-		this.indicationThreadPool=null;
+		this.indicationThreadPool = null;
 	}
-	
-	
-	
-	protected void notifyConnection(){
-		if(this.connectionListener!=null){
-			new Thread(){
-				public void run(){
-					connectionListener.notifyConnection();
+
+	protected void notifyConnectionEvent() {
+		if (this.connectionEventsListener != null) {
+			new Thread() {
+				public void run() {
+					connectionEventsListener.notifyConnection();
 				}
-				
+
 			}.start();
-			
-		}
-	}
-	
-	protected void notifyDisconnection(){
-		if(this.connectionListener!=null){
-			new Thread(){
-				public void run(){
-					connectionListener.notifyDisconnection();
-				}
-				
-			}.start();
-			
 		}
 	}
 
+	protected void notifyDisconnectionEvent() {
+		if (this.connectionEventsListener != null) {
+			new Thread() {
+				public void run() {
+					connectionEventsListener.notifyDisconnection();
+				}
+			}.start();
+		}
+	}
 }

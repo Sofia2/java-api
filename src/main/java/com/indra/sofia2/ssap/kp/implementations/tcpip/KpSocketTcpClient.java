@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  ******************************************************************************/
-package com.indra.sofia2.ssap.kp.implementations;
+package com.indra.sofia2.ssap.kp.implementations.tcpip;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.SocketTCPConnectionConfig;
 import com.indra.sofia2.ssap.kp.encryption.XXTEA;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
 import com.indra.sofia2.ssap.kp.implementations.tcpip.connector.IConnectorMessageListener;
 import com.indra.sofia2.ssap.kp.implementations.tcpip.core.TcpipConnector;
 import com.indra.sofia2.ssap.kp.implementations.tcpip.exception.KPIConnectorException;

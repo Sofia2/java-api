@@ -20,7 +20,7 @@ import java.util.UUID;
 import org.fusesource.mqtt.client.QoS;
 
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
-import com.indra.sofia2.ssap.kp.implementations.KpMQTTClient;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.MqttConstants;
 
 public class MQTTConnectionConfig extends ConnectionConfig {
 	
@@ -230,7 +230,7 @@ public class MQTTConnectionConfig extends ConnectionConfig {
 	
 	
 	public static String generateClientId() {
-		return UUID.randomUUID().toString().substring(0, KpMQTTClient.CLIENT_ID_LENGTH);
+		return UUID.randomUUID().toString().substring(0, MqttConstants.CLIENT_ID_LENGTH);
 	}
 	
 	public int getConnectAttemptsMax() {

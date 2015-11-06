@@ -19,9 +19,10 @@ import org.junit.Test;
 
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
-import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
+import com.indra.sofia2.ssap.ssap.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 

@@ -20,11 +20,12 @@ import org.junit.Test;
 
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
-import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPBulkMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
+import com.indra.sofia2.ssap.ssap.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
@@ -33,8 +34,8 @@ public class KpMqttFuncional {
 	
 	private static Log log = LogFactory.getLog(KpGatewayRestFuncional.class);
 	
-	private final static String HOST="mihost";
-	private final static int PORT=1883;
+	private final static String HOST="sofia2.com";
+	private final static int PORT=1880;
 	
 	private final static String TOKEN = "f0516016ef2647aeb115ad035e18f0fb";
 	private final static String KP_INSTANCE = "kpParadaAutobus:kp01";
@@ -50,7 +51,7 @@ public class KpMqttFuncional {
 	private final static String ONTOLOGY_INSERT_SQLLIKE = "insert into TestSensorTemperatura(geometry, assetId, measure, timestamp) values (\"{ 'coordinates': [ 40.512967, -3.67495 ], 'type': 'Point' }\", \"S_Temperatura_00066\", 15, \"{ '$date': '2014-04-29T08:24:54.005Z'}\")";
 	private final static String ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 20 where Sensor.assetId = \"S_Temperatura_00066\"";
 	
-	private final static String ONTOLOGY_QUERY_SQLLIKE = "select * from TestSensorTemperatura where Sensor.assetId = \"S_Temperatura_00066\"";
+//	private final static String ONTOLOGY_QUERY_SQLLIKE = "select * from TestSensorTemperatura where Sensor.assetId = \"S_Temperatura_00066\"";
 
 	private Kp kp;
 	
@@ -161,7 +162,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 		
 	}
 	
@@ -195,7 +196,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	@Test
@@ -228,7 +229,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	@Test
@@ -262,7 +263,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 		
 	}
 	
@@ -297,7 +298,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	
@@ -332,7 +333,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	
@@ -366,7 +367,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 
@@ -401,7 +402,7 @@ public class KpMqttFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	
@@ -522,7 +523,7 @@ public class KpMqttFuncional {
 		
 		
 		//Genera un mensaje DELETE
-		SSAPMessage msgDelete1=SSAPMessageGenerator.getInstance().generateRemoveMessage(sessionKey, ONTOLOGY_NAME, "db.TestSensorTemperatura.remove({'Sensor.assetId':'S_Temperatura_00066'})");
+//		SSAPMessage msgDelete1=SSAPMessageGenerator.getInstance().generateRemoveMessage(sessionKey, ONTOLOGY_NAME, "db.TestSensorTemperatura.remove({'Sensor.assetId':'S_Temperatura_00066'})");
 		
 		
 		//SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey, ONTOLOGY_NAME);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  ******************************************************************************/
-package com.indra.sofia2.ssap.kp.implementations;
+package com.indra.sofia2.ssap.kp.implementations.websockets;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +42,7 @@ import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
 import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
+import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
 import com.indra.sofia2.ssap.kp.implementations.listener.KpConnectorEventListener;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;

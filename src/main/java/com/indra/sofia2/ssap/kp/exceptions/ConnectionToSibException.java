@@ -22,11 +22,11 @@ public class ConnectionToSibException extends RuntimeException {
 		super(message);
 	}
 	
-	public ConnectionToSibException(String message,Exception e){
-		super(message,e);
+	public ConnectionToSibException(String message, Throwable e) {
+		super(message, e);
 	}
 
-	public ConnectionToSibException(Exception e) {
+	public ConnectionToSibException(Throwable e) {
 		super(e);
 	}
 	

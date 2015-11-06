@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  ******************************************************************************/
-package com.indra.sofia2.ssap.kp;
+package com.indra.sofia2.ssap.ssap;
 
 import java.io.File;
 import java.util.HashMap;
@@ -24,11 +24,6 @@ import java.util.Map.Entry;
 
 import com.indra.sofia2.ssap.kp.exceptions.NotJoinedException;
 import com.indra.sofia2.ssap.kp.exceptions.SQLSentenceNotAllowedForThisOperationException;
-import com.indra.sofia2.ssap.ssap.SSAPBulkMessage;
-import com.indra.sofia2.ssap.ssap.SSAPMessage;
-import com.indra.sofia2.ssap.ssap.SSAPMessageDirection;
-import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
-import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 import com.indra.sofia2.ssap.ssap.binary.BinarySizeException;
 import com.indra.sofia2.ssap.ssap.binary.Encoding;
 import com.indra.sofia2.ssap.ssap.binary.Mime;
@@ -141,6 +136,7 @@ public class SSAPMessageGenerator {
 	 * Metodo que genera una estructura Clave Valor con todos los tipo de datos binary contenidos en un JSON.
 	 * @return
 	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Map<String, SSAPBinaryMessage> getBinary(LinkedHashMap JSON){
 		Map<String, SSAPBinaryMessage> binary = new HashMap<String, SSAPBinaryMessage>();
 		try {
@@ -151,6 +147,7 @@ public class SSAPMessageGenerator {
 		return binary;
 	}
 	
+	@SuppressWarnings({ "unchecked" })
 	private SSAPBinaryMessage subAnalize(Map<String,Object> JSONSubStructure, Map<String, SSAPBinaryMessage> binary){
 		for (Entry<String, Object> jsonElement : JSONSubStructure.entrySet()){
 			if (jsonElement.getValue() instanceof LinkedHashMap){
