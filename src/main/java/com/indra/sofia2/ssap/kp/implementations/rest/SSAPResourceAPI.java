@@ -39,7 +39,7 @@ import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
 
 public class SSAPResourceAPI implements ISSAPResourceAPI {
-	
+
 	private ISSAPResourceAPI api=null;
 	
 	public SSAPResourceAPI(String serviceURL){
