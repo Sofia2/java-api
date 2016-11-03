@@ -12,12 +12,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
-
 
 /**
  * <p>
@@ -45,15 +42,10 @@ import flexjson.JSONSerializer;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "subscribe_response")
 @XmlType(name = "subscribe_response")
-@ApiObject(name = "SubscribeResponse")
 public class SubscribeResponse extends CommonResponse implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	@ApiObjectField(description = "subscriptionId assigned to the query")
 	protected String subscriptionId;
 	
 	

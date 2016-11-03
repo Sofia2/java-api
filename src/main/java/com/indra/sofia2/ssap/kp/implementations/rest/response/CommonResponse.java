@@ -17,24 +17,14 @@ package com.indra.sofia2.ssap.kp.implementations.rest.response;
 
 import java.io.Serializable;
 
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
-
 import com.indra.sofia2.ssap.ssap.SSAPErrorCode;
 
-@ApiObject(name = "CommonResponse", show=false)
 public class CommonResponse implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5996442695228247795L;
 	
-	@ApiObjectField(description = "The operation sucesfull")
 	protected boolean ok;
-	@ApiObjectField(description = "The error message")
     protected String error;
-	@ApiObjectField(description = "The error code")
 	protected SSAPErrorCode errorCode;
 
 	public boolean isOk() {

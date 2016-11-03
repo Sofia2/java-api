@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
 import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
-
 public class SSAPResourceAPI implements ISSAPResourceAPI {
 
 	private ISSAPResourceAPI api=null;

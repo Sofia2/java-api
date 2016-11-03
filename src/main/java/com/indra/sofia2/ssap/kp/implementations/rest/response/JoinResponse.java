@@ -27,8 +27,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
@@ -59,15 +57,10 @@ import flexjson.JSONSerializer;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "join_response")
 @XmlType(name = "join_response")
-@ApiObject(name = "JoinResponse")
 public class JoinResponse extends CommonResponse implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	@ApiObjectField(description = "sessionKey assigned to user")
 	protected String sessionKey;
 
 	/**
