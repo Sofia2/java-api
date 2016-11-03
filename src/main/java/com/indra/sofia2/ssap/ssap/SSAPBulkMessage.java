@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,24 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkItem;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
-
+@JsonIgnoreProperties("body_asCollection")
 public class SSAPBulkMessage extends SSAPMessage {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	//Correc: Instanciacion String
+	
+	private Collection<SSAPBodyBulkItem> body_asCollection;
 	public SSAPBulkMessage(){
-		this.body="[]";
+		body_asCollection = new ArrayList<SSAPBodyBulkItem>();
 	}
 	
 	public SSAPBulkMessage addMessage(SSAPMessage ssapMessage) throws NotSupportedMessageTypeException{
@@ -43,57 +42,43 @@ public class SSAPBulkMessage extends SSAPMessage {
 		item.setType(ssapMessage.getMessageType());
 		item.setBody(ssapMessage.getBody());
 		item.setOntology(ssapMessage.getOntology());
-		
-		Collection<SSAPBodyBulkItem> lItems=SSAPBodyBulkItem.fromJsonArrayToSSAPBodyBulkItems(this.body);
-		lItems.add(item);
-		
-		this.body=SSAPBodyBulkItem.toJsonArray(lItems);
-		
+		body_asCollection.add(item);
 		return this;
 		
 	}
 	
 	public void addMessage(List<SSAPMessage> ssapMessages) throws NotSupportedMessageTypeException{
-		Collection<SSAPBodyBulkItem> lItems=SSAPBodyBulkItem.fromJsonArrayToSSAPBodyBulkItems(this.body);
-		
 		for(SSAPMessage ssapMessage:ssapMessages){
 			this.checkMessageType(ssapMessage.getMessageType());
-			
 			SSAPBodyBulkItem item=new SSAPBodyBulkItem();
 			item.setType(ssapMessage.getMessageType());
 			item.setBody(ssapMessage.getBody());
 			item.setOntology(ssapMessage.getOntology());
-			lItems.add(item);
-				
-		}
-		
-		this.body=SSAPBodyBulkItem.toJsonArray(lItems);
-	}
-	
-	private void checkMessageType(SSAPMessageTypes type) throws NotSupportedMessageTypeException{
-		switch(type){
-			case INSERT:
-			case UPDATE:
-			case DELETE:break;
-			default: throw new NotSupportedMessageTypeException("Message type: "+type+" is not supported by SSAPBulkMessage");
+			body_asCollection.add(item);
 		}
 	}
 	
+	private void checkMessageType(SSAPMessageTypes type) throws NotSupportedMessageTypeException {
+		if (type != SSAPMessageTypes.INSERT && type != SSAPMessageTypes.UPDATE && type != SSAPMessageTypes.DELETE) {
+			throw new NotSupportedMessageTypeException(
+					"Message type: " + type + " is not supported by SSAPBulkMessage");
+		}
+	}
+	
+	private SSAPBulkMessage prepareForSerialization() {
+		try {
+			this.body = new ObjectMapper().writeValueAsString(this.body_asCollection);
+			return this;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	public String toJson() {
-		return new JSONSerializer().exclude("lItems").exclude("*.class").serialize(this);
-    }
-    
-    public String toJson(String[] fields) {
-    	return new JSONSerializer().exclude("lItems").include(fields).exclude("*.class").serialize(this);
-    }
-    
-    public static SSAPMessage fromJsonToSSAPBulkMessage(String json) {
-        return new JSONDeserializer<SSAPMessage>().use(null, SSAPMessage.class).deserialize(json);
-    }
-    
-    public static Collection<SSAPBulkMessage> fromJsonArrayToSSAPBulkMessages(String json) {
-        return new JSONDeserializer<List<SSAPBulkMessage>>().use(null, ArrayList.class).use("values", SSAPBulkMessage.class).deserialize(json);
-    }
-
+		try {
+			return new ObjectMapper().writeValueAsString(this.prepareForSerialization());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,81 +15,66 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body.bulk.message;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBodyBulkReturnMessage {
-	
+
 	private SSAPBulkOperationSummary insertSummary;
 	private SSAPBulkOperationSummary updateSummary;
 	private SSAPBulkOperationSummary deleteSummary;
-	
+
 	public SSAPBulkOperationSummary getInsertSummary() {
 		return insertSummary;
 	}
+
 	public void setInsertSummary(SSAPBulkOperationSummary insertSummary) {
 		this.insertSummary = insertSummary;
 	}
+
 	public SSAPBulkOperationSummary getUpdateSummary() {
 		return updateSummary;
 	}
+
 	public void setUpdateSummary(SSAPBulkOperationSummary updateSummary) {
 		this.updateSummary = updateSummary;
 	}
+
 	public SSAPBulkOperationSummary getDeleteSummary() {
 		return deleteSummary;
 	}
+
 	public void setDeleteSummary(SSAPBulkOperationSummary deleteSummary) {
 		this.deleteSummary = deleteSummary;
 	}
+
 	public String toJson() {
-		return new JSONSerializer().include("insertSummary.objectIds").include("insertSummary.errors")
-				.include("updateSummary.objectIds").include("updateSummary.errors")
-				.include("deleteSummary.objectIds").include("deleteSummary.errors")
-				.exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include("insertSummary.objectIds").include("insertSummary.errors")
-				.include("updateSummary.objectIds").include("updateSummary.errors")
-				.include("deleteSummary.objectIds").include("deleteSummary.errors").include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBodyBulkReturnMessage fromJsonToSSAPBodyBulkReturnMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyBulkReturnMessage>().use(null,
-				SSAPBodyBulkReturnMessage.class).deserialize(json);
-	}
-
+	
 	public static String toJsonArray(
 			Collection<SSAPBodyBulkReturnMessage> collection) {
-		return new JSONSerializer().include("insertSummary.objectIds").include("insertSummary.errors")
-				.include("updateSummary.objectIds").include("updateSummary.errors")
-				.include("deleteSummary.objectIds").include("deleteSummary.errors").exclude("*.class").serialize(collection);
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static String toJsonArray(
-			Collection<SSAPBodyBulkReturnMessage> collection, String[] fields) {
-		return new JSONSerializer().include("insertSummary.objectIds").include("insertSummary.errors")
-				.include("updateSummary.objectIds").include("updateSummary.errors")
-				.include("deleteSummary.objectIds").include("deleteSummary.errors").include(fields).exclude("*.class")
-				.serialize(collection);
+	public static SSAPBodyBulkReturnMessage fromJsonToSSAPBodyBulkReturnMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyBulkReturnMessage.class);
 	}
 
-	public static Collection<SSAPBodyBulkReturnMessage> fromJsonArrayToSSAPBodyBulkReturnMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyBulkReturnMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyBulkReturnMessage.class)
-				.deserialize(json);
+	public static Collection<SSAPBodyBulkReturnMessage> fromJsonArrayToSSAPBodyBulkReturnMessage(String json)
+			throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyBulkReturnMessage>>(){});
 	}
 	
-	
-	
-
 }

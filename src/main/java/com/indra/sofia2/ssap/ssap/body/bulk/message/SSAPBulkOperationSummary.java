@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,64 +15,57 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body.bulk.message;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBulkOperationSummary {
-	
+
 	private List<String> objectIds;
 	private List<SSAPBulkOperationErrorSummary> errors;
-	
+
 	public List<String> getObjectIds() {
 		return objectIds;
 	}
+
 	public void setObjectIds(List<String> objectIds) {
 		this.objectIds = objectIds;
 	}
+
 	public List<SSAPBulkOperationErrorSummary> getErrors() {
 		return errors;
 	}
+
 	public void setErrors(List<SSAPBulkOperationErrorSummary> errors) {
 		this.errors = errors;
 	}
-	
+
 	public String toJson() {
-		return new JSONSerializer().include("objectIds").include("errors").exclude("*.class").serialize(this);
-	}
-
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include("objectIds").include("errors").include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBulkOperationErrorSummary fromJsonToSSAPBulkOperationErrorSummary(
-			String json) {
-		return new JSONDeserializer<SSAPBulkOperationErrorSummary>().use(null,
-				SSAPBulkOperationErrorSummary.class).deserialize(json);
-	}
-
-	public static String toJsonArray(
-			Collection<SSAPBulkOperationErrorSummary> collection) {
-		return new JSONSerializer().include("objectIds").include("errors").exclude("*.class").serialize(collection);
-	}
-
-	public static String toJsonArray(
-			Collection<SSAPBulkOperationErrorSummary> collection, String[] fields) {
-		return new JSONSerializer().include("objectIds").include("errors").include(fields).exclude("*.class")
-				.serialize(collection);
-	}
-
-	public static Collection<SSAPBulkOperationErrorSummary> fromJsonArrayToSSAPBulkOperationErrorSummarys(
-			String json) {
-		return new JSONDeserializer<List<SSAPBulkOperationErrorSummary>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBulkOperationErrorSummary.class)
-				.deserialize(json);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
+	public static String toJsonArray(
+			Collection<SSAPBulkOperationSummary> collection) {
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	public static SSAPBulkOperationSummary fromJsonToSSAPBulkOperationSummary(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBulkOperationSummary.class);
+	}
+
+	public static Collection<SSAPBulkOperationSummary> fromJsonArrayToSSAPBulkOperationSummary(String json)
+			throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBulkOperationSummary>>(){});
+	}
 }

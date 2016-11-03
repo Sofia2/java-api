@@ -11,6 +11,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fusesource.mqtt.client.QoS;
@@ -480,7 +482,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testBulk(){
+	public void testBulk() throws IOException {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
