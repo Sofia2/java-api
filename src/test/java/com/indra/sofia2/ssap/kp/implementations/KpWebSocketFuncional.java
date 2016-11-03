@@ -20,12 +20,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.atmosphere.wasync.Request.METHOD;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
@@ -41,8 +41,7 @@ import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
 
 public class KpWebSocketFuncional {
 	
-	private static Log log = LogFactory.getLog(KpWebSocketFuncional.class);
-	
+	private static final Logger log = LoggerFactory.getLogger(KpWebSocketFuncional.class);
 	
 	private final static String TOKEN = "e5e8a005d0a248f1ad2cd60a821e6838";
 	private final static String KP_INSTANCE = "KPTestTemperatura:KPTestTemperatura01";

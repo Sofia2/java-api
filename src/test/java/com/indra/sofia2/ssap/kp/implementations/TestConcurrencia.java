@@ -23,10 +23,10 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.implementations.rest.SSAPResourceAPI;
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
@@ -34,7 +34,7 @@ import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
 public class TestConcurrencia implements Runnable{
 	
-private static Log log = LogFactory.getLog(KpGatewayRestFuncional.class);
+	private static Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
 	
 	private final static String SERVICE_URL="http://sofia2.com/sib/services/api_ssap/";
 	

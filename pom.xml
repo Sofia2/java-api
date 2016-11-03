@@ -82,8 +82,8 @@
 	</dependencies>
 	<build>
 		<finalName>ssap-standalone-${project.version}</finalName>
-		<plugins>			
-			<!--  Compiler configuration -->
+		<plugins>
+			<!-- Compiler configuration -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -94,7 +94,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<!--  Enable Eclipse integration -->
+			<!-- Enable Eclipse integration -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -104,15 +104,13 @@
 					<downloadJavadocs>false</downloadJavadocs>
 				</configuration>
 			</plugin>
-			<!--  Pack dependencies in JAR file -->
+			<!-- Pack dependencies in JAR file -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
 						<manifest>
-							<!--
-							<mainClass>com.yourcompany.MainClass</mainClass>
-							-->
+							<!-- <mainClass>com.yourcompany.MainClass</mainClass> -->
 						</manifest>
 					</archive>
 					<descriptorRefs>

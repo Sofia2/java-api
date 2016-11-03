@@ -19,8 +19,8 @@ package com.indra.sofia2.ssap.kp.implementations.mqtt;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
@@ -30,7 +30,7 @@ import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
  */
 class MqttReceptionCallback {
 
-	private static final Log log = LogFactory.getLog(MqttReceptionCallback.class);
+	private static final Logger log = LoggerFactory.getLogger(MqttReceptionCallback.class);
 
 	private final CountDownLatch latch;
 	private String response;

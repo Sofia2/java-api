@@ -19,12 +19,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.fusesource.mqtt.client.QoS;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
@@ -37,7 +37,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 public class KpMqttIsConnected {
 
-	private static Log log = LogFactory.getLog(KpGatewayRestFuncional.class);
+	private static Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
 
 	private final static String HOST = "localhost";
 	private final static int PORT = 1883;

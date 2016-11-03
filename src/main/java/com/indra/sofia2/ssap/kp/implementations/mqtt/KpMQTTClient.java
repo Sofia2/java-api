@@ -24,12 +24,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
 import org.fusesource.mqtt.client.Future;
 import org.fusesource.mqtt.client.FutureConnection;
 import org.fusesource.mqtt.client.MQTT;
 import org.fusesource.mqtt.client.QoS;
 import org.fusesource.mqtt.client.Topic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
@@ -49,7 +50,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyJoinUserAndPasswordMessage;
 
 public class KpMQTTClient extends KpToExtend {
 	
-	private static Logger log = Logger.getLogger(KpMQTTClient.class.getName());
+	private static Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
 
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;
 

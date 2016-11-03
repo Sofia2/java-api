@@ -8,15 +8,15 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.fusesource.hawtdispatch.transport.SslTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.exceptions.SSLContextInitializationError;
 
 public class SSLContextHolder {
 
-	private static final Log log = LogFactory.getLog(SSLContextHolder.class);
+	private static final Logger log = LoggerFactory.getLogger(SSLContextHolder.class);
 	private static SSLContext sslContext;
 
 	public static SSLContext getSSLContext() throws SSLContextInitializationError {

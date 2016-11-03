@@ -5,12 +5,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.httpclient.util.HttpURLConnection;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InternetConnectionTester {
 
-	private static final Log log = LogFactory.getLog(InternetConnectionTester.class);
+	private static final Logger log = LoggerFactory.getLogger(InternetConnectionTester.class);
 	private static final String DEFAULT_TEST_URL = "http://www.google.es";
 
 	private boolean isEnabled;

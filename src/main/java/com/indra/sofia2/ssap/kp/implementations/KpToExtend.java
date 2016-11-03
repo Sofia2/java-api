@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.ConnectionListener;
 import com.indra.sofia2.ssap.kp.Kp;
@@ -34,7 +34,7 @@ import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 
 public abstract class KpToExtend implements Kp {
 
-	protected static Log log = LogFactory.getLog(KpToExtend.class);
+	private static final Logger log = LoggerFactory.getLogger(KpToExtend.class);
 
 	/**
 	 * XXTEA algorithm cipher key
