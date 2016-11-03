@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body.config.message;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBodyConfigAppsw {
 	private String identificacion;
@@ -29,11 +28,6 @@ public class SSAPBodyConfigAppsw {
 	private String url;
 	private Integer versioncfg;
 	private Map<String, String> propiedadescfg;
-
-	public String toJson() {
-		return new JSONSerializer().rootName("appsw").include("propiedadescfg")
-				.exclude("*.class").serialize(this);
-	}
 
 	public String getIdentificacion() {
 		return identificacion;
@@ -74,28 +68,29 @@ public class SSAPBodyConfigAppsw {
 	public void setPropiedadescfg(Map<String, String> propiedadescfg) {
 		this.propiedadescfg = propiedadescfg;
 	}
-
-	public static SSAPBodyConfigAppsw fromJsonToSSAPBodyConfigAppsw(String json) {
-		return new JSONDeserializer<SSAPBodyConfigAppsw>().use(null,
-				SSAPBodyConfigAppsw.class).deserialize(json);
+	
+	public String toJson() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 	public static String toJsonArray(Collection<SSAPBodyConfigAppsw> collection) {
-		return new JSONSerializer().rootName("appsw").exclude("*.class")
-				.serialize(collection);
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static String toJsonArray(
-			Collection<SSAPBodyConfigAppsw> collection, String[] fields) {
-		return new JSONSerializer().rootName("appsw").include(fields)
-				.exclude("*.class").serialize(collection);
+	public static SSAPBodyConfigAppsw fromJsonToSSAPBodyConfigAppsw(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyConfigAppsw.class);
 	}
 
 	public static Collection<SSAPBodyConfigAppsw> fromJsonArrayToSSAPBodyConfigAppsws(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyConfigAppsw>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyConfigAppsw.class).deserialize(json);
+			String json) throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigAppsw>>(){});
 	}
-
 }

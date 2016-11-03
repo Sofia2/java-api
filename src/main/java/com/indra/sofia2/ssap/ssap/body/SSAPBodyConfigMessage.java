@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,15 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigAppsw;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigAsset;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigOntologia;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 
@@ -121,22 +118,14 @@ public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().include("lappsw").include("lasset")
-				.include("lontologia").include("lmisc").exclude("*.class")
-				.serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static SSAPBodyConfigMessage fromJsonToSSAPBodyConfigMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyConfigMessage>()
-				.use(null,SSAPBodyConfigMessage.class).deserialize(json);
+	public static SSAPBodyConfigMessage fromJsonToSSAPBodyConfigMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyConfigMessage.class);
 	}
-
-	public static Collection<SSAPBodyConfigMessage> fromJsonArrayToSSAPBodyConfigMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyConfigMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyConfigMessage.class).deserialize(json);
-	}
-
 }

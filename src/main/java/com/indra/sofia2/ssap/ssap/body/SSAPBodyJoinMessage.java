@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,9 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementacion de JoinMessage
@@ -45,19 +41,16 @@ public class SSAPBodyJoinMessage extends SSAPBodyMessage {
 
 	
 	public String toJson() {
-        return new JSONSerializer().exclude("*.class").serialize(this);
-    }
-    
-    public String toJson(String[] fields) {
-        return new JSONSerializer().include(fields).exclude("*.class").serialize(this);
-    }
-    
-    public static SSAPBodyJoinMessage fromJsonToSSAPBodyJoinMessage(String json) {
-        return new JSONDeserializer<SSAPBodyJoinMessage>().use(null, SSAPBodyJoinMessage.class).deserialize(json);
-    }
-    
-    public static Collection<SSAPBodyJoinMessage> fromJsonArrayToSSAPBodyJoinMessages(String json) {
-        return new JSONDeserializer<List<SSAPBodyJoinMessage>>().use(null, ArrayList.class).use("values", SSAPBodyJoinMessage.class).deserialize(json);
-    }
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static SSAPBodyJoinMessage fromJsonToSSAPBodyJoinMessage(
+			String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyJoinMessage.class);
+	}
 	
 }

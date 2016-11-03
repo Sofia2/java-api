@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementacion del mensaje JoinMessage con token
@@ -41,26 +38,16 @@ public class SSAPBodyJoinTokenMessage extends SSAPBodyJoinMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
+	public static SSAPBodyJoinTokenMessage fromJsonToSSAPBodyJoinTokenMessage(String json) throws IOException {
+		ObjectMapper objMapper = new ObjectMapper();
+		objMapper.enableDefaultTyping();
+		return objMapper.readValue(json, SSAPBodyJoinTokenMessage.class);
 	}
-
-	public static SSAPBodyJoinTokenMessage fromJsonToSSAPBodyJoinTokenMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyJoinTokenMessage>().use(null,
-				SSAPBodyJoinTokenMessage.class).deserialize(json);
-	}
-
-	public static Collection<SSAPBodyJoinTokenMessage> fromJsonArrayToSSAPBodyJoinTokenMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyJoinTokenMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyJoinTokenMessage.class)
-				.deserialize(json);
-	}
-
 }

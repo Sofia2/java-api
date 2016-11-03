@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementacion de JoinMessage con usuario y password
@@ -56,27 +53,17 @@ public class SSAPBodyJoinUserAndPasswordMessage extends SSAPBodyJoinMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
+	public static SSAPBodyJoinUserAndPasswordMessage fromJsonToSSAPBodyJoinTokenMessage(String json)
+			throws IOException {
+		ObjectMapper objMapper = new ObjectMapper();
+		objMapper.enableDefaultTyping();
+		return objMapper.readValue(json, SSAPBodyJoinUserAndPasswordMessage.class);
 	}
-
-	public static SSAPBodyJoinUserAndPasswordMessage fromJsonToSSAPBodyJoinUserAndPasswordMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyJoinUserAndPasswordMessage>().use(
-				null, SSAPBodyJoinUserAndPasswordMessage.class).deserialize(
-				json);
-	}
-
-	public static Collection<SSAPBodyJoinUserAndPasswordMessage> fromJsonArrayToSSAPBodyJoinUserAndPasswordMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyJoinUserAndPasswordMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyJoinUserAndPasswordMessage.class)
-				.deserialize(json);
-	}
-
 }

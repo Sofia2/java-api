@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body.config.message;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBodyConfigOntologia {
 	private String identificacion;
@@ -52,37 +51,27 @@ public class SSAPBodyConfigOntologia {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().rootName("ontologia").exclude("*.class")
-				.serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String toJsonArray(Collection<SSAPBodyConfigOntologia> collection) {
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().rootName("ontologia").include(fields)
-				.exclude("*.class").serialize(this);
+	public static SSAPBodyConfigOntologia fromJsonToSSAPBodyConfigOntologia(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyConfigOntologia.class);
 	}
 
-	public static SSAPBodyConfigOntologia fromJsonToSSAPBodyConfigOntologia(
-			String json) {
-		return new JSONDeserializer<SSAPBodyConfigOntologia>().use(null,
-				SSAPBodyConfigOntologia.class).deserialize(json);
-	}
-
-	public static String toJsonArray(
-			Collection<SSAPBodyConfigOntologia> collection) {
-		return new JSONSerializer().rootName("ontologia").exclude("*.class")
-				.serialize(collection);
-	}
-
-	public static String toJsonArray(
-			Collection<SSAPBodyConfigOntologia> collection, String[] fields) {
-		return new JSONSerializer().rootName("ontologia").include(fields)
-				.exclude("*.class").serialize(collection);
-	}
-
-	public static Collection<SSAPBodyConfigOntologia> fromJsonArrayToSSAPBodyConfigOntologias(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyConfigOntologia>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyConfigOntologia.class).deserialize(json);
+	public static Collection<SSAPBodyConfigOntologia> fromJsonArrayToSSAPBodyConfigOntologia(
+			String json) throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigOntologia>>(){});
 	}
 }
