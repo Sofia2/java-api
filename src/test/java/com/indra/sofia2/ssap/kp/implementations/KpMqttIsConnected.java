@@ -29,7 +29,6 @@ import org.junit.Test;
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageGenerator;
@@ -78,7 +77,7 @@ public class KpMqttIsConnected {
 		createSubscription();
 	}
 
-	private void performJoin() throws ConnectionToSibException {
+	private void performJoin() throws Exception {
 		SSAPMessage msgJoin = SSAPMessageGenerator.getInstance()
 				.generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 
@@ -108,7 +107,7 @@ public class KpMqttIsConnected {
 		};
 	}
 	
-	private void createSubscription() throws ConnectionToSibException {
+	private void createSubscription() throws Exception {
 		kp.addListener4SIBNotifications(new Listener4SIBIndicationNotifications() {
 			@Override
 			public void onIndication(String messageId, SSAPMessage ssapMessage) {

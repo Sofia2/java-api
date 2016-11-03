@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.indra.sofia2.ssap.kp.exceptions.NotJoinedException;
 import com.indra.sofia2.ssap.kp.exceptions.SQLSentenceNotAllowedForThisOperationException;
 import com.indra.sofia2.ssap.ssap.binary.BinarySizeException;
 import com.indra.sofia2.ssap.ssap.binary.Encoding;
@@ -269,7 +268,6 @@ public class SSAPMessageGenerator {
 	 * @param ontologia
 	 * @param datos
 	 * @return
-	 * @throws NotJoinedException
 	 */
 	public SSAPMessage generateInsertMessage(String sessionKey, String ontologia, String datos) {
 		SSAPMessage mensaje = new SSAPMessage();
@@ -290,7 +288,6 @@ public class SSAPMessageGenerator {
 	 * @param datos
 	 * @param queryType
 	 * @return
-	 * @throws NotJoinedException
 	 */
 	public SSAPMessage generateInsertMessage(String sessionKey, String ontologia, String datos, SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException{
 		SSAPMessage mensaje = new SSAPMessage();
@@ -334,9 +331,8 @@ public class SSAPMessageGenerator {
 	 * @param datos
 	 * @param query
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateUpdateMessage(String sessionKey, String ontologia, String datos, String query)throws NotJoinedException{
+	public SSAPMessage generateUpdateMessage(String sessionKey, String ontologia, String datos, String query) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -360,9 +356,9 @@ public class SSAPMessageGenerator {
 	 * @param query
 	 * @param queryType
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateUpdateMessage(String sessionKey, String ontologia, String datos, String query, SSAPQueryType queryType)throws SQLSentenceNotAllowedForThisOperationException{
+	public SSAPMessage generateUpdateMessage(String sessionKey, String ontologia, String datos, String query,
+			SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -387,9 +383,8 @@ public class SSAPMessageGenerator {
 	 * @param ontologia
 	 * @param query
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateRemoveMessage(String sessionKey, String ontologia, String query)throws NotJoinedException{
+	public SSAPMessage generateRemoveMessage(String sessionKey, String ontologia, String query) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -435,9 +430,8 @@ public class SSAPMessageGenerator {
 	 * @param idQuery
 	 * @param queryType
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query) throws NotJoinedException{
+	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -480,9 +474,8 @@ public class SSAPMessageGenerator {
 	 * @param idQuery
 	 * @param queryType
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateQueryMessage (String sessionKey, String idQuery) throws NotJoinedException{
+	public SSAPMessage generateQueryMessage (String sessionKey, String idQuery) {
 		SSAPMessage message = new SSAPMessage();
 		message.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -500,9 +493,10 @@ public class SSAPMessageGenerator {
 	 * @param idQuery
 	 * @param params
 	 * @return
-	 * @throws NotJoinedException
+	 * @throws SQLSentenceNotAllowedForThisOperationException
 	 */
-	public SSAPMessage generateQueryMessageWithParam (String sessionKey, String idQuery, Map<String,String> params) throws NotJoinedException{
+	public SSAPMessage generateQueryMessageWithParam(String sessionKey, String idQuery, Map<String, String> params)
+			throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage message = new SSAPMessage();
 		message.setSessionKey(sessionKey);
 		//Segun el tipo de query que llege se creara un body diferente
@@ -539,9 +533,8 @@ public class SSAPMessageGenerator {
 	 * @param idQuery
 	 * @param queryType
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateSubscribeMessage(String sessionKey, String ontologia, int msRefresh, String query)throws NotJoinedException{
+	public SSAPMessage generateSubscribeMessage(String sessionKey, String ontologia, int msRefresh, String query) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodySubscribeMessage body = new SSAPBodySubscribeMessage();
@@ -595,9 +588,8 @@ public class SSAPMessageGenerator {
 	 * @param ontologia
 	 * @param idSuscripcion
 	 * @return
-	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateUnsubscribeMessage(String sessionKey, String ontologia, String idSuscripcion)throws NotJoinedException{
+	public SSAPMessage generateUnsubscribeMessage(String sessionKey, String ontologia, String idSuscripcion) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyUnsubscribeMessage body = new SSAPBodyUnsubscribeMessage();

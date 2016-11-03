@@ -30,8 +30,7 @@ import org.junit.Test;
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
-import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
+import com.indra.sofia2.ssap.kp.exceptions.UnsupportedSSAPMessageTypeException;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPBulkMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
@@ -99,7 +98,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testJoinByTokenLeave() throws ConnectionToSibException {
+	public void testJoinByTokenLeave() throws Exception {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -142,7 +141,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertNative()  throws ConnectionToSibException {
+	public void testInsertNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -177,7 +176,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative()  throws ConnectionToSibException {
+	public void testUpdateNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -210,7 +209,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testQueryNative() throws ConnectionToSibException {
+	public void testQueryNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -243,7 +242,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike() throws ConnectionToSibException {
+	public void testInsertSqlLike() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -279,7 +278,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike() throws ConnectionToSibException {
+	public void testUpdateSqlLike() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -313,7 +312,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySql() throws ConnectionToSibException {
+	public void testQuerySql() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -348,7 +347,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySqlBDC() throws ConnectionToSibException {
+	public void testQuerySqlBDC() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -382,7 +381,7 @@ public class KpMqttFuncional {
 	
 
 	@Test
-	public void testQueryBDC() throws ConnectionToSibException {
+	public void testQueryBDC() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -488,7 +487,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testBulk() throws ConnectionToSibException {
+	public void testBulk() throws Exception {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -550,7 +549,7 @@ public class KpMqttFuncional {
 		SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey, "Ontologia");
 		try{
 			msgBulk.addMessage(msgInsert1).addMessage(msgInsert2).addMessage(msgInsert3).addMessage(msgUpate1).addMessage(msgUpate2);
-		} catch(NotSupportedMessageTypeException e){
+		} catch(UnsupportedSSAPMessageTypeException e){
 			e.printStackTrace();
 		}
 		

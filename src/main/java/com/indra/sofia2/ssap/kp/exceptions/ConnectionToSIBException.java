@@ -15,19 +15,19 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class ConnectionToSibException extends Exception {
+public class ConnectionToSIBException extends Exception {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public ConnectionToSibException(String message){
+	public ConnectionToSIBException(String message){
 		super(message);
 	}
 	
-	public ConnectionToSibException(String message, Throwable e) {
+	public ConnectionToSIBException(String message, Throwable e) {
 		super(message, e);
 	}
 
-	public ConnectionToSibException(Throwable e) {
+	public ConnectionToSIBException(Throwable e) {
 		super(e);
 	}
 	

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
 
 /**
@@ -41,7 +41,7 @@ class MqttReceptionCallback {
 		this.kpMqttClient = kpMqttClient;
 	}
 
-	String get() throws ConnectionToSibException {
+	String get() throws ConnectionToSIBException, SSAPResponseTimeoutException {
 		try {
 			latch.await(kpMqttClient.getSsapResponseTimeout(), TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
@@ -58,7 +58,7 @@ class MqttReceptionCallback {
 						kpMqttClient.getMqttClientId());
 				log.error(errorMessage);
 				kpMqttClient.getInternetConnectionTester().testConnection();
-				throw new ConnectionToSibException(errorMessage);
+				throw new ConnectionToSIBException(errorMessage);
 			} else {
 				String errorMessage = String.format(
 						"The internal MQTT client %s has exceeded the SSAP response timeout (%s ms)",

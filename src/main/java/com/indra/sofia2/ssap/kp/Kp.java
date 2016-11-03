@@ -16,7 +16,8 @@
 package com.indra.sofia2.ssap.kp;
 
 import com.indra.sofia2.ssap.kp.config.ConnectionConfig;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 
 /**
@@ -38,7 +39,7 @@ public interface Kp {
 	 * aun no se ha enviado mensaje JOIN, sirve para conectar
 	 * si no hay conexion devuelve ConnectionToSibException con el error de la conexion
 	 */
-	void connect() throws ConnectionToSibException;
+	void connect() throws ConnectionToSIBException;
 	
 	/**
 	 * Hace la desconexion del protocolo físico
@@ -60,16 +61,16 @@ public interface Kp {
 	 * envia al SIB cualquier mensaje
 	 * @return
 	 */
-	SSAPMessage send(SSAPMessage msg) throws ConnectionToSibException;
+	SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException, SSAPResponseTimeoutException;
 	
 	/**
 	 * Envia al SIB un mensaje  cifrado con la clave
 	 * @param msg
 	 * @param cipherKey
 	 * @return
-	 * @throws ConnectionToSibException
+	 * @throws ConnectionToSIBException
 	 */
-	SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSibException;
+	SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSIBException, SSAPResponseTimeoutException;
 		
 	/**
 	 * Mecanismo para registrar un escuchador de notificaciones del SIB a suscripciones

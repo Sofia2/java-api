@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class SSAPResponseTimeoutException extends RuntimeException {
+public class SSAPResponseTimeoutException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 

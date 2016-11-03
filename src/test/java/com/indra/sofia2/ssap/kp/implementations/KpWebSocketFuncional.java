@@ -30,8 +30,7 @@ import org.junit.Test;
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
-import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
+import com.indra.sofia2.ssap.kp.exceptions.UnsupportedSSAPMessageTypeException;
 import com.indra.sofia2.ssap.kp.implementations.websockets.KpWebSocketClient;
 import com.indra.sofia2.ssap.ssap.SSAPBulkMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
@@ -88,7 +87,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testQueryBDC() throws ConnectionToSibException {
+	public void testQueryBDC() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -122,7 +121,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testJoinByTokenLeave() throws ConnectionToSibException {
+	public void testJoinByTokenLeave() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		log.info("Envia mensaje JOIN al SIB: "+msgJoin.toJson());
@@ -163,7 +162,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testInsertNative() throws ConnectionToSibException {
+	public void testInsertNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -198,7 +197,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative() throws ConnectionToSibException {
+	public void testUpdateNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -231,7 +230,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testQueryNative() throws ConnectionToSibException {
+	public void testQueryNative() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -264,7 +263,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike() throws ConnectionToSibException {
+	public void testInsertSqlLike() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -300,7 +299,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike() throws ConnectionToSibException {
+	public void testUpdateSqlLike() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -334,7 +333,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testQuerySql() throws ConnectionToSibException {
+	public void testQuerySql() throws Exception {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -441,7 +440,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testBulk() throws ConnectionToSibException {
+	public void testBulk() throws Exception {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -495,7 +494,7 @@ public class KpWebSocketFuncional {
 			msgBulk.addMessage(msgUpate2);
 			msgBulk.addMessage(msgDelete1);
 			
-		} catch (NotSupportedMessageTypeException e) {
+		} catch (UnsupportedSSAPMessageTypeException e) {
 			e.printStackTrace();
 		}
 		

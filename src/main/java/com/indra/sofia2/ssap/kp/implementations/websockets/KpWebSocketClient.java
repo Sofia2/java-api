@@ -40,7 +40,7 @@ import org.atmosphere.wasync.Socket.STATUS;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
 import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
 import com.indra.sofia2.ssap.kp.implementations.listener.KpConnectorEventListener;
@@ -113,7 +113,7 @@ public class KpWebSocketClient extends KpToExtend {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void connect() throws ConnectionToSibException {
+	public void connect() throws ConnectionToSIBException {
 		this.initializeIndicationPool();
 
 		OptionsBuilder newOptionsBuilder = this.client.newOptionsBuilder();
@@ -165,7 +165,7 @@ public class KpWebSocketClient extends KpToExtend {
                 }
             }).open(this.request.build(),this.config.getTimeOutConnectionSIB(), TimeUnit.MILLISECONDS);
 		}catch(Exception e){
-			throw new ConnectionToSibException(e);
+			throw new ConnectionToSIBException(e);
 		}
 	}
 	
@@ -184,7 +184,7 @@ public class KpWebSocketClient extends KpToExtend {
 	}
 
 	@Override
-	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSibException {
+	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException, SSAPResponseTimeoutException {
 		try {
 
 			//Send the message to Server
@@ -201,13 +201,13 @@ public class KpWebSocketClient extends KpToExtend {
 			 return responseSsap;
 			
 		} catch (IOException e) {
-			throw new ConnectionToSibException(e);
+			throw new ConnectionToSIBException(e);
 		}
 	}
 
 	@Override
 	public SSAPMessage sendCipher(SSAPMessage msg)
-			throws ConnectionToSibException {
+			throws ConnectionToSIBException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -223,7 +223,7 @@ public class KpWebSocketClient extends KpToExtend {
 
         private String response;
 
-        String get() {
+        String get() throws SSAPResponseTimeoutException {
           try {
             latch.await(ssapResponseTimeout, TimeUnit.MILLISECONDS);
           } catch (InterruptedException e) {

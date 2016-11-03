@@ -35,7 +35,7 @@ import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.encryption.XXTEA;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.DnsResolutionException;
 import com.indra.sofia2.ssap.kp.exceptions.SSLContextInitializationError;
 import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
@@ -116,7 +116,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Creates a MQTT client and connects it to the MQTT server in SIB
 	 */
 	@Override
-	public void connect() throws ConnectionToSibException {
+	public void connect() throws ConnectionToSIBException {
 
 		String sibAddress = null;
 		try {
@@ -162,14 +162,14 @@ public class KpMQTTClient extends KpToExtend {
 					sibAddress, config.getPortSIB());
 			log.error(errorMessage, e);
 			this.disconnect();
-			throw new ConnectionToSibException(errorMessage, e);
+			throw new ConnectionToSIBException(errorMessage, e);
 		} catch (Exception e) {
 			String errorMessage = String.format("Unable to connnect the internal MQTT client to the SIB server %s:%s.",
 					sibAddress, config.getPortSIB());
 			log.error(errorMessage, e);
 			this.disconnect();
 			internetConnectionTester.testConnection();
-			throw new ConnectionToSibException(errorMessage, e);
+			throw new ConnectionToSIBException(errorMessage, e);
 		}
 	}
 
@@ -268,7 +268,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Subscribe the MQTT client to the topics that the SIB will use to notify
 	 * messages from SIB
 	 */
-	private void subscribeToSibMqttTopics() throws ConnectionToSibException {
+	private void subscribeToSibMqttTopics() throws ConnectionToSIBException {
 		
 		subscribeToMqttTopic(MqttConstants.getSsapResponseMqttTopic(mqttClientId));
 		subscribeToMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
@@ -297,7 +297,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Send a SSAP message to the server, and returns the response
 	 */
 	@Override
-	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSibException {
+	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException {
 		if (log.isDebugEnabled()){
 			log.debug(String.format("Sending SSAP message to the SIB server using the internal MQTT client %s. Payload=%s.",
 					mqttClientId, msg.toJson()));
@@ -337,7 +337,7 @@ public class KpMQTTClient extends KpToExtend {
 			log.error(errorMessage, e);
 			responseCallback = null;
 			internetConnectionTester.testConnection();
-			throw new ConnectionToSibException(errorMessage, e);
+			throw new ConnectionToSIBException(errorMessage, e);
 		}
 	}
 
@@ -345,7 +345,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Send a SSAP message to the server, and returns the response
 	 */
 	@Override
-	public SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSibException {
+	public SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSIBException {
 		if (log.isDebugEnabled()){
 			log.debug(String.format("Sending cyphered SSAP message to the SIB server using the internal MQTT client %s. Payload=%s.",
 					mqttClientId, msg.toJson()));
@@ -400,7 +400,7 @@ public class KpMQTTClient extends KpToExtend {
 			String errorMessage = String.format("Unable to send SSAP message to the SIB server using internal MQTT client %s. Payload=%s.", 
 					mqttClientId, msg.toJson());
 			log.error(errorMessage, e);
-			throw new ConnectionToSibException(errorMessage, e);
+			throw new ConnectionToSIBException(errorMessage, e);
 		}
 	}
 
@@ -426,7 +426,7 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	
 	private void configureMqttClient(MQTTConnectionConfig cfg, String sibAddress)
-			throws SSLContextInitializationError, ConnectionToSibException, URISyntaxException {
+			throws SSLContextInitializationError, ConnectionToSIBException, URISyntaxException {
 		if (mqttClient == null) {
 			mqttClient = new MQTT();
 			String username = cfg.getUser();
@@ -509,7 +509,7 @@ public class KpMQTTClient extends KpToExtend {
 		return mqttClientId;
 	}
 	
-	private void subscribeToMqttTopic(String topicName) throws ConnectionToSibException {
+	private void subscribeToMqttTopic(String topicName) throws ConnectionToSIBException {
 		Future<byte[]> subscribeFuture = null;
 
 		// Subscription to topic for ssap response messages
@@ -531,7 +531,7 @@ public class KpMQTTClient extends KpToExtend {
 					"Unable to subscribe internal MQTT client %s to the SIB MQTT topic %s with QoS=%s. The connection process will be aborted.",
 					mqttClientId, topicName, qosLevel);
 			log.error(errorMessage, e);
-			throw new ConnectionToSibException(errorMessage, e);
+			throw new ConnectionToSIBException(errorMessage, e);
 		}
 	}
 	

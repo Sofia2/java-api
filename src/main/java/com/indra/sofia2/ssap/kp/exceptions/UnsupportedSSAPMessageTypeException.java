@@ -15,19 +15,19 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class NotSupportedMessageTypeException extends Exception {
+public class UnsupportedSSAPMessageTypeException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public NotSupportedMessageTypeException(String message) {
+	public UnsupportedSSAPMessageTypeException(String message) {
 		super(message);
 	}
 
-	public NotSupportedMessageTypeException(String message, Exception e) {
+	public UnsupportedSSAPMessageTypeException(String message, Exception e) {
 		super(message, e);
 	}
 
-	public NotSupportedMessageTypeException(Exception e) {
+	public UnsupportedSSAPMessageTypeException(Exception e) {
 		super(e);
 	}
 

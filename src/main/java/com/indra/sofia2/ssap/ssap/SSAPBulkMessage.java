@@ -22,7 +22,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
+import com.indra.sofia2.ssap.kp.exceptions.UnsupportedSSAPMessageTypeException;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkItem;
 
 @JsonIgnoreProperties("body_asCollection")
@@ -35,9 +35,8 @@ public class SSAPBulkMessage extends SSAPMessage {
 		body_asCollection = new ArrayList<SSAPBodyBulkItem>();
 	}
 	
-	public SSAPBulkMessage addMessage(SSAPMessage ssapMessage) throws NotSupportedMessageTypeException{
+	public SSAPBulkMessage addMessage(SSAPMessage ssapMessage) throws UnsupportedSSAPMessageTypeException {
 		this.checkMessageType(ssapMessage.getMessageType());
-		
 		SSAPBodyBulkItem item=new SSAPBodyBulkItem();
 		item.setType(ssapMessage.getMessageType());
 		item.setBody(ssapMessage.getBody());
@@ -47,7 +46,7 @@ public class SSAPBulkMessage extends SSAPMessage {
 		
 	}
 	
-	public void addMessage(List<SSAPMessage> ssapMessages) throws NotSupportedMessageTypeException{
+	public void addMessage(List<SSAPMessage> ssapMessages) throws UnsupportedSSAPMessageTypeException {
 		for(SSAPMessage ssapMessage:ssapMessages){
 			this.checkMessageType(ssapMessage.getMessageType());
 			SSAPBodyBulkItem item=new SSAPBodyBulkItem();
@@ -58,9 +57,9 @@ public class SSAPBulkMessage extends SSAPMessage {
 		}
 	}
 	
-	private void checkMessageType(SSAPMessageTypes type) throws NotSupportedMessageTypeException {
+	private void checkMessageType(SSAPMessageTypes type) throws UnsupportedSSAPMessageTypeException {
 		if (type != SSAPMessageTypes.INSERT && type != SSAPMessageTypes.UPDATE && type != SSAPMessageTypes.DELETE) {
-			throw new NotSupportedMessageTypeException(
+			throw new UnsupportedSSAPMessageTypeException(
 					"Message type: " + type + " is not supported by SSAPBulkMessage");
 		}
 	}
