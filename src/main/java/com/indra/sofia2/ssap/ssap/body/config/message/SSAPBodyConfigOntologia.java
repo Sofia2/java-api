@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBodyConfigOntologia {
 	private String identificacion;
@@ -57,7 +58,7 @@ public class SSAPBodyConfigOntologia {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static String toJsonArray(Collection<SSAPBodyConfigOntologia> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
@@ -66,12 +67,19 @@ public class SSAPBodyConfigOntologia {
 		}
 	}
 
-	public static SSAPBodyConfigOntologia fromJsonToSSAPBodyConfigOntologia(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyConfigOntologia.class);
+	public static SSAPBodyConfigOntologia fromJsonToSSAPBodyConfigOntologia(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyConfigOntologia.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBodyConfigOntologia> fromJsonArrayToSSAPBodyConfigOntologia(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigOntologia>>(){});
+	public static Collection<SSAPBodyConfigOntologia> fromJsonArrayToSSAPBodyConfigOntologia(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigOntologia>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

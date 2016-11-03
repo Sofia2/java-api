@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,18 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap;
 
-
 public enum SSAPQueryType {
 	/*
 	 * Tipo de motor de persistencia sobre la que se ralizara la operacion
 	 */
-	NATIVE,
-	SQLLIKE,
-	SIB_DEFINED,  //predefined queries
-	CEP,
-	BDH,
-	BDC;
-	
-	public String value() {
-        return name();
-    }
+	NATIVE, SQLLIKE, SIB_DEFINED, // predefined queries
+	CEP, BDH, BDC;
 
-    public static SSAPQueryType fromValue(String v) {
-        return valueOf(v);
-    }
+	public String value() {
+		return name();
+	}
+
+	public static SSAPQueryType fromValue(String v) {
+		return valueOf(v);
+	}
 }

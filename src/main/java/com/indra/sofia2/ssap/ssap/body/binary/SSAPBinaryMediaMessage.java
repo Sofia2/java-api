@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 import com.indra.sofia2.ssap.ssap.binary.Encoding;
 import com.indra.sofia2.ssap.ssap.binary.Storage;
 
@@ -41,30 +42,34 @@ public class SSAPBinaryMediaMessage {
 	 * Mime asociado al fichero
 	 */
 	private String mime;
-	
+
 	public String getName() {
 		return name;
 	}
+
 	public Encoding getBinaryEncoding() {
 		return binaryEncoding;
 	}
+
 	public String getMime() {
 		return mime;
 	}
+
 	public Storage getStorageArea() {
 		return storageArea;
 	}
-	protected SSAPBinaryMediaMessage(){
-		
+
+	protected SSAPBinaryMediaMessage() {
+
 	}
-	
-	public SSAPBinaryMediaMessage(String name, Storage storageArea, Encoding binaryEncoding, String mime){
-		this.name=name;
-		this.storageArea=storageArea;
-		this.binaryEncoding=binaryEncoding;
-		this.mime=mime;
+
+	public SSAPBinaryMediaMessage(String name, Storage storageArea, Encoding binaryEncoding, String mime) {
+		this.name = name;
+		this.storageArea = storageArea;
+		this.binaryEncoding = binaryEncoding;
+		this.mime = mime;
 	}
-	
+
 	public String toJson() {
 		try {
 			return new ObjectMapper().writeValueAsString(this);
@@ -72,7 +77,7 @@ public class SSAPBinaryMediaMessage {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static String toJsonArray(Collection<SSAPBinaryMediaMessage> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
@@ -80,13 +85,20 @@ public class SSAPBinaryMediaMessage {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static SSAPBinaryMediaMessage fromJsonToSSAPBinaryMediaMessage(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBinaryMediaMessage.class);
+
+	public static SSAPBinaryMediaMessage fromJsonToSSAPBinaryMediaMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBinaryMediaMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBinaryMediaMessage> fromJsonArrayToSSAPBinaryMediaMessage(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBinaryMediaMessage>>(){});
+	public static Collection<SSAPBinaryMediaMessage> fromJsonArrayToSSAPBinaryMediaMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBinaryMediaMessage>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

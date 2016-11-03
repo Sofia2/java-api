@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.indra.sofia2.ssap.ssap;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,7 +36,6 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyQueryWithParamMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodySubscribeMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyUnsubscribeMessage;
 import com.indra.sofia2.ssap.ssap.body.binary.SSAPBinaryMessage;
-
 
 public class SSAPMessageGenerator {
 
@@ -163,11 +161,7 @@ public class SSAPMessageGenerator {
 					json.append("\",\"name\":\"");
 					json.append(media.get("name"));
 					json.append("\"}}");
-					try {
-						return SSAPBinaryMessage.fromJsonToSSAPBinaryMessage(json.toString());
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
+					return SSAPBinaryMessage.fromJsonToSSAPBinaryMessage(json.toString());
 				}else{
 					SSAPBinaryMessage binaryMessage = subAnalize(((Map<String,Object>)jsonElement.getValue()), binary);
 					if (binaryMessage!=null){

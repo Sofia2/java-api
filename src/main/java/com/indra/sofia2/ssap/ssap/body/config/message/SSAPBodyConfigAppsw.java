@@ -21,6 +21,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBodyConfigAppsw {
 	private String identificacion;
@@ -68,7 +69,7 @@ public class SSAPBodyConfigAppsw {
 	public void setPropiedadescfg(Map<String, String> propiedadescfg) {
 		this.propiedadescfg = propiedadescfg;
 	}
-	
+
 	public String toJson() {
 		try {
 			return new ObjectMapper().writeValueAsString(this);
@@ -76,7 +77,7 @@ public class SSAPBodyConfigAppsw {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static String toJsonArray(Collection<SSAPBodyConfigAppsw> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
@@ -85,12 +86,19 @@ public class SSAPBodyConfigAppsw {
 		}
 	}
 
-	public static SSAPBodyConfigAppsw fromJsonToSSAPBodyConfigAppsw(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyConfigAppsw.class);
+	public static SSAPBodyConfigAppsw fromJsonToSSAPBodyConfigAppsw(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyConfigAppsw.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBodyConfigAppsw> fromJsonArrayToSSAPBodyConfigAppsws(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigAppsw>>(){});
+	public static Collection<SSAPBodyConfigAppsw> fromJsonArrayToSSAPBodyConfigAppsws(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigAppsw>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

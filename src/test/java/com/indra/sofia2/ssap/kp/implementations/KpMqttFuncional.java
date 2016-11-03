@@ -1,8 +1,17 @@
 /*******************************************************************************
- * © Indra Sistemas, S.A.
- * 2013 - 2014  SPAIN
- * 
- * All rights reserved
+ * Copyright 2013-16 Indra Sistemas S.A.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.implementations;
 
@@ -10,8 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -91,7 +98,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testJoinByTokenLeave() throws IOException {
+	public void testJoinByTokenLeave() {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -134,7 +141,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertNative() throws IOException {
+	public void testInsertNative() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -169,7 +176,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative() throws IOException {
+	public void testUpdateNative() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -202,7 +209,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testQueryNative() throws IOException {
+	public void testQueryNative() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -235,7 +242,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike() throws IOException {
+	public void testInsertSqlLike() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -271,7 +278,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike() throws IOException {
+	public void testUpdateSqlLike() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -305,7 +312,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySql() throws IOException {
+	public void testQuerySql() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -340,7 +347,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySqlBDC() throws IOException {
+	public void testQuerySqlBDC() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -374,7 +381,7 @@ public class KpMqttFuncional {
 	
 
 	@Test
-	public void testQueryBDC() throws IOException {
+	public void testQueryBDC() {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -429,12 +436,10 @@ public class KpMqttFuncional {
 				
 				KpMqttFuncional.indicationReceived=true;
 			
-				try {
-					SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
-					assertNotSame(indicationMessage.getData(), null);
-					assertTrue(indicationMessage.isOk());
-					assertSame(indicationMessage.getError(), null);
-				} catch (IOException e) {}
+				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
+				assertNotSame(indicationMessage.getData(), null);
+				assertTrue(indicationMessage.isOk());
+				assertSame(indicationMessage.getError(), null);
 			}
 		});
 		
@@ -482,7 +487,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testBulk() throws IOException {
+	public void testBulk() {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);

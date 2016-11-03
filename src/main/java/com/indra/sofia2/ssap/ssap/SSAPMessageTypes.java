@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
-
-
-@XmlType(name = "ssapMessageTypes", namespace = "")
-@XmlEnum
 public enum SSAPMessageTypes {
 	/*
 	 * Transacciones para logado y logout en SIB

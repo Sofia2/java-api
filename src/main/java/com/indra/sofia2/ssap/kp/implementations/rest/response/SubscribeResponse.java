@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 /**
  * <p>
@@ -88,13 +89,20 @@ public class SubscribeResponse extends CommonResponse implements Serializable {
 		}
 	}
 
-	public static SubscribeResponse fromJsonToConfigResponse(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SubscribeResponse.class);
+	public static SubscribeResponse fromJsonToConfigResponse(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SubscribeResponse.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SubscribeResponse> fromJsonArrayToConfigResponses(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SubscribeResponse>>(){});
+	public static Collection<SubscribeResponse> fromJsonArrayToConfigResponses(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SubscribeResponse>>(){});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 	public String toString() {

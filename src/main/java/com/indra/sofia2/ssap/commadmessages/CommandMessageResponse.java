@@ -21,7 +21,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class CommandMessageResponse {
 
@@ -60,7 +60,7 @@ public class CommandMessageResponse {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static String toJsonArray(Collection<CommandMessageResponse> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
@@ -69,17 +69,21 @@ public class CommandMessageResponse {
 		}
 	}
 
-	public static CommandMessageResponse fromJsonToCommandMessageResponse(String json) throws IOException {
+	public static CommandMessageResponse fromJsonToCommandMessageResponse(String json) {
 		try {
 			return new ObjectMapper().readValue(json, CommandMessageResponse.class);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new SSAPMessageDeserializationError(e);
 		}
 	}
 
-	public static Collection<CommandMessageResponse> fromJsonArrayToCommandMessageResponses(String json)
-			throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<List<CommandMessageResponse>>() {});
+	public static Collection<CommandMessageResponse> fromJsonArrayToCommandMessageResponses(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<List<CommandMessageResponse>>() {
+			});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 }

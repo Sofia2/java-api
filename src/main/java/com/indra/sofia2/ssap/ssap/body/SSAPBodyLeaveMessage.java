@@ -18,6 +18,7 @@ package com.indra.sofia2.ssap.ssap.body;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 /**
  * Implementacion de JoinMessage con usuario y password
@@ -34,8 +35,12 @@ public class SSAPBodyLeaveMessage extends SSAPBodyJoinMessage {
 		}
 	}
 
-	public static SSAPBodyLeaveMessage fromJsonToSSAPBodyLeaveMessage(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyLeaveMessage.class);
+	public static SSAPBodyLeaveMessage fromJsonToSSAPBodyLeaveMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyLeaveMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 }

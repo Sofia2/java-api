@@ -20,30 +20,31 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
 
 public class SSAPBodyBulkItem {
-	
+
 	private SSAPMessageTypes type;
 	private String body;
 	private String ontology;
-	
+
 	public SSAPMessageTypes getType() {
 		return type;
 	}
-	
+
 	public void setType(SSAPMessageTypes type) {
 		this.type = type;
 	}
-	
+
 	public String getBody() {
 		return body;
 	}
-	
+
 	public void setBody(String body) {
 		this.body = body;
 	}
-	
+
 	public String getOntology() {
 		return ontology;
 	}
@@ -59,9 +60,8 @@ public class SSAPBodyBulkItem {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static String toJsonArray(
-			Collection<SSAPBodyBulkItem> collection) {
+
+	public static String toJsonArray(Collection<SSAPBodyBulkItem> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
 		} catch (IOException e) {
@@ -69,12 +69,20 @@ public class SSAPBodyBulkItem {
 		}
 	}
 
-	public static SSAPBodyBulkItem fromJsonToSSAPBodyBulkItem(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyBulkItem.class);
+	public static SSAPBodyBulkItem fromJsonToSSAPBodyBulkItem(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyBulkItem.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBodyBulkItem> fromJsonArrayToSSAPBodyBulkItems(String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyBulkItem>>(){});
+	public static Collection<SSAPBodyBulkItem> fromJsonArrayToSSAPBodyBulkItems(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyBulkItem>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 }

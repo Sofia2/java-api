@@ -18,6 +18,7 @@ package com.indra.sofia2.ssap.ssap.body;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBodyUnsubscribeMessage extends SSAPBodyMessage {
 
@@ -39,10 +40,14 @@ public class SSAPBodyUnsubscribeMessage extends SSAPBodyMessage {
 		}
 	}
 
-	public static SSAPBodyUnsubscribeMessage fromJsonToSSAPBodyUnsubscribeMessage(String json) throws IOException {
+	public static SSAPBodyUnsubscribeMessage fromJsonToSSAPBodyUnsubscribeMessage(String json) {
 		ObjectMapper objMapper = new ObjectMapper();
 		objMapper.enableDefaultTyping();
-		return objMapper.readValue(json, SSAPBodyUnsubscribeMessage.class);
+		try {
+			return objMapper.readValue(json, SSAPBodyUnsubscribeMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 }

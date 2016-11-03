@@ -1,11 +1,19 @@
 /*******************************************************************************
- * © Indra Sistemas, S.A.
- * 2013 - 2014  SPAIN
- * 
- * All rights reserved
+ * Copyright 2013-16 Indra Sistemas S.A.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.implementations;
-
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,8 +31,6 @@ import com.indra.sofia2.ssap.kp.implementations.rest.SSAPResourceAPI;
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
 import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
-
-
 public class KpGatewayRestFuncional {
 	
 	private static Log log = LogFactory.getLog(KpGatewayRestFuncional.class);
@@ -37,7 +43,7 @@ public class KpGatewayRestFuncional {
 	private final static String ONTOLOGY_NAME = "TestSensorTemperatura";
 	private final static String ONTOLOGY_INSTANCE = "{ \"Sensor\": { \"geometry\": { \"coordinates\": [ 40.512967, -3.67495 ], \"type\": \"Point\" }, \"assetId\": \"S_Temperatura_00066\", \"measure\": 25, \"timestamp\": { \"$date\": \"2014-04-29T08:24:54.005Z\"}}}";
 	
-	private final static String COMMAND_REQ_INSTANCE= "{\"Request\":{ \"commandId\":\"string\",\"timestamp\":{\"$date\": \"2014-01-30T17:14:00Z\"},\"assetId\":\"miassedt\",\"signalId\":\"string\",\"assetSource\":\"string\",\"targetKpInstance\":\"string\",\"requestId\":\"string\",\"instancekp\":\"string\",\"command\":{\"type\":\"SEND\",\"unit\":\"string\",\"signal\":\"ACTIVEPOWER\",\"value1\":\"string\",\"value2\":\"string\",\"value3\":\"string\",\"valuelist\":[\"string\"]},\"description\":\"string\"}}";
+//	private final static String COMMAND_REQ_INSTANCE= "{\"Request\":{ \"commandId\":\"string\",\"timestamp\":{\"$date\": \"2014-01-30T17:14:00Z\"},\"assetId\":\"miassedt\",\"signalId\":\"string\",\"assetSource\":\"string\",\"targetKpInstance\":\"string\",\"requestId\":\"string\",\"instancekp\":\"string\",\"command\":{\"type\":\"SEND\",\"unit\":\"string\",\"signal\":\"ACTIVEPOWER\",\"value1\":\"string\",\"value2\":\"string\",\"value3\":\"string\",\"valuelist\":[\"string\"]},\"description\":\"string\"}}";
 	
 //	private final static String ONTOLOGY_NAME = "feedBiciCoruna";
 //	private final static String ONTOLOGY_INSTANCE = "{\"Feed\": {\"assetId\": \"10\", \"assetName\": \"Estaci\u00f3n Autobuses\", \"assetSource\": \"BiciCoruna\", \"assetType\": \"\", \"attribs\": [{\"name\": \"nombre\", \"value\": \"Estaci\u00f3n Autobuses\"}, {\"name\": \"direccion\", \"value\": \"Estaci\u00f3n autobuses\"}, {\"name\": \"horaDeInicio\", \"value\": \"7:30\"}, {\"name\": \"horaDeFin\", \"value\": \"22:30\"}], \"feedId\": \"feed_10_2015-05-07T15:10:00\", \"feedSource\": \"BiciCoruna\", \"geometry\": {\"coordinates\": [-8.406013488769531, 43.353599548339844], \"type\": \"Point\"}, \"measures\": [{\"desc\": \"Total de Puestos\", \"measure\": \"16\", \"method\": \"REAL\", \"name\": \"PuestosActivos\", \"unit\": \"u\"}, {\"desc\": \"Bicicletas disponibles\", \"measure\": \"12\", \"method\": \"REAL\", \"name\": \"BicisDisponibles\", \"unit\": \"u\"}], \"measuresPeriod\": 60, \"measuresPeriodUnit\": \"s\", \"measuresTimestamp\": {\"$date\": \"2015-05-07T15:10:00.835Z\"}, \"measuresType\": \"INSTANT\", \"timestamp\": {\"$date\": \"2015-05-07T15:10:00.835Z\"}, \"type\": \"VIRTUAL\"}}";

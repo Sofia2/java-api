@@ -15,19 +15,19 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class SSAPResponseTimeoutException extends RuntimeException {
+public class SSAPMessageDeserializationError extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public SSAPResponseTimeoutException(String message) {
+	public SSAPMessageDeserializationError(String message) {
 		super(message);
 	}
 
-	public SSAPResponseTimeoutException(String message, Exception e) {
+	public SSAPMessageDeserializationError(String message, Exception e) {
 		super(message, e);
 	}
 
-	public SSAPResponseTimeoutException(Exception e) {
+	public SSAPMessageDeserializationError(Exception e) {
 		super(e);
 	}
 

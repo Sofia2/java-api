@@ -18,6 +18,7 @@ package com.indra.sofia2.ssap.ssap.body;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 
 public class SSAPBodyOperationMessage extends SSAPBodyMessage {
@@ -66,7 +67,11 @@ public class SSAPBodyOperationMessage extends SSAPBodyMessage {
 		}
 	}
 
-	public static SSAPBodyOperationMessage fromJsonToSSAPBodyOperationMessage(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyOperationMessage.class);
+	public static SSAPBodyOperationMessage fromJsonToSSAPBodyOperationMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyOperationMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

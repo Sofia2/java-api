@@ -15,12 +15,12 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-@SuppressWarnings("serial")
-public class NotJoinedException extends RuntimeException{
+public class NotJoinedException extends RuntimeException {
 
-	public NotJoinedException(Exception e){
+	private static final long serialVersionUID = 1L;
+
+	public NotJoinedException(Exception e) {
 		super(e);
 	}
-	
-	
+
 }

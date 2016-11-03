@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBodyBulkReturnMessage {
 
@@ -58,9 +59,8 @@ public class SSAPBodyBulkReturnMessage {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static String toJsonArray(
-			Collection<SSAPBodyBulkReturnMessage> collection) {
+
+	public static String toJsonArray(Collection<SSAPBodyBulkReturnMessage> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
 		} catch (IOException e) {
@@ -68,13 +68,21 @@ public class SSAPBodyBulkReturnMessage {
 		}
 	}
 
-	public static SSAPBodyBulkReturnMessage fromJsonToSSAPBodyBulkReturnMessage(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyBulkReturnMessage.class);
+	public static SSAPBodyBulkReturnMessage fromJsonToSSAPBodyBulkReturnMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyBulkReturnMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
+
 	}
 
-	public static Collection<SSAPBodyBulkReturnMessage> fromJsonArrayToSSAPBodyBulkReturnMessage(String json)
-			throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyBulkReturnMessage>>(){});
+	public static Collection<SSAPBodyBulkReturnMessage> fromJsonArrayToSSAPBodyBulkReturnMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyBulkReturnMessage>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
-	
+
 }

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigAppsw;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigAsset;
 import com.indra.sofia2.ssap.ssap.body.config.message.SSAPBodyConfigOntologia;
@@ -32,9 +33,9 @@ public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 	private String instanciaKp;
 
 	private String token;
-	
+
 	private String assetService;
-	
+
 	private HashMap<String, String> assetServiceParam;
 
 	private List<SSAPBodyConfigAppsw> lappsw;
@@ -72,7 +73,7 @@ public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 	public String getAssetService() {
 		return assetService;
 	}
-	
+
 	public void setAssetService(String assetService) {
 		this.assetService = assetService;
 	}
@@ -80,11 +81,11 @@ public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 	public HashMap<String, String> getAssetServiceParam() {
 		return assetServiceParam;
 	}
-	
+
 	public void setAssetServiceParam(HashMap<String, String> assetServiceParam) {
 		this.assetServiceParam = assetServiceParam;
 	}
-	
+
 	public List<SSAPBodyConfigAppsw> getLappsw() {
 		return lappsw;
 	}
@@ -125,7 +126,11 @@ public class SSAPBodyConfigMessage extends SSAPBodyMessage {
 		}
 	}
 
-	public static SSAPBodyConfigMessage fromJsonToSSAPBodyConfigMessage(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyConfigMessage.class);
+	public static SSAPBodyConfigMessage fromJsonToSSAPBodyConfigMessage(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyConfigMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

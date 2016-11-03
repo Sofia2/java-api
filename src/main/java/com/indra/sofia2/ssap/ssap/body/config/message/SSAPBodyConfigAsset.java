@@ -21,6 +21,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBodyConfigAsset {
 	private String identificacion;
@@ -104,12 +105,19 @@ public class SSAPBodyConfigAsset {
 		}
 	}
 
-	public static SSAPBodyConfigAsset fromJsonToSSAPBodyConfigAsset(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyConfigAsset.class);
+	public static SSAPBodyConfigAsset fromJsonToSSAPBodyConfigAsset(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBodyConfigAsset.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBodyConfigAsset> fromJsonArrayToSSAPBodyConfigAsset(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigAsset>>(){});
+	public static Collection<SSAPBodyConfigAsset> fromJsonArrayToSSAPBodyConfigAsset(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBodyConfigAsset>>(){});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 }

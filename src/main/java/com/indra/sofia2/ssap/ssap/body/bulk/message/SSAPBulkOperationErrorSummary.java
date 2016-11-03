@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 public class SSAPBulkOperationErrorSummary {
 
@@ -41,7 +42,7 @@ public class SSAPBulkOperationErrorSummary {
 	public void setResponseBody(String responseBody) {
 		this.responseBody = responseBody;
 	}
-	
+
 	public String toJson() {
 		try {
 			return new ObjectMapper().writeValueAsString(this);
@@ -49,9 +50,8 @@ public class SSAPBulkOperationErrorSummary {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static String toJsonArray(
-			Collection<SSAPBulkOperationErrorSummary> collection) {
+
+	public static String toJsonArray(Collection<SSAPBulkOperationErrorSummary> collection) {
 		try {
 			return new ObjectMapper().writeValueAsString(collection);
 		} catch (IOException e) {
@@ -59,13 +59,20 @@ public class SSAPBulkOperationErrorSummary {
 		}
 	}
 
-	public static SSAPBulkOperationErrorSummary fromJsonToSSAPBulkOperationErrorSummary(String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBulkOperationErrorSummary.class);
+	public static SSAPBulkOperationErrorSummary fromJsonToSSAPBulkOperationErrorSummary(String json) {
+		try {
+			return new ObjectMapper().readValue(json, SSAPBulkOperationErrorSummary.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<SSAPBulkOperationErrorSummary> fromJsonArrayToSSAPBulkOperationErrorSummary(String json)
-			throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBulkOperationErrorSummary>>(){});
+	public static Collection<SSAPBulkOperationErrorSummary> fromJsonArrayToSSAPBulkOperationErrorSummary(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBulkOperationErrorSummary>>() {});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 }

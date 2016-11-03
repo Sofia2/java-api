@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "config_response")
@@ -63,13 +64,20 @@ public class ConfigResponse extends CommonResponse implements Serializable {
 		}
 	}
 
-	public static ConfigResponse fromJsonToConfigResponse(String json) throws IOException {
-		return new ObjectMapper().readValue(json, ConfigResponse.class);
+	public static ConfigResponse fromJsonToConfigResponse(String json) {
+		try {
+			return new ObjectMapper().readValue(json, ConfigResponse.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
-	public static Collection<ConfigResponse> fromJsonArrayToConfigResponses(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, new TypeReference<Collection<ConfigResponse>>(){});
+	public static Collection<ConfigResponse> fromJsonArrayToConfigResponses(String json) {
+		try {
+			return new ObjectMapper().readValue(json, new TypeReference<Collection<ConfigResponse>>(){});
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 	public String toString() {

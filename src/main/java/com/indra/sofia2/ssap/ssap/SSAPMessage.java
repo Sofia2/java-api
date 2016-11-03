@@ -18,24 +18,14 @@ package com.indra.sofia2.ssap.ssap;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.indra.sofia2.ssap.kp.exceptions.SSAPMessageDeserializationError;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "ssapmessage")
-@XmlType(name = "ssapmessage")
 public class SSAPMessage implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/*
@@ -127,10 +117,14 @@ public class SSAPMessage implements Serializable {
 		}
 	}
 
-	public static SSAPMessage fromJsonToSSAPMessage(String json) throws IOException {
+	public static SSAPMessage fromJsonToSSAPMessage(String json) {
 		ObjectMapper objMapper = new ObjectMapper();
 		objMapper.enableDefaultTyping();
-		return objMapper.readValue(json, SSAPMessage.class);
+		try {
+			return objMapper.readValue(json, SSAPMessage.class);
+		} catch (IOException e) {
+			throw new SSAPMessageDeserializationError(e);
+		}
 	}
 
 	public String toString() {
