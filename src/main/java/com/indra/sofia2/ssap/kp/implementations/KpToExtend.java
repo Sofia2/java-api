@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,9 @@ import com.indra.sofia2.ssap.kp.Listener4SIBCommandMessageNotifications;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.ConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
-import com.indra.sofia2.ssap.kp.implementations.tcpip.connector.IConnectorMessageListener;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 
-public abstract class KpToExtend implements Kp, IConnectorMessageListener {
+public abstract class KpToExtend implements Kp {
 
 	protected static Log log = LogFactory.getLog(KpToExtend.class);
 
@@ -181,10 +180,6 @@ public abstract class KpToExtend implements Kp, IConnectorMessageListener {
 		this.connectionEventsListener = null;
 	}
 	
-	@Override
-	public void messageReceived(byte[] message) {
-	}
-
 	protected void executeIndicationTasks(Collection<IndicationTask> indicationTasks) {
 		for (IndicationTask task : indicationTasks) {
 			this.indicationThreadPool.submit(task);

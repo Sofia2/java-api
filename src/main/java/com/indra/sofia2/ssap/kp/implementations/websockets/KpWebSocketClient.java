@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,13 +231,6 @@ public class KpWebSocketClient extends KpToExtend {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public void messageReceived(byte[] message) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 
 	/**
      * Internal class to receive the synchronous notifications for SSAP messages
