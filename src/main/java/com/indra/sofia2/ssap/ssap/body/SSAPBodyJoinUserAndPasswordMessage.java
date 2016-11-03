@@ -60,7 +60,7 @@ public class SSAPBodyJoinUserAndPasswordMessage extends SSAPBodyJoinMessage {
 		}
 	}
 
-	public static SSAPBodyJoinUserAndPasswordMessage fromJsonToSSAPBodyJoinTokenMessage(String json)
+	public static SSAPBodyJoinUserAndPasswordMessage fromJsonToSSAPBodyJoinUserAndPasswordMessage(String json)
 			throws IOException {
 		ObjectMapper objMapper = new ObjectMapper();
 		objMapper.enableDefaultTyping();
