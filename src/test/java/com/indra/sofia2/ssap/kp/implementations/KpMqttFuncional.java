@@ -91,7 +91,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testJoinByTokenLeave(){
+	public void testJoinByTokenLeave() throws IOException {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -134,7 +134,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertNative(){
+	public void testInsertNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -169,7 +169,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative(){
+	public void testUpdateNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -202,7 +202,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testQueryNative(){
+	public void testQueryNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -235,7 +235,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike(){
+	public void testInsertSqlLike() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -271,7 +271,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike(){
+	public void testUpdateSqlLike() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -305,7 +305,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySql(){
+	public void testQuerySql() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -340,7 +340,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySqlBDC(){
+	public void testQuerySqlBDC() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -374,7 +374,7 @@ public class KpMqttFuncional {
 	
 
 	@Test
-	public void testQueryBDC(){
+	public void testQueryBDC() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -411,7 +411,7 @@ public class KpMqttFuncional {
 	public static boolean indicationReceived=false;
 	
 	@Test
-	public void testSubscribeUnsubscribe() throws Exception{
+	public void testSubscribeUnsubscribe() throws Exception {
 		
 		//Hace JOIN al SIB
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -429,12 +429,12 @@ public class KpMqttFuncional {
 				
 				KpMqttFuncional.indicationReceived=true;
 			
-				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
-				
-				assertNotSame(indicationMessage.getData(), null);
-				assertTrue(indicationMessage.isOk());
-				assertSame(indicationMessage.getError(), null);
-				
+				try {
+					SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
+					assertNotSame(indicationMessage.getData(), null);
+					assertTrue(indicationMessage.isOk());
+					assertSame(indicationMessage.getError(), null);
+				} catch (IOException e) {}
 			}
 		});
 		

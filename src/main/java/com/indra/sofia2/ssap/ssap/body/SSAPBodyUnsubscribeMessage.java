@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBodyUnsubscribeMessage extends SSAPBodyMessage {
 
@@ -35,26 +32,17 @@ public class SSAPBodyUnsubscribeMessage extends SSAPBodyMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBodyUnsubscribeMessage fromJsonToSSAPBodyUnsubscribeMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyUnsubscribeMessage>().use(null,
-				SSAPBodyUnsubscribeMessage.class).deserialize(json);
-	}
-
-	public static Collection<SSAPBodyUnsubscribeMessage> fromJsonArrayToSSAPBodyUnsubscribeMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyUnsubscribeMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyUnsubscribeMessage.class)
-				.deserialize(json);
+	public static SSAPBodyUnsubscribeMessage fromJsonToSSAPBodyUnsubscribeMessage(String json) throws IOException {
+		ObjectMapper objMapper = new ObjectMapper();
+		objMapper.enableDefaultTyping();
+		return objMapper.readValue(json, SSAPBodyUnsubscribeMessage.class);
 	}
 
 }

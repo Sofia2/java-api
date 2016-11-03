@@ -15,10 +15,6 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Implementacion de JoinMessage
  * @author lmgracia
@@ -39,18 +35,4 @@ public class SSAPBodyJoinMessage extends SSAPBodyMessage {
 		this.instance = instance;
 	}
 
-	
-	public String toJson() {
-		try {
-			return new ObjectMapper().writeValueAsString(this);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static SSAPBodyJoinMessage fromJsonToSSAPBodyJoinMessage(
-			String json) throws IOException {
-		return new ObjectMapper().readValue(json, SSAPBodyJoinMessage.class);
-	}
-	
 }

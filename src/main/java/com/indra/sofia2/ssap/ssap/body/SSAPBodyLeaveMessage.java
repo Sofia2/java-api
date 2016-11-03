@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,9 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implementacion de JoinMessage con usuario y password
@@ -30,25 +27,15 @@ import flexjson.JSONSerializer;
  */
 public class SSAPBodyLeaveMessage extends SSAPBodyJoinMessage {
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBodyLeaveMessage fromJsonToSSAPBodyLeaveMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyLeaveMessage>().use(null,
-				SSAPBodyLeaveMessage.class).deserialize(json);
-	}
-
-	public static Collection<SSAPBodyLeaveMessage> fromJsonArrayToSSAPBodyLeaveMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyLeaveMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyLeaveMessage.class).deserialize(json);
+	public static SSAPBodyLeaveMessage fromJsonToSSAPBodyLeaveMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyLeaveMessage.class);
 	}
 
 }

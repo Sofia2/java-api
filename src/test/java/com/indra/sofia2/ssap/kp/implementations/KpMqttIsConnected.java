@@ -10,6 +10,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fusesource.mqtt.client.QoS;
@@ -99,7 +101,7 @@ public class KpMqttIsConnected {
 		};
 	}
 	
-	private void createSubscription(){
+	private void createSubscription() throws IOException {
 		kp.addListener4SIBNotifications(new Listener4SIBIndicationNotifications() {
 			@Override
 			public void onIndication(String messageId, SSAPMessage ssapMessage) {

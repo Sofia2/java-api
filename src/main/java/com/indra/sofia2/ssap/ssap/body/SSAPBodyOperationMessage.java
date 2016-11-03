@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 public class SSAPBodyOperationMessage extends SSAPBodyMessage {
 
@@ -63,26 +59,14 @@ public class SSAPBodyOperationMessage extends SSAPBodyMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class").serialize(this);
+	public static SSAPBodyOperationMessage fromJsonToSSAPBodyOperationMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyOperationMessage.class);
 	}
-
-	public static SSAPBodyOperationMessage fromJsonToSSAPBodyOperationMessage(String json) {
-		return new JSONDeserializer<SSAPBodyOperationMessage>().use(null,
-				SSAPBodyOperationMessage.class).deserialize(json);
-	}
-
-	public static String toJson(SSAPBodyOperationMessage body) {
-		return new JSONSerializer().exclude("*.class").serialize(body);
-	}
-
-	public static Collection<SSAPBodyOperationMessage> fromJsonArrayToSSAPBodyOperationMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyOperationMessage>>().use(null, ArrayList.class)
-				.use("values", SSAPBodyOperationMessage.class).deserialize(json);
-	}
-
 }

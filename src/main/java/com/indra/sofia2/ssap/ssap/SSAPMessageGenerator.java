@@ -33,7 +33,6 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyConfigMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyJoinTokenMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyJoinUserAndPasswordMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyOperationMessage;
-import com.indra.sofia2.ssap.ssap.body.SSAPBodyQueryMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyQueryWithParamMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodySubscribeMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyUnsubscribeMessage;
@@ -447,7 +446,7 @@ public class SSAPMessageGenerator {
 	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query) throws NotJoinedException{
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
-		SSAPBodyQueryMessage body = new SSAPBodyQueryMessage();
+		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
 		body.setQuery(query);
 		mensaje.setBody(body.toJson());
 		mensaje.setDirection(SSAPMessageDirection.REQUEST);
@@ -467,7 +466,7 @@ public class SSAPMessageGenerator {
 	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query, SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException{
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
-		SSAPBodyQueryMessage body = new SSAPBodyQueryMessage();
+		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
 		if(isQuery(query, queryType)){
 			body.setQuery(query);
 		}else{
@@ -492,7 +491,7 @@ public class SSAPMessageGenerator {
 	public SSAPMessage generateQueryMessage (String sessionKey, String idQuery) throws NotJoinedException{
 		SSAPMessage message = new SSAPMessage();
 		message.setSessionKey(sessionKey);
-		SSAPBodyQueryMessage body = new SSAPBodyQueryMessage();
+		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
 		body.setQuery(idQuery);
 		body.setQueryType(SSAPQueryType.SIB_DEFINED);
 		message.setBody(body.toJson());
@@ -525,7 +524,7 @@ public class SSAPMessageGenerator {
 			body.setQueryParams(params);
 			message.setBody(body.toJson());
 		}else{
-			SSAPBodyQueryMessage body = new SSAPBodyQueryMessage();
+			SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
 			if(isQuery(idQuery, SSAPQueryType.SIB_DEFINED)){
 				body.setQuery(idQuery);
 			}else{

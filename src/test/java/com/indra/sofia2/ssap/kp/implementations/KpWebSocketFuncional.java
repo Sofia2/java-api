@@ -80,7 +80,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testQueryBDC(){
+	public void testQueryBDC() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -114,7 +114,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testJoinByTokenLeave(){
+	public void testJoinByTokenLeave() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		log.info("Envia mensaje JOIN al SIB: "+msgJoin.toJson());
@@ -156,7 +156,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testInsertNative(){
+	public void testInsertNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -191,7 +191,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative(){
+	public void testUpdateNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -224,7 +224,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testQueryNative(){
+	public void testQueryNative() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -257,7 +257,7 @@ public class KpWebSocketFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike(){
+	public void testInsertSqlLike() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -293,7 +293,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike(){
+	public void testUpdateSqlLike() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -327,7 +327,7 @@ public class KpWebSocketFuncional {
 	
 	
 	@Test
-	public void testQuerySql(){
+	public void testQuerySql() throws IOException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -381,11 +381,13 @@ public class KpWebSocketFuncional {
 				
 				KpWebSocketFuncional.indicationReceived=true;
 			
-				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
-				
-				assertNotSame(indicationMessage.getData(), null);
-				assertTrue(indicationMessage.isOk());
-				assertSame(indicationMessage.getError(), null);
+				try {
+					SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
+					
+					assertNotSame(indicationMessage.getData(), null);
+					assertTrue(indicationMessage.isOk());
+					assertSame(indicationMessage.getError(), null);
+				} catch (IOException e) {}
 				
 			}
 		});

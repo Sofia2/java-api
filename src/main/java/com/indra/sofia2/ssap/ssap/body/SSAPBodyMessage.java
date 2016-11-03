@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,6 @@
  * limitations under the License. 
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 public abstract class SSAPBodyMessage {
 
@@ -44,34 +37,4 @@ public abstract class SSAPBodyMessage {
 		return cadena.toString();
 	}
 
-	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
-	}
-
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBodyMessage fromJsonToSSAPBodyMessage(String json) {
-		return new JSONDeserializer<SSAPBodyMessage>().use(null,
-				SSAPBodyMessage.class).deserialize(json);
-	}
-
-	public static String toJsonArray(Collection<SSAPBodyMessage> collection) {
-		return new JSONSerializer().exclude("*.class").serialize(collection);
-	}
-
-	public static String toJsonArray(Collection<SSAPBodyMessage> collection,
-			String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(collection);
-	}
-
-	public static Collection<SSAPBodyMessage> fromJsonArrayToSSAPBodyMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyMessage.class).deserialize(json);
-	}
 }
