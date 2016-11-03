@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-
-
 /**
  * <p>Java class for insert_response complex type.
  * 
@@ -51,10 +49,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @XmlType(name = "insert_response")
 public class InsertResponse extends CommonResponse implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	
 	protected String ontologyInstanceId;
 
 	public String getOntologyInstanceId() {
@@ -68,6 +64,4 @@ public class InsertResponse extends CommonResponse implements Serializable {
     public String toString() {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
-
-	
 }

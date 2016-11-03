@@ -29,42 +29,43 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
 import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
 public class SSAPResourceAPI implements ISSAPResourceAPI {
 
-	private ISSAPResourceAPI api=null;
-	
-	public SSAPResourceAPI(String serviceURL){
-		
+	private ISSAPResourceAPI api = null;
+
+	public SSAPResourceAPI(String serviceURL) {
+
 		List<MessageBodyReader<?>> providers = new ArrayList<MessageBodyReader<?>>();
-		
-		providers.add(new JacksonJsonProvider());
-		api = JAXRSClientFactory.create(serviceURL, ISSAPResourceAPI.class, providers); 
-	}
-	
-	public SSAPResourceAPI(String serviceURL, String server, Integer port, String user, String pass ){
-		
-		List<MessageBodyReader<?>> providers = new ArrayList<MessageBodyReader<?>>();
-		
+
 		providers.add(new JacksonJsonProvider());
 		api = JAXRSClientFactory.create(serviceURL, ISSAPResourceAPI.class, providers);
-				
-        HTTPConduit conduit = WebClient.getConfig(api).getHttpConduit();
-        HTTPClientPolicy policy = new HTTPClientPolicy();
-        policy.setProxyServer(server);
-        policy.setProxyServerPort(port);
-        if (user != null && user !="" && pass != null && pass !=""){
-	        conduit.getProxyAuthorization().setUserName(user);
-	        conduit.getProxyAuthorization().setPassword(pass);	            
-        }
-        conduit.setClient(policy);	
+	}
+
+	public SSAPResourceAPI(String serviceURL, String server, Integer port, String user, String pass) {
+
+		List<MessageBodyReader<?>> providers = new ArrayList<MessageBodyReader<?>>();
+
+		providers.add(new JacksonJsonProvider());
+		api = JAXRSClientFactory.create(serviceURL, ISSAPResourceAPI.class, providers);
+
+		HTTPConduit conduit = WebClient.getConfig(api).getHttpConduit();
+		HTTPClientPolicy policy = new HTTPClientPolicy();
+		policy.setProxyServer(server);
+		policy.setProxyServerPort(port);
+		if (user != null && user != "" && pass != null && pass != "") {
+			conduit.getProxyAuthorization().setUserName(user);
+			conduit.getProxyAuthorization().setPassword(pass);
+		}
+		conduit.setClient(policy);
 	}
 
 	@Override
@@ -72,35 +73,35 @@ public class SSAPResourceAPI implements ISSAPResourceAPI {
 		String data = ssap.getData();
 		String sessionkey = ssap.getSessionKey();
 		String ontology = ssap.getOntology();
-		
 
-		//El cliente de CXF ignora el cuerpo de la petición si se trata de un DELETE por lo que invocamos a través de path param 
+		// El cliente de CXF ignora el cuerpo de la petición si se trata de un
+		// DELETE por lo que invocamos a través de path param
 
-		String objectId=null;
-		if(data!=null && !data.trim().equals("")){
+		String objectId = null;
+		if (data != null && !data.trim().equals("")) {
 			Map<String, Map<String, String>> map = new HashMap<String, Map<String, String>>();
 			ObjectMapper mapper = new ObjectMapper();
-		 	try {
-				map = mapper.readValue(data, HashMap.class);
-		 		objectId = map.get("_id").get("$oid");
-		 	} catch (Exception e) {
-				
+			try {
+				map = mapper.readValue(data, new TypeReference<HashMap<String, Map<String, String>>>() {
+				});
+				objectId = map.get("_id").get("$oid");
+			} catch (Exception e) {
+
 			}
 		}
-		
 
-		if(objectId!=null){
+		if (objectId != null) {
 			return api.deleteOid(objectId, sessionkey, ontology);
-		}else{
-			return Response.status(Response.Status.BAD_REQUEST).entity("Bad Request: could not get ObjectId from body Object").build();
+		} else {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity("Bad Request: could not get ObjectId from body Object").build();
 		}
 	}
 
 	@Override
-	public Response query(String $sessionKey, String $ontology, String $query,
-			String $queryArguments, String $queryType) {
-		
-		return api.query($sessionKey, $ontology, $query, $queryArguments, $queryType);
+	public Response query(String sessionKey, String ontology, String query, String queryArguments, String queryType) {
+
+		return api.query(sessionKey, ontology, query, queryArguments, queryType);
 	}
 
 	@Override
@@ -114,24 +115,24 @@ public class SSAPResourceAPI implements ISSAPResourceAPI {
 	}
 
 	@Override
-	public Response getConfig(String $kp, String $instanciakp, String $token, String $assetService, String $assetServiceParam) {
-		return api.getConfig($kp, $instanciakp, $token, $assetService, $assetServiceParam);
+	public Response getConfig(String kp, String instanciakp, String token, String assetService,
+			String assetServiceParam) {
+		return api.getConfig(kp, instanciakp, token, assetService, assetServiceParam);
 	}
 
 	@Override
-	public Response deleteOid(String oid, String $sessionKey, String $ontology) {
-		return api.deleteOid(oid, $sessionKey, $ontology);
+	public Response deleteOid(String oid, String sessionKey, String ontology) {
+		return api.deleteOid(oid, sessionKey, ontology);
 	}
 
 	@Override
-	public Response query(String oid, String $sessionKey, String $ontology) {
-		return api.query(oid, $sessionKey, $ontology);
+	public Response query(String oid, String sessionKey, String ontology) {
+		return api.query(oid, sessionKey, ontology);
 	}
-	
+
 	@Override
-	public Response subscribe(String sessionKey, String ontology, String query,
-			int msRefresh, String queryArguments, String queryType,
-			String endpoint) {
+	public Response subscribe(String sessionKey, String ontology, String query, int msRefresh, String queryArguments,
+			String queryType, String endpoint) {
 		return api.subscribe(sessionKey, ontology, query, msRefresh, queryArguments, queryType, endpoint);
 	}
 
@@ -139,13 +140,13 @@ public class SSAPResourceAPI implements ISSAPResourceAPI {
 	public Response unsubscribe(String sessionKey, String subscriptionId) {
 		return api.unsubscribe(sessionKey, subscriptionId);
 	}
-	
+
 	@Override
-	public SSAPResource responseAsSsap(Response resp) throws ResponseMapperException{
-		ObjectMapper mapper=new ObjectMapper();
-		
+	public SSAPResource responseAsSsap(Response resp) throws ResponseMapperException {
+		ObjectMapper mapper = new ObjectMapper();
+
 		try {
-			return mapper.readValue((InputStream)resp.getEntity(), SSAPResource.class);
+			return mapper.readValue((InputStream) resp.getEntity(), SSAPResource.class);
 		} catch (JsonParseException e) {
 			throw new ResponseMapperException(e);
 		} catch (JsonMappingException e) {
@@ -153,8 +154,5 @@ public class SSAPResourceAPI implements ISSAPResourceAPI {
 		} catch (IOException e) {
 			throw new ResponseMapperException(e);
 		}
-		
-		
 	}
-
 }

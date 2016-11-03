@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.implementations.rest;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
@@ -25,35 +22,25 @@ import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
 public interface ISSAPResourceAPI {
 
-    Response delete(SSAPResource ssap);
+	Response delete(SSAPResource ssap);
 
-    Response query(@QueryParam("$sessionKey") String $sessionKey, @QueryParam("$ontology") String $ontology, @QueryParam("$query") @DefaultValue("null") String $query, @QueryParam("$queryArguments") @DefaultValue("null") String $queryArguments, 
-                @QueryParam("$queryType") @DefaultValue("SQLLIKE") String $queryType);
+	Response query(String sessionKey, String ontology, String query, String queryArguments, String queryType);
 
-    
-	Response subscribe(@QueryParam("$sessionKey") String sessionKey,
-			@QueryParam("$ontology") String ontology,
-			@QueryParam("$query") String query,
-			@QueryParam("$msRefresh") int msRefresh,
-			@QueryParam("$queryArguments") String queryArguments,
-			@QueryParam("$queryType") String queryType,
-			@QueryParam("$endpoint") String endpoint);
-	
-	
-	Response unsubscribe(@QueryParam("$sessionKey") String sessionKey,
-			@QueryParam("$subscriptionId") String subscriptionId);
-	
-    
-    Response insert(SSAPResource ssap);
+	Response subscribe(String sessionKey, String ontology, String query, int msRefresh, String queryArguments,
+			String queryType, String endpoint);
 
-    Response update(SSAPResource ssap);
+	Response unsubscribe(String sessionKey, String subscriptionId);
 
-    Response getConfig(@QueryParam("$kp") String $kp, @QueryParam("$instanciakp") String $instanciakp, @QueryParam("$token") @DefaultValue("null") String $token, @QueryParam("$assetService") @DefaultValue("null") String $assetService, @QueryParam("$assetServiceParam") @DefaultValue("null") String $assetServiceParam);
+	Response insert(SSAPResource ssap);
 
-    Response deleteOid(@PathParam("oid") String oid, @QueryParam("$sessionKey") String $sessionKey, @QueryParam("$ontology") String $ontology);
+	Response update(SSAPResource ssap);
 
-    Response query(@PathParam("oid") String oid, @QueryParam("$sessionKey") String $sessionKey, @QueryParam("$ontology") String $ontology);
-    
-    SSAPResource responseAsSsap(Response o)throws ResponseMapperException;
+	Response getConfig(String kp, String instanciakp, String token, String assetService, String assetServiceParam);
+
+	Response deleteOid(String oid, String sessionKey, String ontology);
+
+	Response query(String oid, String sessionKey, String ontology);
+
+	SSAPResource responseAsSsap(Response o) throws ResponseMapperException;
 
 }
