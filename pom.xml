@@ -4,7 +4,7 @@
 	<groupId>com.indra.sofia2.ssap</groupId>
 	<artifactId>ssap-standalone</artifactId>
 	<packaging>jar</packaging>
-	<version>2.24.1</version>
+	<version>16.11</version>
 	<name>ssap-standalone</name>
 	<url>http://maven.apache.org</url>
 	<properties>
