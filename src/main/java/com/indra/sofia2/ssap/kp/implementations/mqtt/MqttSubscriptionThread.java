@@ -35,7 +35,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 /**
  * This thread will be continuously running to receive any kind of messages from
- * the SIB.
+ * the SIB server.
  */
 class MqttSubscriptionThread extends Thread {
 
@@ -51,15 +51,14 @@ class MqttSubscriptionThread extends Thread {
 	}
 
 	protected void myStop() {
-		log.info(String.format("Stopping MQTT subscription thread of the internal MQTT client %s.",
-				kpMqttClient.getMqttClientId()));
+		log.info("Stopping MQTT subscription thread of the internal MQTT client {}.", kpMqttClient.getMqttClientId());
 		this.stop = true;
 		if (this.receive != null) {
 			this.interrupt();
 		}
 	}
 
-	protected boolean isStoped() {
+	protected boolean isStopped() {
 		return stop;
 	}
 
@@ -75,29 +74,26 @@ class MqttSubscriptionThread extends Thread {
 				message = receive.await();
 				// gets the message payload (SSAPMessage)
 				payload = new String(message.getPayload());
-				if (log.isDebugEnabled()) {
-					log.debug(
-							String.format("The internal MQTT client %s has received a message from the SIB server. Payload=%s.",
-									kpMqttClient.getMqttClientId(), payload));
-				}
+				log.debug("The internal MQTT client {} has received a message from the SIB server. Payload={}.",
+						kpMqttClient.getMqttClientId(), payload);
 			} catch (Throwable e) {
 				boolean disconnectImmediately = false;
 				if (e instanceof InterruptedException) {
-					log.info(String.format(
-							"The MQTT subscription thread of the internal MQTT client %s has been interrupted.",
-							kpMqttClient.getMqttClientId()));
+					log.info(
+							"The MQTT subscription thread of the internal MQTT client {} has been interrupted.",
+							kpMqttClient.getMqttClientId());
 				} else {
-					log.error(String.format(
-							"An exception has been raised in the MQTT subscription thread of the MQTT client %s.",
-							kpMqttClient.getMqttClientId()), e);
+					log.error(
+							"An exception has been raised in the MQTT subscription thread of the MQTT client {}. Cause = {}, errorMessage = {}.",
+							kpMqttClient.getMqttClientId(), e.getCause(), e.getMessage());
 					disconnectImmediately = true;
 				}
 				if (kpMqttClient.getResponseCallback() != null) {
 					kpMqttClient.getResponseCallback().handle(null);
 				}
 				if (disconnectImmediately || !stop) {
-					log.info(String.format("Initiating disconnection process of the internal MQTT client %s.",
-							kpMqttClient.getMqttClientId()));
+					log.info("Initiating disconnection process of the internal MQTT client {}.",
+							kpMqttClient.getMqttClientId());
 					stop = true;
 					kpMqttClient.disconnect();
 				}
@@ -118,24 +114,23 @@ class MqttSubscriptionThread extends Thread {
 										.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).getData();
 								if (SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).isOk()
 										&& sessionKey != null) {
-									log.info(
-											String.format("The internal MQTT client %s has opened the SSAP session %s.",
-													kpMqttClient.getMqttClientId(), sessionKey));
+									log.info("The internal MQTT client {} has opened the SSAP session {}.",
+											kpMqttClient.getMqttClientId(), sessionKey);
 								}
 							} else if (messageType != null
 									&& ssapMessage.getMessageType().equals(SSAPMessageTypes.LEAVE)
 									&& SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody())
 											.isOk()) {
-								log.info(String.format("The internal MQTT client %s has closed the SSAP session.",
-										kpMqttClient.getMqttClientId(), ssapMessage.getSessionKey()));
+								log.info("The internal MQTT client {} has closed the SSAP session {}.",
+										kpMqttClient.getMqttClientId(), ssapMessage.getSessionKey());
 							}
 
 							// Notifies the reception to unlock the
 							// synchronous waiting
 						} catch (Throwable e) {
-							log.error(String.format(
-									"An exception was raised while the internal MQTT client %s was processing a SSAP response. Payload=%s.",
-									kpMqttClient.getMqttClientId(), payload), e);
+							log.error(
+									"An exception was raised while the internal MQTT client {} was processing a SSAP response. Payload={}, cause = {}, errorMessage = {}.",
+									kpMqttClient.getMqttClientId(), payload, e.getCause(), e.getMessage());
 						}
 						if (kpMqttClient.getResponseCallback() != null) {
 							kpMqttClient.getResponseCallback().handle(payload);
@@ -171,25 +166,23 @@ class MqttSubscriptionThread extends Thread {
 											kpMqttClient.getListener4StatusControlRequestNotifications(), messageId,
 											ssapMessage));
 								}
-								if (log.isDebugEnabled()) {
-									log.debug(String.format(
-											"Notifying %s SSAP INDICATION listeners of the internal MQTT client %s. Payload=%s",
-											tasks.size(), kpMqttClient.getMqttClientId(), payload));
-								}
+								log.debug(
+										"Notifying {} SSAP INDICATION listeners of the internal MQTT client {}. Payload={}.",
+										tasks.size(), kpMqttClient.getMqttClientId(), payload);
 								kpMqttClient.runIndicationTasks(tasks);
 							} else {
-								log.warn(String.format(
-										"The internal MQTT client %s received a SSAP INDICATION message whithout a messageId. "
-										+ "It won't be notified to the SSAP INDICATION listeners. Payload=%s",
-										kpMqttClient.getMqttClientId(), payload));
+								log.warn(
+										"The internal MQTT client {} received a SSAP INDICATION message whithout a messageId. "
+												+ "It won't be notified to the SSAP INDICATION listeners. Payload={}.",
+										kpMqttClient.getMqttClientId(), payload);
 							}
 						}
 					}
 				}
 			} catch (Exception e) {
-				log.error(String.format(
-						"An exception was raised while the internal MQTT client %s was receiving a message from the SIB server.",
-						kpMqttClient.getMqttClientId()), e);
+				log.error(
+						"An exception was raised while the internal MQTT client {} was receiving a message from the SIB server. Cause = {}, errorMessage = {}.",
+						kpMqttClient.getMqttClientId(), e.getCause(), e.getMessage());
 				if (kpMqttClient.getResponseCallback() != null) {
 					kpMqttClient.getResponseCallback().handle("");
 				}
@@ -210,10 +203,8 @@ class MqttSubscriptionThread extends Thread {
 
 			String clearMessage = new String(
 					XXTEA.decrypt(bCifradoBaseado, kpMqttClient.getXxteaCipherKey().getBytes()));
-			if (log.isDebugEnabled()) {
-				log.debug(String.format("The internal MQTT client %s received a decoded SSAP message. Payload=%s.",
-						kpMqttClient.getMqttClientId(), clearMessage));
-			}
+			log.debug("The internal MQTT client {} has decoded a SSAP message. Payload={}.",
+					kpMqttClient.getMqttClientId(), clearMessage);
 			return clearMessage;
 		}
 	}

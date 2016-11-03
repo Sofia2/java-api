@@ -19,6 +19,10 @@ public class SSAPResponseTimeoutException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
+	public SSAPResponseTimeoutException() {
+		super();
+	}
+	
 	public SSAPResponseTimeoutException(String message) {
 		super(message);
 	}

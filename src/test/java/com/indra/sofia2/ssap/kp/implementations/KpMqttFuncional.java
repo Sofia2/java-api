@@ -41,7 +41,7 @@ import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
 
 public class KpMqttFuncional {
 	
-	private static final Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
+	private static final Logger log = LoggerFactory.getLogger(KpMqttFuncional.class);
 	
 	private final static String HOST="sofia2.com";
 	private final static int PORT=1880;

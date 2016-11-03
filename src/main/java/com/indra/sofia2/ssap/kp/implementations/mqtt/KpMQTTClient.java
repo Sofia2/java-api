@@ -114,15 +114,15 @@ public class KpMQTTClient extends KpToExtend {
 	}
 
 	/**
-	 * Creates a MQTT client and connects it to the MQTT server in SIB
+	 * Creates a MQTT client and connects it to the SIB server
 	 */
 	@Override
 	public void connect() throws ConnectionToSIBException {
 
 		String sibAddress = null;
 		try {
-			log.info(String.format("Establishing MQTT connection with SIB server %s using port %s.",
-					config.getHostSIB(), config.getPortSIB()));
+			log.info("Establishing MQTT connection with SIB server {} using port {}.",
+					config.getHostSIB(), config.getPortSIB());
 
 			MQTTConnectionConfig cfg = (MQTTConnectionConfig) config;
 
@@ -132,7 +132,7 @@ public class KpMQTTClient extends KpToExtend {
 			ssapResponseTimeout = cfg.getSsapResponseTimeout();
 			boolean cleanSession = cfg.isCleanSession();
 
-			// Creates the client (if needed) and open a connection to the SIB
+			// Creates the client (if needed) and open a connection to the SIB server
 			configureMqttClient(cfg, sibAddress);
 
 			if (mqttConnection == null || !mqttConnection.isConnected()) {
@@ -155,22 +155,17 @@ public class KpMQTTClient extends KpToExtend {
 			if (this.isConnectionEstablished()) {
 				this.notifyConnectionEvent();
 			}
-			log.info(String.format("The internal MQTT client %s has established a connection to the SIB server.",
-					mqttClientId));
+			log.info("The internal MQTT client {} has established a connection to the SIB server.",
+					mqttClientId);
 
-		} catch (URISyntaxException e) {
-			String errorMessage = String.format("The internal MQTT client %s couldn't connect to the SIB server %s:%s",
-					sibAddress, config.getPortSIB());
-			log.error(errorMessage, e);
+		} catch (Throwable e) {
+			log.error("Unable to connect internal MQTT client to the SIB server. Cause = {}, errorMessage = {}.", e.getCause(),
+					e.getMessage());
 			this.disconnect();
-			throw new ConnectionToSIBException(errorMessage, e);
-		} catch (Exception e) {
-			String errorMessage = String.format("Unable to connnect the internal MQTT client to the SIB server %s:%s.",
-					sibAddress, config.getPortSIB());
-			log.error(errorMessage, e);
-			this.disconnect();
-			internetConnectionTester.testConnection();
-			throw new ConnectionToSIBException(errorMessage, e);
+			if (!(e instanceof URISyntaxException)) {
+				internetConnectionTester.testConnection();
+			}
+			throw new ConnectionToSIBException(e);
 		}
 	}
 
@@ -180,24 +175,24 @@ public class KpMQTTClient extends KpToExtend {
 	}
 
 	/**
-	 * Disconnect the MQTT client from the SIB
+	 * Disconnect the MQTT client from the SIB server
 	 */
 	@Override
 	public synchronized void disconnect() {
-		log.info(String.format("Disconnecting internal MQTT client %s from the SIB server.", mqttClientId));
+		log.info("Disconnecting internal MQTT client {} from the SIB server.", mqttClientId);
 
 		if (mqttConnection != null) {
 			// Cierra el hilo de recepción
 			try {
 				// Stop the thread that waits for notifications from SIB
-				if (this.subscriptionThread != null && !this.subscriptionThread.isStoped()) {
-					log.info(String.format("Stopping SIB subscription thread of the internal MQTT client %s.",
-							mqttClientId));
+				if (this.subscriptionThread != null && !this.subscriptionThread.isStopped()) {
+					log.info("Stopping SIB subscription thread of the internal MQTT client {}.", mqttClientId);
 					this.subscriptionThread.myStop();
 				}
 			} catch (Exception e) {
-				log.error(String.format("Unable to stop SIB subscription thread of the internal MQTT client %s.",
-						mqttClientId), e);
+				log.error(
+						"Unable to stop SIB subscription thread of the internal MQTT client {}. Cause = {}, errorMessage = {}.",
+						mqttClientId, e.getCause(), e.getMessage());
 			}
 
 			// Se desuscribe de topicos de notificacion
@@ -213,21 +208,21 @@ public class KpMQTTClient extends KpToExtend {
 					mqttConnection.kill().await(DEFAULT_DISCONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
 				} else {
 					try {
-						log.info(String.format("Disconnecting internal MQTT client %s from the SIB server.",
-								mqttClientId));
+						log.info("Disconnecting internal MQTT client {} from the SIB server.", mqttClientId);
 						mqttConnection.kill().await(timeout, TimeUnit.MILLISECONDS);
 					} catch (Exception e) {
-						log.warn(String.format(
-								"A timeout error was detected while disconnecting the internal MQTT client %s. Trying to close the connection again...",
-								mqttClientId));
+						log.warn(
+								"A timeout error was detected while disconnecting the internal MQTT client {}. Trying to close the connection again.",
+								mqttClientId);
 						mqttConnection.disconnect().await(timeout, TimeUnit.MILLISECONDS);
 					}
 				}
 
-				log.info(String.format("The internal MQTT client %s has disconnected from the SIB server successfully.",
-						mqttClientId));
+				log.info("The internal MQTT client {} has been disconnected from the SIB server successfully.",
+						mqttClientId);
 			} catch (Exception e) {
-				log.error(String.format("Ignoring disconnect error of the internal MQTT client %s.", mqttClientId), e);
+				log.warn("The internal MQTT client {} had a disconnection error. Cause = {}, errorMessage = {}.",
+						mqttClientId, e.getCause(), e.getMessage());
 			} finally {
 				mqttConnection = null;
 				this.destroyIndicationPool();
@@ -235,9 +230,8 @@ public class KpMQTTClient extends KpToExtend {
 			}
 
 		} else {
-			log.info(String.format(
-					"The internal MQTT client %s was disconnected from the SIB server. Nothing will be done.",
-					mqttClientId));
+			log.info("The internal MQTT client {} is already disconnected from the SIB server. Nothing will be done.",
+					mqttClientId);
 			this.destroyIndicationPool();
 			this.notifyDisconnectionEvent();
 		}
@@ -245,29 +239,28 @@ public class KpMQTTClient extends KpToExtend {
 
 	@Override
 	protected void notifyConnectionEvent() {
-		log.info(String.format(
-				"Notifying connection event of the internal MQTT client %s to the connection events listener (if exists).",
-				mqttClientId));
+		log.info(
+				"Notifying connection event of the internal MQTT client {} to the connection events listener (if exists).",
+				mqttClientId);
 		super.notifyConnectionEvent();
 	}
 
 	@Override
 	protected void notifyDisconnectionEvent() {
-		log.info(String.format(
-				"Notifying disconnection event of the internal MQTT client %s to the connection events listener (if exists).",
-				mqttClientId));
+		log.info(
+				"Notifying disconnection event of the internal MQTT client {} to the connection events listener (if exists).",
+				mqttClientId);
 		super.notifyDisconnectionEvent();
 	}
 
 	@Override
 	protected void destroyIndicationPool() {
-		log.info(String.format("Destroying indication pool of the internal MQTT client %s.", mqttClientId));
+		log.info("Destroying indication pool of the internal MQTT client {}.", mqttClientId);
 		super.destroyIndicationPool();
 	}
 
 	/**
-	 * Subscribe the MQTT client to the topics that the SIB will use to notify
-	 * messages from SIB
+	 * Subscribe the MQTT client to the topics that the SIB server will use to notify SSAP responses
 	 */
 	private void subscribeToSibMqttTopics() throws ConnectionToSIBException {
 		
@@ -275,8 +268,8 @@ public class KpMQTTClient extends KpToExtend {
 		subscribeToMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
 
 		// Launch a Thread to receive notifications
-		if (this.subscriptionThread == null || this.subscriptionThread.isStoped()) {
-			log.info(String.format("Starting subscription thread of the internal MQTT client %s.", mqttClientId));
+		if (this.subscriptionThread == null || this.subscriptionThread.isStopped()) {
+			log.info("Starting subscription thread of the internal MQTT client {}.", mqttClientId);
 			this.subscriptionThread = new MqttSubscriptionThread(this);
 			this.subscriptionThread.start();
 		}
@@ -284,8 +277,8 @@ public class KpMQTTClient extends KpToExtend {
 	}
 
 	/**
-	 * Unsubscribe the MQTT client to the topics that the SIB will use to notify
-	 * messages from SIB
+	 * Unsubscribe the MQTT client to the topics that the SIB server will use to notify
+	 * SSAP responses
 	 */
 	private void unsubscribeFromSibMqttTopics() {
 
@@ -299,10 +292,8 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	@Override
 	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException {
-		if (log.isDebugEnabled()){
-			log.debug(String.format("Sending SSAP message to the SIB server using the internal MQTT client %s. Payload=%s.",
-					mqttClientId, msg.toJson()));
-		}
+		log.debug("Sending SSAP message to the SIB server using the internal MQTT client {}. Payload={}.", mqttClientId,
+				msg.toJson());
 		internetConnectionTester.testConnection();
 		// Sends the message to Server
 		try {
@@ -315,30 +306,26 @@ public class KpMQTTClient extends KpToExtend {
 				// It is not necessary publish topic. The message will be
 				// received by the handler in server
 				QoS qosLevel = ((MQTTConnectionConfig) config).getQualityOfService();
-				if (log.isDebugEnabled()){
-					log.debug(String.format(
-							"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client %s. QoS=%s, Payload=%s.",
-							mqttClientId, qosLevel, msg.toJson()));
-				}
+				log.debug(
+						"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client {}. QoS={}, Payload={}.",
+						mqttClientId, qosLevel, msg.toJson());
 				mqttConnection.publish("", msg.toJson().getBytes(),
 						qosLevel, false);
 				ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
-				if (log.isDebugEnabled()){
-					log.debug(String.format(
-							"The internal MQTT client %s received a SSAP response from the SIB server. Payload=%s, Original request=%s.",
-							mqttClientId, ssapResponse.toJson(), msg.toJson()));
-				}
+				log.debug(
+						"The internal MQTT client {} received a SSAP response from the SIB server. Response={}, request={}.",
+						mqttClientId, ssapResponse.toJson(), msg.toJson());
 				responseCallback = null;
 			}
 			return ssapResponse;
 
 		} catch (Throwable e) {
-			String errorMessage = String.format("Unable to send SSAP message to the SIB server using internal MQTT client %s. Payload=%s.", 
-					mqttClientId, msg.toJson());
-			log.error(errorMessage, e);
+			log.error(
+					"Unable to send SSAP message to the SIB server using internal MQTT client {}. Payload = {}, cause = {}, errorMessage = {}.",
+					mqttClientId, msg.toJson(), e.getCause(), e.getMessage());
 			responseCallback = null;
 			internetConnectionTester.testConnection();
-			throw new ConnectionToSIBException(errorMessage, e);
+			throw new ConnectionToSIBException("Unable to send SSAP message to the SIB server", e);
 		}
 	}
 
@@ -347,10 +334,8 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	@Override
 	public SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSIBException {
-		if (log.isDebugEnabled()){
-			log.debug(String.format("Sending cyphered SSAP message to the SIB server using the internal MQTT client %s. Payload=%s.",
-					mqttClientId, msg.toJson()));
-		}
+		log.debug("Sending cyphered SSAP message to the SIB server using the internal MQTT client {}. Payload={}.",
+				mqttClientId, msg.toJson());
 		// Sends the message to Server
 		try {
 
@@ -378,11 +363,9 @@ public class KpMQTTClient extends KpToExtend {
 				// It is not necessary publish topic. The message will be
 				// received by the handler in server
 				QoS qosLevel = ((MQTTConnectionConfig) config).getQualityOfService();
-				if (log.isDebugEnabled()) {
-					log.debug(String.format(
-							"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client %s. QoS=%s, Payload=%s.",
-							mqttClientId, qosLevel, msg.toJson()));
-				}
+				log.debug(
+						"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client {}. QoS={}, Payload={}.",
+						mqttClientId, qosLevel, msg.toJson());
 				mqttConnection.publish("", base64Payload, qosLevel, false);
 
 			} finally {
@@ -390,18 +373,15 @@ public class KpMQTTClient extends KpToExtend {
 			}
 
 			SSAPMessage ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
-			if (log.isDebugEnabled()) {
-				log.debug(String.format(
-						"The internal MQTT client %s received a SSAP response from the SIB server. Payload=%s, Original request=%s.",
-						mqttClientId, ssapResponse.toJson(), msg.toJson()));
-			}
+			log.debug(
+					"The internal MQTT client {} received a SSAP response from the SIB server. Payload={}, Original request={}.",
+					mqttClientId, ssapResponse.toJson(), msg.toJson());
 			return ssapResponse;
 
 		} catch (Exception e) {
-			String errorMessage = String.format("Unable to send SSAP message to the SIB server using internal MQTT client %s. Payload=%s.", 
-					mqttClientId, msg.toJson());
-			log.error(errorMessage, e);
-			throw new ConnectionToSIBException(errorMessage, e);
+			log.error("Unable to send SSAP message to the SIB server using internal MQTT client {}. Payload = {}, cause = {}, errorMessage = {}.", 
+					mqttClientId, msg.toJson(), e.getCause(), e.getMessage());
+			throw new ConnectionToSIBException("Unable to send SSAP message to the SIB server", e);
 		}
 	}
 
@@ -474,20 +454,17 @@ public class KpMQTTClient extends KpToExtend {
 				InetAddress.getByName(config.getHostSIB());
 			}
 			sibAddress = config.getHostSIB();
-			log.info(String.format("The SIB address %s can be resolved. The connection process will continue.",
-					config.getHostSIB()));
+			log.info("The hostname of the SIB server ({}) can be resolved. The connection process will continue.",
+					config.getHostSIB());
 		} catch (java.net.UnknownHostException e) {
 			if (cfg.getDnsFailHostSIB() == null || cfg.getDnsFailHostSIB().trim().length() == 0) {
-				String errorMessage = String.format(
-						"The SIB address %s couldn't be resolved. The connection process has been aborted.",
-						config.getHostSIB());
-				log.error(errorMessage);
+				log.error("Unable to resolve hostname of the SIB server ({}).", config.getHostSIB());
 				internetConnectionTester.testConnection();
-				throw new DnsResolutionException(errorMessage);
+				throw new DnsResolutionException("Unable to resolve hostname of the SIB server");
 			} else {
 				sibAddress = cfg.getDnsFailHostSIB();
-				log.warn(String.format("The SIB address %s couldn't be resolved. Using fallback IP address %s.",
-						config.getHostSIB(), cfg.getDnsFailHostSIB()));
+				log.warn("Unable to resolve hostname of the SIB server ({}). Using fallback IP address ({}).",
+						config.getHostSIB(), cfg.getDnsFailHostSIB());
 			}
 		}
 		return sibAddress;
@@ -499,9 +476,8 @@ public class KpMQTTClient extends KpToExtend {
 			mqttClientId = MQTTConnectionConfig.generateClientId();
 		} else {
 			if (cfg.getClientId().length() > MqttConstants.CLIENT_ID_LENGTH) {
-				log.warn(String.format(
-						"The MQTT client ID '%s' is too long. It has been trimmed to %s characters.",
-						cfg.getClientId(), MqttConstants.CLIENT_ID_LENGTH));
+				log.warn("The MQTT client ID '{}' is too long. It will be trimmed to {} characters long.",
+						cfg.getClientId(), MqttConstants.CLIENT_ID_LENGTH);
 				mqttClientId = cfg.getClientId().substring(0, MqttConstants.CLIENT_ID_LENGTH);
 			} else {
 				mqttClientId = cfg.getClientId();
@@ -516,8 +492,8 @@ public class KpMQTTClient extends KpToExtend {
 		// Subscription to topic for ssap response messages
 		QoS qosLevel = ((MQTTConnectionConfig) config).getQualityOfService();
 		try {
-			log.info(String.format("Subscribing internal MQTT client %s to SIB topic %s with QoS=%s.", mqttClientId,
-					topicName, qosLevel));
+			log.info("Subscribing internal MQTT client {} to SIB topic {} with QoS={}.", mqttClientId,
+					topicName, qosLevel);
 			Topic[] topics = { new Topic(topicName,  qosLevel)};
 			subscribeFuture = mqttConnection.subscribe(topics);
 
@@ -528,11 +504,10 @@ public class KpMQTTClient extends KpToExtend {
 				subscribeFuture.await(timeout, TimeUnit.MILLISECONDS);
 			}
 		} catch (Exception e) {
-			String errorMessage = String.format(
-					"Unable to subscribe internal MQTT client %s to the SIB MQTT topic %s with QoS=%s. The connection process will be aborted.",
-					mqttClientId, topicName, qosLevel);
-			log.error(errorMessage, e);
-			throw new ConnectionToSIBException(errorMessage, e);
+			log.error(
+					"Unable to subscribe internal MQTT client {} to the SIB MQTT topic {} with QoS={}. The connection process will be aborted. Cause = {}, errorMessage = {}.",
+					mqttClientId, topicName, qosLevel, e.getCause(), e.getMessage());
+			throw new ConnectionToSIBException("Unable to subscribe internal MQTT client to topic " + topicName, e);
 		}
 	}
 	
@@ -540,8 +515,8 @@ public class KpMQTTClient extends KpToExtend {
 		Future<Void> subscribeFuture = null;
 		// Unsubscription to topic for ssap response messages
 		try {
-			log.info(String.format("Unsubscribing internal MQTT client %s from the SIB MQTT topic %s.",
-					mqttClientId, publicationTopicName));
+			log.info("Unsubscribing internal MQTT client {} from the SIB MQTT topic {}.", mqttClientId,
+					publicationTopicName);
 			String[] topics = { new String(publicationTopicName) };
 
 			subscribeFuture = mqttConnection.unsubscribe(topics);
@@ -553,8 +528,8 @@ public class KpMQTTClient extends KpToExtend {
 			}
 
 		} catch (Exception e) {
-			log.warn(String.format("Unable to unsubscribe internal MQTT client %s from the SIB MQTT topic %s.",
-					mqttClientId, publicationTopicName), e);
+			log.warn("Unable to unsubscribe internal MQTT client {} from the SIB MQTT topic {}. Cause = {}, errorMessage = {}.",
+					mqttClientId, publicationTopicName, e.getCause(), e.getMessage());
 		}
 	}
 	

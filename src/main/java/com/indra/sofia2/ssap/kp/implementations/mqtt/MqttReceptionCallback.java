@@ -45,38 +45,28 @@ class MqttReceptionCallback {
 		try {
 			latch.await(kpMqttClient.getSsapResponseTimeout(), TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
-			String errorMessage = String.format(
-					"The callback of the internal MQTT client %s was interrupted while waiting for a response from the SIB server.",
+			log.error("The callback of the internal MQTT client {} was interrupted while waiting for a response from the SIB server.",
 					kpMqttClient.getMqttClientId());
-			log.error(errorMessage);
-			throw new RuntimeException(errorMessage, e);
 		}
 		if (response == null) {
-			if (kpMqttClient.getSubscriptionThread().isStoped()) {
-				String errorMessage = String.format(
-						"The internal MQTT client %s has lost the connection with the SIB server.",
+			if (kpMqttClient.getSubscriptionThread().isStopped()) {
+				log.error("The internal MQTT client {} has lost the connection with the SIB server.",
 						kpMqttClient.getMqttClientId());
-				log.error(errorMessage);
 				kpMqttClient.getInternetConnectionTester().testConnection();
-				throw new ConnectionToSIBException(errorMessage);
+				throw new ConnectionToSIBException("The internal MQTT client has lost the connection with the SIB server");
 			} else {
-				String errorMessage = String.format(
-						"The internal MQTT client %s has exceeded the SSAP response timeout (%s ms)",
-						kpMqttClient.getMqttClientId(), kpMqttClient.getSsapResponseTimeout());
-				log.error(errorMessage);
+				log.error("The SSAP response timeout ({} milliseconds) has been exceeded. MqttClientId = {}.",
+						kpMqttClient.getSsapResponseTimeout(), kpMqttClient.getMqttClientId());
 				kpMqttClient.getInternetConnectionTester().testConnection();
-				throw new SSAPResponseTimeoutException(errorMessage);
+				throw new SSAPResponseTimeoutException();
 			}
 		}
 		return response;
 	}
 
 	void handle(String response) {
-		if (log.isDebugEnabled()) {
-			log.debug(String.format(
-					"The callback of the internal MQTT client %s has received a response from the SIB. Payload=%s",
-					kpMqttClient.getMqttClientId(), response));
-		}
+		log.debug("The callback of the internal MQTT client {} has received a response from the SIB server. Payload={}.",
+				kpMqttClient.getMqttClientId(), response);
 		this.response = response;
 		latch.countDown();
 	}

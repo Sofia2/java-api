@@ -37,7 +37,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 public class KpMqttIsConnected {
 
-	private static Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
+	private static Logger log = LoggerFactory.getLogger(KpMqttFuncional.class);
 
 	private final static String HOST = "localhost";
 	private final static int PORT = 1883;
@@ -81,7 +81,7 @@ public class KpMqttIsConnected {
 		SSAPMessage msgJoin = SSAPMessageGenerator.getInstance()
 				.generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 
-		log.info("Sending JOIN message to the SIB: " + msgJoin.toJson());
+		log.info("Sending JOIN message to the SIB server: {}.", msgJoin.toJson());
 
 		// Envia el mensaje
 		SSAPMessage response = kp.send(msgJoin);
@@ -116,7 +116,7 @@ public class KpMqttIsConnected {
 		});
 		
 		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey, ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
-		log.info("Sending SUBSCRIBE message to the SIB: " + msg.toJson());
+		log.info("Sending SUBSCRIBE message to the SIB server: {}.", msg.toJson());
 		SSAPMessage msgSubscribe = kp.send(msg);
 		log.info("SUBSCRIBE response: " + msgSubscribe);
 		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
