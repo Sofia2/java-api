@@ -116,10 +116,8 @@ class MqttSubscriptionThread extends Thread {
 							if (messageType != null && ssapMessage.getMessageType().equals(SSAPMessageTypes.JOIN)) {
 								String sessionKey = SSAPBodyReturnMessage
 										.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).getData();
-								kpMqttClient.setSessionKey(sessionKey);
 								if (SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).isOk()
 										&& sessionKey != null) {
-									kpMqttClient.setJoined(true);
 									log.info(
 											String.format("The internal MQTT client %s has opened the SSAP session %s.",
 													kpMqttClient.getMqttClientId(), sessionKey));
@@ -128,9 +126,8 @@ class MqttSubscriptionThread extends Thread {
 									&& ssapMessage.getMessageType().equals(SSAPMessageTypes.LEAVE)
 									&& SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody())
 											.isOk()) {
-								log.info(String.format("The internal MQTT client %s has closed the SSAP session %s.",
-										kpMqttClient.getMqttClientId(), kpMqttClient.getSessionKey()));
-								kpMqttClient.setJoined(false);
+								log.info(String.format("The internal MQTT client %s has closed the SSAP session.",
+										kpMqttClient.getMqttClientId(), ssapMessage.getSessionKey()));
 							}
 
 							// Notifies the reception to unlock the

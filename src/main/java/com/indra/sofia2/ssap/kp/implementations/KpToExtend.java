@@ -37,11 +37,6 @@ public abstract class KpToExtend implements Kp {
 	protected static Log log = LogFactory.getLog(KpToExtend.class);
 
 	/**
-	 * Session key del kp en la conexión con el SIB
-	 */
-	protected String sessionKey;
-
-	/**
 	 * XXTEA algorithm cipher key
 	 */
 	protected String xxteaCipherKey = null;
@@ -76,11 +71,6 @@ public abstract class KpToExtend implements Kp {
 	 * ConnectionListener
 	 */
 	private ConnectionListener connectionEventsListener;
-
-	/**
-	 * Estado conexion
-	 */
-	protected boolean joined = false;
 
 	/**
 	 * Configuracion de Conexion
@@ -120,15 +110,6 @@ public abstract class KpToExtend implements Kp {
 			throw new ConnectionConfigException("Configuration is null");
 		}
 		config.validateConfig();
-	}
-
-	public boolean isJoined() {
-		return this.joined;
-	}
-
-	@Override
-	public String getSessionKey() {
-		return this.sessionKey;
 	}
 
 	public void setXxteaCipherKey(String cipherKey) {

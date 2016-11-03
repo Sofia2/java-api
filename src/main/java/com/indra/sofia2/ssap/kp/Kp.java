@@ -28,24 +28,10 @@ import com.indra.sofia2.ssap.ssap.SSAPMessage;
 public interface Kp {
 	
 	/**
-	 * indica si esta conectado con SIB
-	 * @deprecated Usar isConnectionEstablished()
-	 * en lugar de este método.
-	 */
-	@Deprecated
-	boolean isConnected();
-	
-	/**
 	 * indica si la conexión física está establecida para los protocolos
 	 * que la utilicen.
 	 */
 	boolean isConnectionEstablished();
-	
-	/**
-	 * nos da el SessionKey si esta conectado con un SIB 
-	 * devuelve null si no esta conectado con SIB
-	 */
-	String getSessionKey();
 	
 	/**
 	 * conecta con el SIB
@@ -58,7 +44,6 @@ public interface Kp {
 	 * Hace la desconexion del protocolo físico
 	 */
 	void disconnect();
-	
 
 	/**
 	 * Parametros de configuracion para la conexion

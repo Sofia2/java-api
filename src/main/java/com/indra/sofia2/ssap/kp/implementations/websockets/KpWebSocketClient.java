@@ -47,7 +47,6 @@ import com.indra.sofia2.ssap.kp.implementations.listener.KpConnectorEventListene
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
-import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 @SuppressWarnings("rawtypes")
 public class KpWebSocketClient extends KpToExtend {
@@ -127,24 +126,7 @@ public class KpWebSocketClient extends KpToExtend {
 	            @Override
 	            public void on(SSAPMessage message) {
 	            	if(message.getMessageType()!=SSAPMessageTypes.INDICATION){
-	            		//Si el mensaje es un JOIN recupera el SessionKey
-						try{
-							if (message.getMessageType()==SSAPMessageTypes.JOIN) {
-								String sKey = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(message.getBody()).getData();
-								sessionKey = sKey;
-								if( SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(message.getBody()).isOk()&&
-										sKey!=null) {
-									joined=true;
-								}
-							}else if (message.getMessageType().equals(SSAPMessageTypes.LEAVE) &&
-									SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(message.getBody()).isOk()){
-								
-								joined=false;
-							}	
-						
-							//Notifies the reception to unlock the synchronous waiting
-						}catch(Exception e){};
-						
+	            		// The session key will no longer be stored in the KP to prevent synchronization issues.
 	            		callbacks.poll().handle(message.toJson());
 	            		
 	            	}else{
@@ -187,11 +169,6 @@ public class KpWebSocketClient extends KpToExtend {
 		}
 	}
 	
-	
-	@Override
-	public boolean isConnected() {
-		return isConnectionEstablished();
-	}
 	
 	@Override
 	public boolean isConnectionEstablished() {

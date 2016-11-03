@@ -20,8 +20,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atmosphere.wasync.Request.METHOD;
@@ -119,7 +117,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	@Test
@@ -130,7 +128,6 @@ public class KpWebSocketFuncional {
 		
 		//Envia el mensaje
 		SSAPMessage response=kp.send(msgJoin);
-		log.info(kp.getSessionKey());
 		
 		log.info("Recibe respuesta desde el SIB: "+response.toJson());
 		
@@ -195,7 +192,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 		
 	}
 	
@@ -229,7 +226,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	@Test
@@ -262,7 +259,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	@Test
@@ -296,7 +293,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 		
 	}
 	
@@ -331,7 +328,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	
@@ -365,7 +362,7 @@ public class KpWebSocketFuncional {
 		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		
 		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
+		kp.send(msgLeave);
 	}
 	
 	

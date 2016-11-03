@@ -179,17 +179,8 @@ public class KpMQTTClient extends KpToExtend {
 	}
 
 	@Override
-	public boolean isConnected() {
-		return isJoined() && isConnectionEstablished();
-	}
-
-	@Override
 	public boolean isConnectionEstablished() {
 		return mqttConnection != null && mqttConnection.isConnected();
-	}
-
-	public boolean isJoined() {
-		return joined;
 	}
 
 	/**
@@ -242,7 +233,6 @@ public class KpMQTTClient extends KpToExtend {
 			} catch (Exception e) {
 				log.error(String.format("Ignoring disconnect error of the internal MQTT client %s.", mqttClientId), e);
 			} finally {
-				joined = false;
 				mqttConnection = null;
 				this.destroyIndicationPool();
 				this.notifyDisconnectionEvent();
@@ -252,7 +242,6 @@ public class KpMQTTClient extends KpToExtend {
 			log.info(String.format(
 					"The internal MQTT client %s was disconnected from the SIB server. Nothing will be done.",
 					mqttClientId));
-			joined = false;
 			this.destroyIndicationPool();
 			this.notifyDisconnectionEvent();
 		}
@@ -582,14 +571,6 @@ public class KpMQTTClient extends KpToExtend {
 	
 	String getMqttClientId(){
 		return this.mqttClientId;
-	}
-	
-	void setSessionKey(String sessionKey){
-		this.sessionKey = sessionKey;
-	}
-	
-	void setJoined(boolean joined){
-		this.joined = joined;
 	}
 	
 	List<Listener4SIBIndicationNotifications> getSubscriptionListeners(){
