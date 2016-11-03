@@ -15,13 +15,10 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 import java.util.Map;
 
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SSAPBodyQueryWithParamMessage extends SSAPBodyOperationMessage {
 
@@ -39,26 +36,15 @@ public class SSAPBodyQueryWithParamMessage extends SSAPBodyOperationMessage {
 	}
 
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBodyQueryWithParamMessage fromJsonToSSAPBodyQueryWithParamMessage(
-			String json) {
-		return new JSONDeserializer<SSAPBodyQueryWithParamMessage>().use(null,
-				SSAPBodyQueryWithParamMessage.class).deserialize(json);
-	}
-
-	public static Collection<SSAPBodyQueryWithParamMessage> fromJsonArrayToSSAPBodyQueryWithParamMessages(
-			String json) {
-		return new JSONDeserializer<List<SSAPBodyQueryWithParamMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBodyQueryWithParamMessage.class)
-				.deserialize(json);
+	public static SSAPBodyQueryWithParamMessage fromJsonToSSAPBodyQueryWithParamMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBodyQueryWithParamMessage.class);
 	}
 
 }

@@ -95,7 +95,11 @@ public class KpWebSocketClient extends KpToExtend {
                         }
 
                         if (type.equals(Event.MESSAGE)) {
-                            return SSAPMessage.fromJsonToSSAPMessage(dataAux);
+                        	try {
+                        		return SSAPMessage.fromJsonToSSAPMessage(dataAux);
+                        	} catch (IOException e) {
+                        		throw new RuntimeException(e);
+                        	}
                         } else {
                             return null;
                         }
