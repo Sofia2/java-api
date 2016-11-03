@@ -19,8 +19,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fusesource.mqtt.client.QoS;
@@ -31,6 +29,7 @@ import org.junit.Test;
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageGenerator;
@@ -66,9 +65,8 @@ public class KpMqttIsConnected {
 		config.setQualityOfService(QoS.AT_LEAST_ONCE);
 		config.setTimeOutConnectionSIB(5000);
 		config.setSsapResponseTimeout(5000);
-		config.setUser("pedro");
-		config.setPassword("pedro");
 		if (ENABLEMQTTAUTHENTICATION) {
+			// In anonymous mode, the username and the password must be setted to null
 			config.setUser(MQTTUSERNAME);
 			config.setPassword(MQTTPASSWORD);
 		}
@@ -80,7 +78,7 @@ public class KpMqttIsConnected {
 		createSubscription();
 	}
 
-	private void performJoin() {
+	private void performJoin() throws ConnectionToSibException {
 		SSAPMessage msgJoin = SSAPMessageGenerator.getInstance()
 				.generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 
@@ -110,7 +108,7 @@ public class KpMqttIsConnected {
 		};
 	}
 	
-	private void createSubscription() throws IOException {
+	private void createSubscription() throws ConnectionToSibException {
 		kp.addListener4SIBNotifications(new Listener4SIBIndicationNotifications() {
 			@Override
 			public void onIndication(String messageId, SSAPMessage ssapMessage) {

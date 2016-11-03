@@ -30,6 +30,7 @@ import org.junit.Test;
 import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
+import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
 import com.indra.sofia2.ssap.kp.exceptions.NotSupportedMessageTypeException;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.ssap.SSAPBulkMessage;
@@ -98,7 +99,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testJoinByTokenLeave() {
+	public void testJoinByTokenLeave() throws ConnectionToSibException {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
@@ -141,7 +142,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertNative() {
+	public void testInsertNative()  throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -176,7 +177,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testUpdateNative() {
+	public void testUpdateNative()  throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -209,7 +210,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testQueryNative() {
+	public void testQueryNative() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -242,7 +243,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testInsertSqlLike() {
+	public void testInsertSqlLike() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -278,7 +279,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testUpdateSqlLike() {
+	public void testUpdateSqlLike() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -312,7 +313,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySql() {
+	public void testQuerySql() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -347,7 +348,7 @@ public class KpMqttFuncional {
 	
 	
 	@Test
-	public void testQuerySqlBDC() {
+	public void testQuerySqlBDC() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -381,7 +382,7 @@ public class KpMqttFuncional {
 	
 
 	@Test
-	public void testQueryBDC() {
+	public void testQueryBDC() throws ConnectionToSibException {
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		
@@ -487,7 +488,7 @@ public class KpMqttFuncional {
 	}
 	
 	@Test
-	public void testBulk() {
+	public void testBulk() throws ConnectionToSibException {
 		
 		//Genera mensaje de JOIN
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);

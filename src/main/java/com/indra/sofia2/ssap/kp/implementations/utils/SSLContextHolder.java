@@ -1,15 +1,8 @@
 package com.indra.sofia2.ssap.kp.implementations.utils;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -19,39 +12,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fusesource.hawtdispatch.transport.SslTransport;
 
-import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.SSLContextInitializationError;
 
 public class SSLContextHolder {
 
 	private static final Log log = LogFactory.getLog(SSLContextHolder.class);
 	private static SSLContext sslContext;
 
-	public static SSLContext getSSLContext() throws UnrecoverableKeyException, KeyManagementException,
-			FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static SSLContext getSSLContext() throws SSLContextInitializationError {
 		synchronized ("") {
 			if (sslContext == null) {
-				sslContext = initSSLContext();
+				try {
+					sslContext = initSSLContext();
+				} catch (SSLContextInitializationError e) {
+					throw e;
+				} catch (Throwable e) {
+					throw new SSLContextInitializationError(e);
+				}
 			}
 			return sslContext;
 		}
 	}
 
-	private static SSLContext initSSLContext() throws FileNotFoundException, KeyStoreException, IOException,
-			NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
-		log.info("Initializing SSL context\n");
+	private static SSLContext initSSLContext() throws Exception {
+		log.info("Initializing SSL context");
 		String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
 		String keyStore = System.getProperty("javax.net.ssl.keyStore");
 		String keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
 
 		if (algorithm == null || algorithm.trim().length() == 0) {
-			throw new ConnectionToSibException(
+			throw new SSLContextInitializationError(
 					"System property: ssl.KeyManagerFactory.algorithm cannot be null or empty");
 		}
 		if (keyStore == null || keyStore.trim().length() == 0) {
-			throw new ConnectionToSibException("System property: javax.net.ssl.keyStore cannot be null or empty");
+			throw new SSLContextInitializationError("System property: javax.net.ssl.keyStore cannot be null or empty");
 		}
 		if (keyStorePassword == null || keyStorePassword.trim().length() == 0) {
-			throw new ConnectionToSibException(
+			throw new SSLContextInitializationError(
 					"System property: javax.net.ssl.keyStorePassword cannot be null or empty");
 		}
 

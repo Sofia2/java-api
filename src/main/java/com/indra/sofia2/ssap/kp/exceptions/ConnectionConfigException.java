@@ -23,7 +23,7 @@ public class ConnectionConfigException extends RuntimeException {
 		super(message);
 	}
 
-	public ConnectionConfigException(Exception e) {
+	public ConnectionConfigException(Throwable e) {
 		super(e);
 	}
 

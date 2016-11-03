@@ -15,15 +15,8 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.implementations.mqtt;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +36,8 @@ import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.encryption.XXTEA;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSibException;
+import com.indra.sofia2.ssap.kp.exceptions.DnsResolutionException;
+import com.indra.sofia2.ssap.kp.exceptions.SSLContextInitializationError;
 import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.exceptions.MQTTClientNotConfiguredException;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
@@ -273,7 +268,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Subscribe the MQTT client to the topics that the SIB will use to notify
 	 * messages from SIB
 	 */
-	private void subscribeToSibMqttTopics() {
+	private void subscribeToSibMqttTopics() throws ConnectionToSibException {
 		
 		subscribeToMqttTopic(MqttConstants.getSsapResponseMqttTopic(mqttClientId));
 		subscribeToMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
@@ -431,8 +426,7 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	
 	private void configureMqttClient(MQTTConnectionConfig cfg, String sibAddress)
-			throws URISyntaxException, UnrecoverableKeyException, KeyManagementException, FileNotFoundException,
-			KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+			throws SSLContextInitializationError, ConnectionToSibException, URISyntaxException {
 		if (mqttClient == null) {
 			mqttClient = new MQTT();
 			String username = cfg.getUser();
@@ -470,7 +464,7 @@ public class KpMQTTClient extends KpToExtend {
 		}
 	}
 	
-	private String getSibAddress(MQTTConnectionConfig cfg){
+	private String getSibAddress(MQTTConnectionConfig cfg) {
 		String sibAddress;
 		try {
 			if (config.getHostSIB().startsWith("tcp://") || config.getHostSIB().startsWith("ssl://")) {
@@ -488,7 +482,7 @@ public class KpMQTTClient extends KpToExtend {
 						config.getHostSIB());
 				log.error(errorMessage);
 				internetConnectionTester.testConnection();
-				throw new ConnectionToSibException(errorMessage);
+				throw new DnsResolutionException(errorMessage);
 			} else {
 				sibAddress = cfg.getDnsFailHostSIB();
 				log.warn(String.format("The SIB address %s couldn't be resolved. Using fallback IP address %s.",
@@ -515,7 +509,7 @@ public class KpMQTTClient extends KpToExtend {
 		return mqttClientId;
 	}
 	
-	private void subscribeToMqttTopic(String topicName) {
+	private void subscribeToMqttTopic(String topicName) throws ConnectionToSibException {
 		Future<byte[]> subscribeFuture = null;
 
 		// Subscription to topic for ssap response messages

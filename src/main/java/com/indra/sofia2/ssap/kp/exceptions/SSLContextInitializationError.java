@@ -15,20 +15,16 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class ConnectionToSibException extends Exception {
+public class SSLContextInitializationError extends ConnectionConfigException {
 	
 	private static final long serialVersionUID = 1L;
-	
-	public ConnectionToSibException(String message){
+
+	public SSLContextInitializationError(String message) {
 		super(message);
 	}
-	
-	public ConnectionToSibException(String message, Throwable e) {
-		super(message, e);
-	}
 
-	public ConnectionToSibException(Throwable e) {
+	public SSLContextInitializationError(Throwable e) {
 		super(e);
 	}
-	
+
 }

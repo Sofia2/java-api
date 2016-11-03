@@ -15,20 +15,16 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class ConnectionToSibException extends Exception {
+public class DnsResolutionException extends ConnectionConfigException {
 	
 	private static final long serialVersionUID = 1L;
-	
-	public ConnectionToSibException(String message){
+
+	public DnsResolutionException(String message) {
 		super(message);
 	}
-	
-	public ConnectionToSibException(String message, Throwable e) {
-		super(message, e);
-	}
 
-	public ConnectionToSibException(Throwable e) {
+	public DnsResolutionException(Throwable e) {
 		super(e);
 	}
-	
+
 }
