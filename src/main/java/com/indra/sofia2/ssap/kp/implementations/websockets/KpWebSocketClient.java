@@ -49,6 +49,7 @@ import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
+@SuppressWarnings("rawtypes")
 public class KpWebSocketClient extends KpToExtend {
 	private Client client;
 	private RequestBuilder request;
@@ -69,9 +70,9 @@ public class KpWebSocketClient extends KpToExtend {
     //Correc: Renombrada variable local
 	public KpWebSocketClient(WebSocketConnectionConfig config) throws ConnectionConfigException {
 		super(config);
-		this.ssapResponseTimeout=config.getTimeOutConnectionSIB();
+		ssapResponseTimeout = config.getTimeOutConnectionSIB();
 
-		this.ssapKeepAlive=config.getKeepAliveInSeconds();
+		this.ssapKeepAlive = config.getKeepAliveInSeconds();
 
 		this.client = ClientFactory.getDefault().newClient();		
 
@@ -105,19 +106,21 @@ public class KpWebSocketClient extends KpToExtend {
                 .transport(Request.TRANSPORT.LONG_POLLING);
 	}
 	
-	public KpWebSocketClient(WebSocketConnectionConfig config, KpConnectorEventListener eventListener) throws ConnectionConfigException {
+	public KpWebSocketClient(WebSocketConnectionConfig config, KpConnectorEventListener eventListener)
+			throws ConnectionConfigException {
 		this(config);
-		this.connectionEventListener=eventListener;
+		this.connectionEventListener = eventListener;
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void connect() throws ConnectionToSibException {
 		this.initializeIndicationPool();
 
 		OptionsBuilder newOptionsBuilder = this.client.newOptionsBuilder();
 		newOptionsBuilder.requestTimeoutInSeconds( this.ssapKeepAlive );
 
-		this.socket = this.client.create( newOptionsBuilder.build() );
+		this.socket = this.client.create(newOptionsBuilder.build());
 
 		try{
 			socket.on("message", new Function<SSAPMessage>() {
