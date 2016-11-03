@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.ssap.binary.Base64;
 import com.indra.sofia2.ssap.ssap.binary.Encoder;
 import com.indra.sofia2.ssap.ssap.binary.Encoding;
 import com.indra.sofia2.ssap.ssap.binary.Mime;
 import com.indra.sofia2.ssap.ssap.binary.Storage;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 public class SSAPBinaryMessage {
 
@@ -91,34 +88,27 @@ public class SSAPBinaryMessage {
 	}
 	
 	public String toJson() {
-		return new JSONSerializer().exclude("*.class").serialize(this);
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
-	public String toJson(String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(this);
-	}
-
-	public static SSAPBinaryMessage fromJsonToSSAPBinaryMessage(String json) {
-		return new JSONDeserializer<SSAPBinaryMessage>().use(null,
-				SSAPBinaryMessage.class).deserialize(json);
-	}
-
+	
 	public static String toJsonArray(Collection<SSAPBinaryMessage> collection) {
-		return new JSONSerializer().exclude("*.class").serialize(collection);
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static String toJsonArray(Collection<SSAPBinaryMessage> collection,
-			String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(collection);
+	public static SSAPBinaryMessage fromJsonToSSAPBinaryMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBinaryMessage.class);
 	}
 
-	public static Collection<SSAPBinaryMessage> fromJsonArrayToSSAPBinaryMessage(
-			String json) {
-		return new JSONDeserializer<List<SSAPBinaryMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBinaryMessage.class).deserialize(json);
+	public static Collection<SSAPBinaryMessage> fromJsonArrayToSSAPBinaryMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBinaryMessage>>(){});
 	}
 	
 }

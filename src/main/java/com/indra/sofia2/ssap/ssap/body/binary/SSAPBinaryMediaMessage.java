@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,13 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.ssap.body.binary;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.indra.sofia2.ssap.ssap.binary.Encoding;
 import com.indra.sofia2.ssap.ssap.binary.Storage;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 public class SSAPBinaryMediaMessage {
 
@@ -67,26 +65,28 @@ public class SSAPBinaryMediaMessage {
 		this.mime=mime;
 	}
 	
-	public static SSAPBinaryMediaMessage fromJsonToSSAPBinaryMediaMessage(String json) {
-		return new JSONDeserializer<SSAPBinaryMediaMessage>().use(null,
-				SSAPBinaryMediaMessage.class).deserialize(json);
+	public String toJson() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 	public static String toJsonArray(Collection<SSAPBinaryMediaMessage> collection) {
-		return new JSONSerializer().exclude("*.class").serialize(collection);
+		try {
+			return new ObjectMapper().writeValueAsString(collection);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
-	public static String toJsonArray(Collection<SSAPBinaryMediaMessage> collection,
-			String[] fields) {
-		return new JSONSerializer().include(fields).exclude("*.class")
-				.serialize(collection);
+	
+	public static SSAPBinaryMediaMessage fromJsonToSSAPBinaryMediaMessage(String json) throws IOException {
+		return new ObjectMapper().readValue(json, SSAPBinaryMediaMessage.class);
 	}
 
 	public static Collection<SSAPBinaryMediaMessage> fromJsonArrayToSSAPBinaryMediaMessage(
-			String json) {
-		return new JSONDeserializer<List<SSAPBinaryMediaMessage>>()
-				.use(null, ArrayList.class)
-				.use("values", SSAPBinaryMediaMessage.class).deserialize(json);
+			String json) throws IOException {
+		return new ObjectMapper().readValue(json, new TypeReference<Collection<SSAPBinaryMediaMessage>>(){});
 	}
-	
 }

@@ -16,6 +16,7 @@
 package com.indra.sofia2.ssap.ssap;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -148,7 +149,7 @@ public class SSAPMessageGenerator {
 	}
 	
 	@SuppressWarnings({ "unchecked" })
-	private SSAPBinaryMessage subAnalize(Map<String,Object> JSONSubStructure, Map<String, SSAPBinaryMessage> binary){
+	private SSAPBinaryMessage subAnalize(Map<String,Object> JSONSubStructure, Map<String, SSAPBinaryMessage> binary) {
 		for (Entry<String, Object> jsonElement : JSONSubStructure.entrySet()){
 			if (jsonElement.getValue() instanceof LinkedHashMap){
 				if (jsonElement.getKey().equals("media")){
@@ -162,8 +163,12 @@ public class SSAPMessageGenerator {
 					json.append(media.get("mime"));
 					json.append("\",\"name\":\"");
 					json.append(media.get("name"));
-					json.append("\"}}");	
-					return SSAPBinaryMessage.fromJsonToSSAPBinaryMessage(json.toString());
+					json.append("\"}}");
+					try {
+						return SSAPBinaryMessage.fromJsonToSSAPBinaryMessage(json.toString());
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 				}else{
 					SSAPBinaryMessage binaryMessage = subAnalize(((Map<String,Object>)jsonElement.getValue()), binary);
 					if (binaryMessage!=null){
