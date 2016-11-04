@@ -8,53 +8,56 @@ import org.apache.commons.httpclient.util.HttpURLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.indra.sofia2.ssap.kp.exceptions.NoInternetConnectionException;
+
 public class InternetConnectionTester {
 
 	private static final Logger log = LoggerFactory.getLogger(InternetConnectionTester.class);
-	private static final String DEFAULT_TEST_URL = "http://www.google.es";
+	private static final String DEFAULT_TEST_URL = "http://www.google.com";
 
 	private boolean isEnabled;
-	private String testUrl;
+	private URL testUrl;
 
-	public InternetConnectionTester() {
+	public InternetConnectionTester() throws MalformedURLException {
 		isEnabled = true;
-		testUrl = DEFAULT_TEST_URL;
+		testUrl = new URL(DEFAULT_TEST_URL);
 	}
 
 	public InternetConnectionTester(boolean isEnabled) {
 		this.isEnabled = isEnabled;
-		testUrl = DEFAULT_TEST_URL;
+		try {
+			testUrl = new URL(DEFAULT_TEST_URL);
+		} catch (MalformedURLException e) {
+			log.error("The default test URL is malformed. Exiting...");
+			throw new RuntimeException(e);
+		}
 	}
 
-	public InternetConnectionTester(boolean isEnabled, String testUrl) {
+	public InternetConnectionTester(boolean isEnabled, String testUrl) throws MalformedURLException {
 		this.isEnabled = isEnabled;
-		this.testUrl = testUrl;
+		this.testUrl = new URL(testUrl);
 	}
 
-	public boolean testConnection() {
+	public void testInternetConnectivity() throws NoInternetConnectionException {
 		if (!isEnabled)
-			return true;
+			return;
 		HttpURLConnection conn = null;
 		try {
-			final URL url = new URL(testUrl);
-			conn = (HttpURLConnection) url.openConnection();
+			conn = (HttpURLConnection) testUrl.openConnection();
 			conn.connect();
 			if (HttpURLConnection.HTTP_OK == conn.getResponseCode()) {
 				log.info("There's internet access.");
 			} else {
 				log.info("There's no internet access: unable to reach " + testUrl);
 			}
-		} catch (MalformedURLException e) {
-			log.info("The test URL is malformed. The test has failed.");
-			return false;
 		} catch (IOException e) {
-			log.info("There's no internet access: unable to reach " + testUrl);
-			return false;
+			log.error("There's no internet access: unable to reach " + testUrl);
+			throw new NoInternetConnectionException(e);
 		} finally {
 			if (conn != null) {
 				conn.disconnect();
 			}
 		}
-		return true;
+		return;
 	}
 }

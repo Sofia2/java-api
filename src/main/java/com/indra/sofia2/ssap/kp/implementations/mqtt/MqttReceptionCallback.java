@@ -52,12 +52,12 @@ class MqttReceptionCallback {
 			if (kpMqttClient.getSubscriptionThread().isStopped()) {
 				log.error("The internal MQTT client {} has lost the connection with the SIB server.",
 						kpMqttClient.getMqttClientId());
-				kpMqttClient.getInternetConnectionTester().testConnection();
+				kpMqttClient.getInternetConnectionTester().testInternetConnectivity();
 				throw new ConnectionToSIBException("The internal MQTT client has lost the connection with the SIB server");
 			} else {
 				log.error("The SSAP response timeout ({} milliseconds) has been exceeded. MqttClientId = {}.",
 						kpMqttClient.getSsapResponseTimeout(), kpMqttClient.getMqttClientId());
-				kpMqttClient.getInternetConnectionTester().testConnection();
+				kpMqttClient.getInternetConnectionTester().testInternetConnectivity();
 				throw new SSAPResponseTimeoutException();
 			}
 		}

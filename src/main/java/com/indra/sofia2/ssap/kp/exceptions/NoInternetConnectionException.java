@@ -15,15 +15,19 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.exceptions;
 
-public class DnsResolutionException extends ConnectionToSIBException {
+public class NoInternetConnectionException extends ConnectionToSIBException {
 	
 	private static final long serialVersionUID = 1L;
+	
+	public NoInternetConnectionException() {
+		super();
+	}
 
-	public DnsResolutionException(String message) {
+	public NoInternetConnectionException(String message) {
 		super(message);
 	}
 
-	public DnsResolutionException(Throwable e) {
+	public NoInternetConnectionException(Throwable e) {
 		super(e);
 	}
 

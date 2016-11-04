@@ -19,6 +19,10 @@ public class ConnectionToSIBException extends Exception {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public ConnectionToSIBException() {
+		super();
+	}
+	
 	public ConnectionToSIBException(String message){
 		super(message);
 	}

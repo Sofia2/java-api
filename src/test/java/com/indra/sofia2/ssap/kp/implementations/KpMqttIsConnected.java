@@ -58,11 +58,11 @@ public class KpMqttIsConnected {
 	public void setUpBeforeClass() throws Exception {
 
 		config = new MQTTConnectionConfig();
-		config.setHostSIB(HOST);
-		config.setPortSIB(PORT);
+		config.setSibHost(HOST);
+		config.setSibPort(PORT);
 		config.setKeepAliveInSeconds(5);
 		config.setQualityOfService(QoS.AT_LEAST_ONCE);
-		config.setTimeOutConnectionSIB(5000);
+		config.setSibConnectionTimeout(5000);
 		config.setSsapResponseTimeout(5000);
 		if (ENABLEMQTTAUTHENTICATION) {
 			// In anonymous mode, the username and the password must be setted to null

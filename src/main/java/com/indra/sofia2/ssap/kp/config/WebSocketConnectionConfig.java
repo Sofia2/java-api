@@ -32,7 +32,7 @@ public class WebSocketConnectionConfig extends ConnectionConfig {
 	
 	private int keepAliveInSeconds = 60;
 	
-	public void validateConfig() throws ConnectionConfigException{
+	public void validate() throws ConnectionConfigException{
 		if (endpointUri == null || endpointUri.trim().length()==0) {
 			throw new ConnectionConfigException("endpointUri cannot be empty or null"); 
 		}

@@ -73,11 +73,11 @@ public class KpMqttFuncional {
 	public void setUpBeforeClass() throws Exception {
 		
 		MQTTConnectionConfig config=new MQTTConnectionConfig();
-		config.setHostSIB(HOST);
-		config.setPortSIB(PORT);
+		config.setSibHost(HOST);
+		config.setSibPort(PORT);
 		config.setKeepAliveInSeconds(5);
 		config.setQualityOfService(QoS.AT_LEAST_ONCE);
-		config.setTimeOutConnectionSIB(6000);
+		config.setSibConnectionTimeout(6000);
 		config.setSsapResponseTimeout(1000000);
 		if (ENABLEMQTTAUTHENTICATION){
 			config.setUser(MQTTUSERNAME);

@@ -68,7 +68,7 @@ public class KpWebSocketFuncional {
 		WebSocketConnectionConfig config=new WebSocketConnectionConfig();
 		config.setEndpointUri("http://sofia2.com/sib/api_websocket");
 		config.setMethod(METHOD.GET);
-		config.setTimeOutConnectionSIB(20000);
+		config.setSibConnectionTimeout(20000);
 		
 		
 		this.kp=new KpWebSocketClient(config);

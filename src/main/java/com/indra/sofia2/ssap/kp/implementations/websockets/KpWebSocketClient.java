@@ -69,7 +69,7 @@ public class KpWebSocketClient extends KpToExtend {
     //Correc: Renombrada variable local
 	public KpWebSocketClient(WebSocketConnectionConfig config) throws ConnectionConfigException {
 		super(config);
-		ssapResponseTimeout = config.getTimeOutConnectionSIB();
+		ssapResponseTimeout = config.getSibConnectionTimeout();
 
 		this.ssapKeepAlive = config.getKeepAliveInSeconds();
 
@@ -163,7 +163,7 @@ public class KpWebSocketClient extends KpToExtend {
                 		connectionEventListener.onOpen(t);
                 	}
                 }
-            }).open(this.request.build(),this.config.getTimeOutConnectionSIB(), TimeUnit.MILLISECONDS);
+            }).open(this.request.build(),this.config.getSibConnectionTimeout(), TimeUnit.MILLISECONDS);
 		}catch(Exception e){
 			throw new ConnectionToSIBException(e);
 		}

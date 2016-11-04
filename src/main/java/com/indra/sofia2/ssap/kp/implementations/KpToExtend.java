@@ -104,12 +104,9 @@ public abstract class KpToExtend implements Kp {
 		this.config = config;
 	}
 
-	public KpToExtend(ConnectionConfig config) throws ConnectionConfigException {
+	protected KpToExtend(ConnectionConfig config) throws ConnectionConfigException {
 		this.config = config;
-		if (config == null) {
-			throw new ConnectionConfigException("Configuration is null");
-		}
-		config.validateConfig();
+		config.validate();
 	}
 
 	public void setXxteaCipherKey(String cipherKey) {
