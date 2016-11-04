@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.codec.binary.Base64;
 import org.fusesource.mqtt.client.Future;
 import org.fusesource.mqtt.client.FutureConnection;
 import org.fusesource.mqtt.client.MQTT;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
-import com.indra.sofia2.ssap.kp.encryption.XXTEA;
+import com.indra.sofia2.ssap.kp.encryption.CypheredSSAPPayloadHandler;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.DnsResolutionException;
@@ -43,8 +42,6 @@ import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.kp.implementations.utils.SSLContextHolder;
 import com.indra.sofia2.ssap.kp.utils.InternetConnectionTester;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
-import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
-import com.indra.sofia2.ssap.ssap.body.SSAPBodyJoinUserAndPasswordMessage;
 
 public class KpMQTTClient extends KpToExtend {
 
@@ -81,6 +78,11 @@ public class KpMQTTClient extends KpToExtend {
 	 * The MQTT clientID to be used.
 	 */
 	private String mqttClientId;
+	
+	/**
+	 * This object will encrypt/decrypt the SSAP payloads (if necessary)
+	 */
+	private CypheredSSAPPayloadHandler cypheredPayloadHandler;
 
 	/**
 	 * 
@@ -96,7 +98,7 @@ public class KpMQTTClient extends KpToExtend {
 	 * Creates a MQTT client and connects it to the SIB server
 	 */
 	@Override
-	public void connect() throws ConnectionToSIBException {
+	public synchronized void connect() throws ConnectionToSIBException {
 
 		try {
 			log.info("Establishing MQTT connection with SIB server {} using port {}.", config.getSibHost(),
@@ -109,6 +111,13 @@ public class KpMQTTClient extends KpToExtend {
 
 			ssapResponseTimeout = cfg.getSsapResponseTimeout();
 			boolean cleanSession = cfg.isCleanSession();
+			
+			if (xxteaCipherKey != null) {
+				log.info("Configuring cypered SSAP payload handler...");
+				cypheredPayloadHandler = new CypheredSSAPPayloadHandler(xxteaCipherKey);
+			} else {
+				log.warn("No xxtea cypher key has been specified. XXTEA-cyphered SSAP messages won't be supported.");
+			}
 
 			// Creates the client (if needed) and open a connection to the SIB
 			// server
@@ -263,28 +272,14 @@ public class KpMQTTClient extends KpToExtend {
 		unsubscribeFromMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
 	}
 	
-	private byte[] encryptPayload(SSAPMessage msg) {
-		byte[] encrypted = XXTEA.encrypt(msg.toJson().getBytes(), this.xxteaCipherKey.getBytes());
-		if (msg.getMessageType() == SSAPMessageTypes.JOIN) {
-			SSAPBodyJoinUserAndPasswordMessage body = SSAPBodyJoinUserAndPasswordMessage
-					.fromJsonToSSAPBodyJoinUserAndPasswordMessage(msg.getBody());
-			String kpName = body.getInstance().split(":")[0];
-			String completeMessage = kpName.length() + "#" + kpName + Base64.encodeBase64String(encrypted);
-			return completeMessage.getBytes();
-		} else {
-			return Base64.encodeBase64(encrypted);
-		}
-	}
-	
 	private SSAPMessage sendSsapMessageToSib(SSAPMessage msg, boolean encryptPayload) throws ConnectionToSIBException {
 		log.debug("Sending SSAP message to the SIB server using the internal MQTT client {}. Payload={}.", mqttClientId,
 				msg.toJson());
 		internetConnectionTester.testInternetConnectivity();
 		try {
-			MqttReceptionCallback callback = new MqttReceptionCallback(this);
 			SSAPMessage ssapResponse;
 			synchronized (this) {
-				this.responseCallback = callback;
+				this.responseCallback = new MqttReceptionCallback(this);
 
 				// Publish a QoS message
 				// It is not necessary publish topic. The message will be
@@ -295,11 +290,16 @@ public class KpMQTTClient extends KpToExtend {
 						mqttClientId, qosLevel, encryptPayload, msg.toJson());
 				byte[] payload;
 				if (encryptPayload)
-					payload = encryptPayload(msg);
+					payload = cypheredPayloadHandler.getEncryptedPayload(msg);
 				else
 					payload = msg.toJson().getBytes();
 				mqttConnection.publish(MqttConstants.SIB_REQUESTS_TOPIC, payload, qosLevel, false);
-				ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
+				
+				String responsePayload = this.responseCallback.get();
+				if (encryptPayload) {
+					responsePayload = cypheredPayloadHandler.getDecryptedPayload(responsePayload);
+				}
+				ssapResponse = SSAPMessage.fromJsonToSSAPMessage(responsePayload);
 				log.debug(
 						"The internal MQTT client {} received a SSAP response from the SIB server. Response={}, request={}.",
 						mqttClientId, ssapResponse.toJson(), msg.toJson());
@@ -330,6 +330,10 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	@Override
 	public SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSIBException {
+		if (xxteaCipherKey == null) {
+			log.error("No XXTEA cypher key has been specified. The SSAP message can only be sent in plain mode.");
+			throw new IllegalStateException("No XXTEA cypher key has been specified");
+		}
 		return sendSsapMessageToSib(msg, true);
 	}
 
@@ -515,6 +519,10 @@ public class KpMQTTClient extends KpToExtend {
 
 	InternetConnectionTester getInternetConnectionTester() {
 		return internetConnectionTester;
+	}
+	
+	public CypheredSSAPPayloadHandler getCypheredPayloadHandler() {
+		return cypheredPayloadHandler;
 	}
 
 	/*

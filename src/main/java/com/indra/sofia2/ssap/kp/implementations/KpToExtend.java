@@ -39,7 +39,7 @@ public abstract class KpToExtend implements Kp {
 	/**
 	 * XXTEA algorithm cipher key
 	 */
-	protected String xxteaCipherKey = null;
+	protected String xxteaCipherKey;
 
 	/**
 	 * Subscription listeners thread pool
