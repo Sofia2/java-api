@@ -50,7 +50,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyJoinUserAndPasswordMessage;
 
 public class KpMQTTClient extends KpToExtend {
 	
-	private static Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
 
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;
 

@@ -37,7 +37,7 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 public class KpMqttIsConnected {
 
-	private static Logger log = LoggerFactory.getLogger(KpMqttFuncional.class);
+	private static final Logger log = LoggerFactory.getLogger(KpMqttFuncional.class);
 
 	private final static String HOST = "localhost";
 	private final static int PORT = 1883;

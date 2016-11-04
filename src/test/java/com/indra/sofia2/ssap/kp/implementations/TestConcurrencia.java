@@ -34,7 +34,7 @@ import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 
 public class TestConcurrencia implements Runnable{
 	
-	private static Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
+	private static final Logger log = LoggerFactory.getLogger(KpGatewayRestFuncional.class);
 	
 	private final static String SERVICE_URL="http://sofia2.com/sib/services/api_ssap/";
 	
