@@ -40,552 +40,306 @@ import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
 
 public class KpMqttFuncional {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(KpMqttFuncional.class);
-	
-	private final static String HOST="sofia2.com";
-	private final static int PORT=1880;
-	
-	private final static String TOKEN = "f0516016ef2647aeb115ad035e18f0fb";
-	private final static String KP_INSTANCE = "kpParadaAutobus:kp01";
-	
-	private final static String ONTOLOGY_NAME = "feedBiciCoruna";
-	private final static String ONTOLOGY_INSTANCE = "{\"Feed\": {\"assetId\": \"5\", \"assetName\": \"Aquarium\", \"assetSource\": \"BiciCoruna\", \"assetType\": \"\", \"attribs\": [{\"name\": \"nombre\", \"value\": \"Aquarium\"}, {\"name\": \"direccion\", \"value\": \"As Lagoas\"}, {\"name\": \"horaDeInicio\", \"value\": \"7:30\"}, {\"name\": \"horaDeFin\", \"value\": \"22:30\"}], \"feedId\": \"feed_5_2015-05-11T08:19:01\", \"feedSource\": \"BiciCoruna\", \"geometry\": {\"coordinates\": [-8.41003131866455, 43.38148880004883], \"type\": \"Point\"}, \"measures\": [{\"desc\": \"Total de Puestos\", \"measure\": \"16\", \"method\": \"REAL\", \"name\": \"PuestosActivos\", \"unit\": \"u\"}, {\"desc\": \"Bicicletas disponibles\", \"measure\": \"5\", \"method\": \"REAL\", \"name\": \"BicisDisponibles\", \"unit\": \"u\"}], \"measuresPeriod\": 60, \"measuresPeriodUnit\": \"s\", \"measuresTimestamp\": {\"$date\": \"2015-05-11T08:19:01.443Z\"}, \"measuresType\": \"INSTANT\", \"timestamp\": {\"$date\": \"2015-05-11T08:19:01.443Z\"}, \"type\": \"VIRTUAL\"}}";
-	
-	private final static String ONTOLOGY_UPDATE = "{\"Sensor\": { \"geometry\": { \"coordinates\": [ 40.512967, -3.67495 ], \"type\": \"Point\" }, \"assetId\": \"S_Temperatura_00066\", \"measure\": 20, \"timestamp\": { \"$date\": \"2014-04-29T08:24:54.005Z\"}}}";
-	private final static String ONTOLOGY_UPDATE_WHERE = "{Sensor.assetId:\"S_Temperatura_00066\"}";
-	
-	private final static String ONTOLOGY_QUERY_NATIVE = "{Sensor.measure:{$gt:10}}";
-	
-	private final static String ONTOLOGY_INSERT_SQLLIKE = "insert into TestSensorTemperatura(geometry, assetId, measure, timestamp) values (\"{ 'coordinates': [ 40.512967, -3.67495 ], 'type': 'Point' }\", \"S_Temperatura_00066\", 15, \"{ '$date': '2014-04-29T08:24:54.005Z'}\")";
-	private final static String ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 20 where Sensor.assetId = \"S_Temperatura_00066\"";
-	
-//	private final static String ONTOLOGY_QUERY_SQLLIKE = "select * from TestSensorTemperatura where Sensor.assetId = \"S_Temperatura_00066\"";
+
+	private final static String HOST = "<SIB_HOST>";
+	private final static int PORT = 1883;
+
+	private final static String TOKEN = "<TOKEN>";
+	private final static String KP_INSTANCE = "<KP>";
+
+	private final static String ONTOLOGY_NAME = "Sofia2InstanceStatus";
+	private final static String ONTOLOGY_INSTANCE = "{\"statusData\":{ \"instanceId\":\"SsapApiTest\",\"systemStatusResult\":true,\"statusResult\":{\"cacheStatus\":true,\"cdbStatus\":true,\"hdbStatus\":true,\"rtdbStatus\":true,\"exportJobSchedulerStatus\":true,\"genericSchedulerStatus\":true,\"groupOntologySchedulerStatus\":true,\"mongoExportJobSchedulerStatus\":true,\"processStatus\":true,\"scriptStatus\":true,\"quartzStatus\":true,\"sibStatus\":true,\"hiveStatus\":true,\"hdfsStatus\":true},\"systemStatusTime\":{\"$date\": \"2014-01-30T17:14:00Z\"}}}";
+
+	private final static String NATIVE_UPDATE = "{\"statusData\":{ \"instanceId\":\"SsapApiTest\",\"systemStatusResult\":true,\"statusResult\":{\"cacheStatus\":true,\"cdbStatus\":true,\"hdbStatus\":true,\"rtdbStatus\":true,\"exportJobSchedulerStatus\":true,\"genericSchedulerStatus\":true,\"groupOntologySchedulerStatus\":true,\"mongoExportJobSchedulerStatus\":true,\"processStatus\":true,\"scriptStatus\":true,\"quartzStatus\":true,\"sibStatus\":true,\"hiveStatus\":true,\"hdfsStatus\":true},\"systemStatusTime\":{\"$date\": \"2014-01-30T17:14:00Z\"}}}";
+	private final static String NATIVE_UPDATE_QUERY = "{\"statusData.instanceId\": \"SsapApiTest\"}";
+	private final static String NATIVE_QUERY = "{\"statusData.instanceId\": \"SsapApiTest\"}";
+	private final static String NATIVE_DELETE_QUERY = "db.Sofia2InstanceStatus.remove(" + NATIVE_QUERY
+			+ ");";
+
+	private final static String SQLLIKE_ONTOLOGY_INSTANCE = "insert into Sofia2InstanceStatus(instanceId, statusResult, systemStatusResult, systemStatusTime) values ('SsapApiTestSqlLike', \"{'cacheStatus':true,'cdbStatus':true,'hdbStatus':true,'rtdbStatus':true,'exportJobSchedulerStatus':true,'genericSchedulerStatus':true,'groupOntologySchedulerStatus':true,'mongoExportJobSchedulerStatus':true,'processStatus':true,'scriptStatus':true,'quartzStatus':true,'sibStatus':true,'hiveStatus':true,'hdfsStatus':true}\", false, \"{ '$date': '2014-04-29T08:24:54.005Z'}\")";
+	private final static String SQLLIKE_UPDATE = "update Sofia2InstanceStatus set systemStatusResult = true where statusData.instanceId=\"SsapApiTestSqlLike\"";
+	private final static String SQLLIKE_UPDATE_QUERY = "select * from Sofia2InstanceStatus where statusData.instanceId = \"SsapApiTestSqlLike\"";
+	private final static String SQLLIKE_DELETE_QUERY = "delete from Sofia2InstanceStatus where statusData.instanceId = \"SsapApiTestSqlLike\"";
+
+	private final static String MQTT_USERNAME = "username";
+	private final static String MQTT_PASSWORD = "password";
+	private final static boolean ENABLE_MQTT_AUTHENTICATION = true;
 
 	private Kp kp;
-	
-	private final static String MQTTUSERNAME = "sofia2";
-	private final static String MQTTPASSWORD = "indra2014";
-	private final static boolean ENABLEMQTTAUTHENTICATION = false;
-	
-	
+	private boolean indicationReceived;
+	private String sessionKey;
+
 	@Before
 	public void setUpBeforeClass() throws Exception {
-		
-		MQTTConnectionConfig config=new MQTTConnectionConfig();
+
+		MQTTConnectionConfig config = new MQTTConnectionConfig();
 		config.setSibHost(HOST);
 		config.setSibPort(PORT);
 		config.setKeepAliveInSeconds(5);
 		config.setQualityOfService(QoS.AT_LEAST_ONCE);
 		config.setSibConnectionTimeout(6000);
 		config.setSsapResponseTimeout(1000000);
-		if (ENABLEMQTTAUTHENTICATION){
-			config.setUser(MQTTUSERNAME);
-			config.setPassword(MQTTPASSWORD);
+		if (ENABLE_MQTT_AUTHENTICATION) {
+			config.setUser(MQTT_USERNAME);
+			config.setPassword(MQTT_PASSWORD);
 		}
-		
-		this.kp=new KpMQTTClient(config);
-		
-		this.kp.connect();
-		
+		kp = new KpMQTTClient(config);
+		kp.connect();
+		doJoin();
 	}
-	
+
 	@After
 	public void disconnectAfterClass() throws Exception {
-		
-		this.kp.disconnect();
+		doLeave();
+		kp.disconnect();
 	}
-	
-	
-	@Test
-	public void testJoinByTokenLeave() throws Exception {
-		
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		System.out.println("Envia mensaje JOIN al SIB: "+msgJoin.toJson());
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		log.info("Recibe respuesta desde el SIB: "+response.toJson());
-		
-		//Comprueba que el mensaje trae session key
+
+	private void doJoin() throws Exception {
+		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
+		log.info("Sending JOIN message to the SIB. Request = {}." + joinMessage.toJson());
+		SSAPMessage response = kp.send(joinMessage);
+		log.info("A JOIN response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				joinMessage.toJson());
 		assertNotSame(response.getSessionKey(), null);
-		System.out.println("Sessionkey recibida: "+ response.getSessionKey());
-		
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Comprueba el BodyResponse
-		SSAPBodyReturnMessage bodyReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		log.info("A session key has been received. SessionKey = {}.", response.getSessionKey());
+		sessionKey = response.getSessionKey();
+		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertEquals(bodyReturn.getData(), sessionKey);
 		assertTrue(bodyReturn.isOk());
 		assertSame(bodyReturn.getError(), null);
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		System.out.println("Envia mensaje LEAVE al SIB: "+msgLeave.toJson());
-		
-		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
-		
-		System.out.println("Recibe respuesta desde el SIB: "+responseLeave.toJson());
-		
-		//Comprueba el BodyResponse
-		SSAPBodyReturnMessage bodyReturnLeave=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseLeave.getBody());
-		assertEquals(bodyReturnLeave.getData(), sessionKey);
-		assertTrue(bodyReturnLeave.isOk());
-		assertSame(bodyReturnLeave.getError(), null);
 	}
-	
-	@Test
-	public void testInsertNative() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		final String sessionKey=response.getSessionKey();
-		
-		//Genera un mensaje de INSERT
-		
-		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSTANCE);
-		log.info("Envia mensaje INSERT al SIB: "+msgInsert.toJson());
-		SSAPMessage responseInsert=kp.send(msgInsert);
-		
-		//Checks if insert message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBody());
-		assertTrue(returned.isOk());
-		log.info("Intancia de ontologia insertada con objectId: "+returned.getData());
-				
-		
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-		
+
+	private void doLeave() throws Exception {
+		SSAPMessage leaveMessage = SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
+		log.info("Sending LEAVE message to the SIB. Request = {}." + leaveMessage.toJson());
+		SSAPMessage response = kp.send(leaveMessage);
+		log.info("A LEAVE response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				leaveMessage.toJson());
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertEquals(responseBody.getData(), sessionKey);
+		assertTrue(responseBody.isOk());
+		assertSame(responseBody.getError(), null);
 	}
-	
-	@Test
-	public void testUpdateNative() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de UPDATE
-		SSAPMessage msgUpate=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_UPDATE, ONTOLOGY_UPDATE_WHERE);
-		log.info("Envia mensaje UPDATE al SIB: "+msgUpate.toJson());
-		SSAPMessage responseUpdate=kp.send(msgUpate);
-		
-		
-		
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUpdate.getBody());
-		assertTrue(returned.isOk());
-		log.info("Intancias de ontologia actualizadas: "+returned.getData());
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-	}
-	
-	@Test
-	public void testQueryNative() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de QUERY
-		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE);
-		log.info("Envia mensaje QUERY al SIB: "+msgQuery.toJson());
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		
-		
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		assertTrue(returned.isOk());
-		log.info("Resutado de la query: "+returned.getData());
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-	}
-	
-	@Test
-	public void testInsertSqlLike() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de INSERT
-		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSERT_SQLLIKE, SSAPQueryType.SQLLIKE);
-		log.info("Envia mensaje INSERT al SIB: "+msgInsert.toJson());
-		SSAPMessage responseInsert=kp.send(msgInsert);
-		
-		
-		
-		//Checks if insert message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBody());
-		assertTrue(returned.isOk());
-		log.info("Intancia de ontologia insertada con objectId: "+returned.getData());
-		
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-		
-	}
-	
-	
-	@Test
-	public void testUpdateSqlLike() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de UPDATE
-		SSAPMessage msgUpate=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, null, ONTOLOGY_UPDATE_SQLLIKE, SSAPQueryType.SQLLIKE);
-		log.info("Envia mensaje UPDATE al SIB: "+msgUpate.toJson());
-		SSAPMessage responseUpdate=kp.send(msgUpate);
-		
-		
-		
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUpdate.getBody());
-		assertTrue(returned.isOk());
-		log.info("Intancias de ontologia actualizadas: "+returned.getData());
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-	}
-	
-	
-	@Test
-	public void testQuerySql() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de QUERY
-		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, "feedForecastMeteorologico", "select * from feedForecastMeteorologico ", SSAPQueryType.SQLLIKE);
-		log.info("Envia mensaje QUERY al SIB: "+msgQuery.toJson());
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		
-		
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		log.info("Resutado de la query: "+responseQuery.toJson());
-		assertTrue(returned.isOk());
-		log.info("Resutado de la query: "+returned.getData());
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-	}
-	
-	
-	@Test
-	public void testQuerySqlBDC() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		
-		//Genera un mensaje de QUERY
-		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, null, "select * from Asset where identificacion='tweets_sofia'", SSAPQueryType.BDC);
-		log.info("Envia mensaje QUERY al SIB: "+msgQuery.toJson());
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		
-		log.info(responseQuery.toJson());
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		assertTrue(returned.isOk());
-		log.info("Resutado de la query: "+returned.getData());
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
-	}
-	
 
 	@Test
-	public void testQueryBDC() throws Exception {
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		String sessionKey=response.getSessionKey();
-		
-		//Genera un mensaje de QUERY
-		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, null, "select * from Asset", SSAPQueryType.BDC);
-		log.info("Envia mensaje QUERY al SIB: "+msgQuery.toJson());
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		
-		
-		//Checks if update message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		log.info("Resutado de la query: "+returned.getData());
-		log.info("Resutado de la query: "+returned.getError());
-		assertTrue(returned.isOk());
-		
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		
-		//Envia el mensaje
-		kp.send(msgLeave);
+	public void testNativeInsert() throws Exception {
+		SSAPMessage insertMessage = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME,
+				ONTOLOGY_INSTANCE);
+		log.info("Sending native INSERT message to the SIB. Request = {}." + insertMessage.toJson());
+		SSAPMessage response = kp.send(insertMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An INSERT response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				insertMessage.toJson());
 	}
-	
-	
-	public static boolean indicationReceived=false;
-	
+
+	@Test
+	public void testNativeUpdate() throws Exception {
+		SSAPMessage updateMessage = SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME,
+				NATIVE_UPDATE, NATIVE_UPDATE_QUERY);
+		log.info("Sending native UPDATE message to the SIB. Request = {}." + updateMessage.toJson());
+		SSAPMessage response = kp.send(updateMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An UPDATE response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				updateMessage.toJson());
+	}
+
+	@Test
+	public void testNativeQuery() throws Exception {
+		SSAPMessage queryMessage = SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME,
+				NATIVE_QUERY);
+		log.info("Sending native QUERY message to the SIB. Request = {}." + queryMessage.toJson());
+		SSAPMessage response = kp.send(queryMessage);
+
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(returned.isOk());
+		log.info("An QUERY response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				queryMessage.toJson());
+	}
+
+	@Test
+	public void testNativeDelete() throws Exception {
+		SSAPMessage deleteMessage = SSAPMessageGenerator.getInstance().generateDeleteMessage(sessionKey, ONTOLOGY_NAME,
+				NATIVE_DELETE_QUERY);
+		log.info("Sending native DELETE message to the SIB. Request = {}." + deleteMessage.toJson());
+		SSAPMessage response = kp.send(deleteMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An DELETE response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				deleteMessage.toJson());
+	}
+
+	@Test
+	public void testSqlLikeInsert() throws Exception {
+		SSAPMessage insertMessage = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME,
+				SQLLIKE_ONTOLOGY_INSTANCE, SSAPQueryType.SQLLIKE);
+		log.info("Sending SQL-LIKE INSERT message to the SIB. Request = {}." + insertMessage.toJson());
+		SSAPMessage response = kp.send(insertMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An INSERT response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				insertMessage.toJson());
+	}
+
+	@Test
+	public void testSqlLikeUpdate() throws Exception {
+		// Genera un mensaje de UPDATE
+		SSAPMessage updateMessage = SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME,
+				null, SQLLIKE_UPDATE, SSAPQueryType.SQLLIKE);
+		log.info("Sending SQL-LIKE UPDATE message to the SIB. Request = {}." + updateMessage.toJson());
+		SSAPMessage response = kp.send(updateMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An UPDATE response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				updateMessage.toJson());
+	}
+
+	@Test
+	public void testSqlLikeQuery() throws Exception {
+		SSAPMessage queryMessage = SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME,
+				SQLLIKE_UPDATE_QUERY, SSAPQueryType.SQLLIKE);
+		log.info("Sending SQL-LIKE QUERY message to the SIB. Request = {}." + queryMessage.toJson());
+		SSAPMessage response = kp.send(queryMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An QUERY response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				queryMessage.toJson());
+	}
+
+	@Test
+	public void testSqlLikeDelete() throws Exception {
+		SSAPMessage deleteMessage = SSAPMessageGenerator.getInstance().generateDeleteMessage(sessionKey, ONTOLOGY_NAME,
+				SQLLIKE_DELETE_QUERY, SSAPQueryType.SQLLIKE);
+		log.info("Sending SQL-LIKE DELETE message to the SIB. Request = {}." + deleteMessage.toJson());
+		SSAPMessage response = kp.send(deleteMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(responseBody.isOk());
+		log.info("An QUERY response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				deleteMessage.toJson());
+	}
+
+	@Test
+	public void testCdbQuery() throws Exception {
+		SSAPMessage queryMessage = SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, null,
+				"select * from Asset where identificacion='test'", SSAPQueryType.BDC);
+		log.info("Sending CDB QUERY message to the SIB. Request = {}." + queryMessage.toJson());
+		SSAPMessage response = kp.send(queryMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertEquals(responseBody.getError(), "Cannot find Asset");
+		log.info("An CDB QUERY response has been received from the SIB. Response = {}, request = {}.",
+				response.toJson(), queryMessage.toJson());
+	}
+
 	@Test
 	public void testSubscribeUnsubscribe() throws Exception {
-		
-		//Hace JOIN al SIB
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		SSAPMessage responseJoin=kp.send(msgJoin);
-		
-		final String sessionKey=responseJoin.getSessionKey();
-		
-		//Registra un listener para recibir notificaciones
+
+		log.info("Registering SIB notifications listener...");
+
 		kp.addListener4SIBNotifications(new Listener4SIBIndicationNotifications() {
-			
+
 			@Override
 			public void onIndication(String messageId, SSAPMessage ssapMessage) {
-				
-				log.info("Recibe mensaje INDICATION para la suscripción con identificador: "+messageId+" with indication message: "+ssapMessage.toJson());
-				
-				KpMqttFuncional.indicationReceived=true;
-			
-				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
+
+				log.info("An INDICATION message has been received. SubscriptionId = {}, payload = {}.", messageId,
+						ssapMessage.toJson());
+				indicationReceived = true;
+				SSAPBodyReturnMessage indicationMessage = SSAPBodyReturnMessage
+						.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
 				assertNotSame(indicationMessage.getData(), null);
 				assertTrue(indicationMessage.isOk());
 				assertSame(indicationMessage.getError(), null);
 			}
 		});
-		
-		
-		//Envia el mensaje de SUBSCRIBE
-		
-		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey, ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
-		
-		SSAPMessage msgSubscribe = kp.send(msg);
-		
-		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
-		
-		assertNotSame(responseSubscribeBody.getData(), null);
-		assertTrue(responseSubscribeBody.isOk());
-		assertSame(responseSubscribeBody.getError(), null);
-		
-		//Recupera el id de suscripcion
-		final String subscriptionId=responseSubscribeBody.getData();
-		
-		
-		//Envia un mensaje INSERT para recibir la notificacion de suscripcion
-		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSERT_SQLLIKE, SSAPQueryType.SQLLIKE);
-		log.info("Envia mensaje INSERT al SIB: "+msgInsert.toJson());
-		SSAPMessage responseInsert=kp.send(msgInsert);
-		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBody());
-		assertTrue(returned.isOk());
-		
-		
-		//Comprueba si se ha recibido el mensaje de notificación
+
+		SSAPMessage subscribeMessage = SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey,
+				ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
+
+		log.info("Sending SUBSCRIBE message to the SIB. Request = {}." + subscribeMessage.toJson());
+		SSAPMessage response = kp.send(subscribeMessage);
+
+		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+
+		assertNotSame(responseBody.getData(), null);
+		assertTrue(responseBody.isOk());
+		assertSame(responseBody.getError(), null);
+
+		log.info("A SUBSCRIBE response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				subscribeMessage.toJson());
+
+		String subscriptionId = responseBody.getData();
+		testSqlLikeInsert();
+
 		Thread.sleep(5000);
 		assertTrue(indicationReceived);
-		
-		
-		//Envia el mensaje de UNSUBSCRIBE
-		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey, ONTOLOGY_NAME, subscriptionId);
-		
-		SSAPMessage responseUnsubscribe=kp.send(msgUnsubscribe);
-		SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
-		
-		assertEquals(responseUnSubscribeBody.getData(), "");
-		assertTrue(responseUnSubscribeBody.isOk());
-		assertSame(responseUnSubscribeBody.getError(), null);
-		
+
+		SSAPMessage unsubscribeMessage = SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey,
+				ONTOLOGY_NAME, subscriptionId);
+
+		log.info("Sending UNSUBSCRIBE message to the SIB. Request = {}." + unsubscribeMessage.toJson());
+
+		response = kp.send(unsubscribeMessage);
+		responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+
+		assertEquals(responseBody.getData(), "");
+		assertTrue(responseBody.isOk());
+		assertSame(responseBody.getError(), null);
+
+		log.info("An UNSUBSCRIBE response has been received from the SIB. Response = {}, request = {}.",
+				response.toJson(), unsubscribeMessage.toJson());
+
 	}
-	
+
 	@Test
 	public void testBulk() throws Exception {
-		
-		//Genera mensaje de JOIN
-		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		
-		log.info("Envia mensaje JOIN al SIB: "+msgJoin.toJson());
-		
-		//Envia el mensaje
-		SSAPMessage response=kp.send(msgJoin);
-		
-		log.info("Recibe respuesta desde el SIB: "+response.toJson());
-		
-		//Comprueba que el mensaje trae session key
-		assertNotSame(response.getSessionKey(), null);
-		log.info("Sessionkey recibida: "+ response.getSessionKey());
-		
-		final String sessionKey=response.getSessionKey();
-		
-		
-		//Comprueba el BodyResponse
-		SSAPBodyReturnMessage bodyReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
-		assertEquals(bodyReturn.getData(), sessionKey);
-		assertTrue(bodyReturn.isOk());
-		assertSame(bodyReturn.getError(), null);
-		
-		
-		
-		//Genera un mensaje de INSERT
-		SSAPMessage msgInsert1=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSTANCE);
-		//Genera un mensaje de INSERT
-		SSAPMessage msgInsert2=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSTANCE);
-	
-		//Genera un mensaje INSERT de SQLLIKE
-		SSAPMessage msgInsert3=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSERT_SQLLIKE, SSAPQueryType.SQLLIKE);
-		
-		//Genera un mensaje de UPDATE
-		SSAPMessage msgUpate1=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_UPDATE, ONTOLOGY_UPDATE_WHERE);
-		
-		//Genera un mensaje UPDATE de SQLLIKE
-		SSAPMessage msgUpate2=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, null, ONTOLOGY_UPDATE_SQLLIKE, SSAPQueryType.SQLLIKE);
-		
-		
-		//Genera un mensaje DELETE
-//		SSAPMessage msgDelete1=SSAPMessageGenerator.getInstance().generateRemoveMessage(sessionKey, ONTOLOGY_NAME, "db.TestSensorTemperatura.remove({'Sensor.assetId':'S_Temperatura_00066'})");
-		
-		
-		//SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey, ONTOLOGY_NAME);
-//		try {
-//			msgBulk.addMessage(msgInsert1);
-//			msgBulk.addMessage(msgInsert2);
-//			msgBulk.addMessage(msgInsert3);
-//			msgBulk.addMessage(msgUpate1);
-//			msgBulk.addMessage(msgUpate2);
-//			msgBulk.addMessage(msgDelete1);
-//			
-//		} catch (NotSupportedMessageTypeException e) {
-//			e.printStackTrace();
-//		}
-		
-		SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey, "Ontologia");
-		try{
-			msgBulk.addMessage(msgInsert1).addMessage(msgInsert2).addMessage(msgInsert3).addMessage(msgUpate1).addMessage(msgUpate2);
-		} catch(UnsupportedSSAPMessageTypeException e){
+
+		SSAPMessage insertMessage1 = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME,
+				ONTOLOGY_INSTANCE);
+		SSAPMessage insertMessage2 = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME,
+				ONTOLOGY_INSTANCE);
+		SSAPMessage insertMessage3 = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME,
+				SQLLIKE_ONTOLOGY_INSTANCE, SSAPQueryType.SQLLIKE);
+		SSAPMessage updateMessage1 = SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME,
+				NATIVE_UPDATE, NATIVE_UPDATE_QUERY);
+		SSAPMessage updateMessage2 = SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME,
+				null, SQLLIKE_UPDATE, SSAPQueryType.SQLLIKE);
+		SSAPMessage deleteMessage1 = SSAPMessageGenerator.getInstance().generateDeleteMessage(sessionKey, ONTOLOGY_NAME,
+				NATIVE_DELETE_QUERY);
+		SSAPMessage deleteMessage2 = SSAPMessageGenerator.getInstance().generateDeleteMessage(sessionKey, ONTOLOGY_NAME,
+				SQLLIKE_DELETE_QUERY, SSAPQueryType.SQLLIKE);
+
+		SSAPBulkMessage bulkMessage = SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey);
+		try {
+			bulkMessage.addMessage(insertMessage1).addMessage(insertMessage2).addMessage(insertMessage3)
+					.addMessage(updateMessage1).addMessage(updateMessage2).addMessage(deleteMessage1)
+					.addMessage(deleteMessage2);
+		} catch (UnsupportedSSAPMessageTypeException e) {
 			e.printStackTrace();
 		}
-		
-		log.info("Envia mensaje BULK al SIB: "+msgBulk.toJson());
-		SSAPMessage respuesta=kp.send(msgBulk);
-		
-		log.info("Recibe respuesta BULK desde el SIB: "+respuesta.toJson());
-		
-		SSAPBodyReturnMessage bodyBulkReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(respuesta.getBody());
-		SSAPBodyBulkReturnMessage summary=SSAPBodyBulkReturnMessage.fromJsonToSSAPBodyBulkReturnMessage(bodyBulkReturn.getData());
-		
+
+		log.info("Sending BULK message to the SIB. Request = {}." + bulkMessage.toJson());
+		SSAPMessage response = kp.send(bulkMessage);
+
+		SSAPBodyReturnMessage bodyBulkReturn = SSAPBodyReturnMessage
+				.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyBulkReturnMessage summary = SSAPBodyBulkReturnMessage
+				.fromJsonToSSAPBodyBulkReturnMessage(bodyBulkReturn.getData());
+
 		assertEquals(3, summary.getInsertSummary().getObjectIds().size());
-		
-		log.info("ObjectIds insertados");
-		for(String oid:summary.getInsertSummary().getObjectIds()){
-			log.info(oid);
-		}
-		
-		
-		//Genera un mensaje de LEAVE
-		SSAPMessage msgLeave=SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
-		log.info("Envia mensaje LEAVE al SIB: "+msgLeave.toJson());
-		
-		//Envia el mensaje
-		SSAPMessage responseLeave=kp.send(msgLeave);
-		
-		log.info("Recive respuesta desde el SIB: "+responseLeave.toJson());
-		
-		//Comprueba el BodyResponse
-		SSAPBodyReturnMessage bodyReturnLeave=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseLeave.getBody());
-		assertEquals(bodyReturnLeave.getData(), sessionKey);
-		assertTrue(bodyReturnLeave.isOk());
-		assertSame(bodyReturnLeave.getError(), null);
-		
+		assertEquals(2, summary.getUpdateSummary().getObjectIds().size());
+		assertEquals(2, summary.getDeleteSummary().getObjectIds().size());
+
+		log.info("A BULK response has been received from the SIB. Response = {}, request = {}.", response.toJson(),
+				bulkMessage.toJson());
 	}
-	
-	
-	
 }

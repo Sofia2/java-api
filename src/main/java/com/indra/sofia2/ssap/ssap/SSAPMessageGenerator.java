@@ -40,7 +40,7 @@ public class SSAPMessageGenerator {
 
 	private Map<String, SSAPBinaryMessage> binary = new HashMap<String, SSAPBinaryMessage>();
 	private Map<String, Long> binarySize = new HashMap<String, Long>();
-	
+
 	private static SSAPMessageGenerator me = new SSAPMessageGenerator();
 
 	public static SSAPMessageGenerator getInstance() {
@@ -52,19 +52,21 @@ public class SSAPMessageGenerator {
 	 */
 	public SSAPMessageGenerator() {
 	}
-	
-	private void validateSize() throws BinarySizeException{
+
+	private void validateSize() throws BinarySizeException {
 		long size = 0;
-		for (String key : binarySize.keySet()){
-			size=size+binarySize.get(key);
+		for (String key : binarySize.keySet()) {
+			size = size + binarySize.get(key);
 		}
-		if (size>1000000){
-			throw new BinarySizeException("El tamaño de los ficheros almacenados para enviar con la ontología es de "+size+" bytes");
+		if (size > 1000000) {
+			throw new BinarySizeException(
+					"El tamaño de los ficheros almacenados para enviar con la ontología es de " + size + " bytes");
 		}
 	}
 
 	/**
 	 * Se añade un fichero con el encoding por defecto Base64 al map de ficheros
+	 * 
 	 * @param fieldName
 	 * @param binary
 	 * @param mime
@@ -75,84 +77,90 @@ public class SSAPMessageGenerator {
 		this.binarySize.put(fieldName, binary.length());
 		validateSize();
 	}
-	
+
 	/**
 	 * Se añade un fichero con el encoding por defecto Base64 al map de ficheros
+	 * 
 	 * @param fieldName
 	 * @param binary
 	 * @param mime
 	 */
-	public void addBinary(String fieldName, File binary, Storage storageArea, Encoding encoding, Mime mime) throws BinarySizeException{
+	public void addBinary(String fieldName, File binary, Storage storageArea, Encoding encoding, Mime mime)
+			throws BinarySizeException {
 		SSAPBinaryMessage binaryField = new SSAPBinaryMessage(binary, storageArea, encoding, mime);
 		this.binary.put(fieldName, binaryField);
 		validateSize();
 	}
-	
+
 	/**
 	 * Se añade un fichero con el encoding por defecto Base64 al map de ficheros
+	 * 
 	 * @param fieldName
 	 * @param binary
 	 * @param mime
 	 */
-	public void removeBinary(String fieldName){
+	public void removeBinary(String fieldName) {
 		this.binary.remove(fieldName);
 		this.binarySize.remove(fieldName);
 	}
-	
+
 	/**
 	 * Método que limpia la lista de ficheros binarios.
 	 */
-	public void cleanBinary(){
-		for (String key : binary.keySet()){
+	public void cleanBinary() {
+		for (String key : binary.keySet()) {
 			this.binary.remove(key);
 			this.binarySize.remove(key);
 		}
 	}
-	
+
 	/**
 	 * Metodo que genera la estructura JSON con los tipo de datos binary.
+	 * 
 	 * @return
 	 */
-	public String generateJSONBinary(){
+	public String generateJSONBinary() {
 		StringBuffer buffer = new StringBuffer();
 		Iterator<String> iterator = binary.keySet().iterator();
-		while (iterator.hasNext()){
+		while (iterator.hasNext()) {
 			String key = iterator.next();
 			buffer.append("\"");
 			buffer.append(key);
 			buffer.append("\":");
 			buffer.append(binary.get(key).toJson());
-			if (iterator.hasNext()){
+			if (iterator.hasNext()) {
 				buffer.append(",");
-			}	
+			}
 		}
 		return buffer.toString();
 	}
-	
+
 	/**
-	 * Metodo que genera una estructura Clave Valor con todos los tipo de datos binary contenidos en un JSON.
+	 * Metodo que genera una estructura Clave Valor con todos los tipo de datos
+	 * binary contenidos en un JSON.
+	 * 
 	 * @return
 	 */
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public Map<String, SSAPBinaryMessage> getBinary(LinkedHashMap JSON){
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map<String, SSAPBinaryMessage> getBinary(LinkedHashMap JSON) {
 		Map<String, SSAPBinaryMessage> binary = new HashMap<String, SSAPBinaryMessage>();
 		try {
 			subAnalize(JSON, binary);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 		return binary;
 	}
-	
+
 	@SuppressWarnings({ "unchecked" })
-	private SSAPBinaryMessage subAnalize(Map<String,Object> JSONSubStructure, Map<String, SSAPBinaryMessage> binary) {
-		for (Entry<String, Object> jsonElement : JSONSubStructure.entrySet()){
-			if (jsonElement.getValue() instanceof LinkedHashMap){
-				if (jsonElement.getKey().equals("media")){
+	private SSAPBinaryMessage subAnalize(Map<String, Object> JSONSubStructure, Map<String, SSAPBinaryMessage> binary) {
+		for (Entry<String, Object> jsonElement : JSONSubStructure.entrySet()) {
+			if (jsonElement.getValue() instanceof LinkedHashMap) {
+				if (jsonElement.getKey().equals("media")) {
 					StringBuffer json = new StringBuffer("{\"data\":\"");
 					json.append(JSONSubStructure.get("data"));
 					json.append("\",\"media\":{");
-					Map<String,Object> media = (Map<String,Object>)JSONSubStructure.get("media");
+					Map<String, Object> media = (Map<String, Object>) JSONSubStructure.get("media");
 					json.append("\"binaryEncoding\":\"");
 					json.append(media.get("binaryEncoding"));
 					json.append("\",\"mime\":\"");
@@ -161,9 +169,10 @@ public class SSAPMessageGenerator {
 					json.append(media.get("name"));
 					json.append("\"}}");
 					return SSAPBinaryMessage.fromJsonToSSAPBinaryMessage(json.toString());
-				}else{
-					SSAPBinaryMessage binaryMessage = subAnalize(((Map<String,Object>)jsonElement.getValue()), binary);
-					if (binaryMessage!=null){
+				} else {
+					SSAPBinaryMessage binaryMessage = subAnalize(((Map<String, Object>) jsonElement.getValue()),
+							binary);
+					if (binaryMessage != null) {
 						binary.put(jsonElement.getKey(), binaryMessage);
 					}
 				}
@@ -171,10 +180,10 @@ public class SSAPMessageGenerator {
 		}
 		return null;
 	}
-	
-	
+
 	/**
 	 * Genera un mensaje JOIN con autenticación basada en usuario y password
+	 * 
 	 * @param usuario
 	 * @param password
 	 * @param instance
@@ -191,9 +200,10 @@ public class SSAPMessageGenerator {
 		mensaje.setMessageType(SSAPMessageTypes.JOIN);
 		return mensaje;
 	}
-	
+
 	/**
 	 * Genera un mensaje JOIN para renovación de sessionkey
+	 * 
 	 * @param usuario
 	 * @param password
 	 * @param instance
@@ -215,11 +225,12 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje JOIN con autenticación basada en token
+	 * 
 	 * @param token
 	 * @param instance
 	 * @return
 	 */
-	public SSAPMessage generateJoinByTokenMessage(String token, String instance){
+	public SSAPMessage generateJoinByTokenMessage(String token, String instance) {
 		SSAPMessage mensaje = new SSAPMessage();
 		SSAPBodyJoinTokenMessage body = new SSAPBodyJoinTokenMessage();
 		body.setToken(token);
@@ -229,15 +240,16 @@ public class SSAPMessageGenerator {
 		mensaje.setMessageType(SSAPMessageTypes.JOIN);
 		return mensaje;
 	}
-	
-	
+
 	/**
-	 * Genera un mensaje JOIN con autenticación basada en token para renovación de sessionkey
+	 * Genera un mensaje JOIN con autenticación basada en token para renovación
+	 * de sessionkey
+	 * 
 	 * @param token
 	 * @param instance
 	 * @return
 	 */
-	public SSAPMessage generateJoinByTokenMessage(String token, String instance, String sessionkey){
+	public SSAPMessage generateJoinByTokenMessage(String token, String instance, String sessionkey) {
 		SSAPMessage mensaje = new SSAPMessage();
 		SSAPBodyJoinTokenMessage body = new SSAPBodyJoinTokenMessage();
 		body.setToken(token);
@@ -250,7 +262,8 @@ public class SSAPMessageGenerator {
 	}
 
 	/**
-	 * genera un mensaje LEAVE para cerrar la sesión 
+	 * genera un mensaje LEAVE para cerrar la sesión
+	 * 
 	 * @param sessionKey
 	 * @return
 	 */
@@ -264,6 +277,7 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * genera un mensaje INSERT de tipo nativo
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param datos
@@ -283,24 +297,26 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * genera un mensaje de INSERT del tipo indicado en el argumento queryType
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param datos
 	 * @param queryType
 	 * @return
 	 */
-	public SSAPMessage generateInsertMessage(String sessionKey, String ontologia, String datos, SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException{
+	public SSAPMessage generateInsertMessage(String sessionKey, String ontologia, String datos, SSAPQueryType queryType)
+			throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
-		if(isInsert(datos, queryType)){
-			if(queryType==SSAPQueryType.SQLLIKE){
+		if (isInsert(datos, queryType)) {
+			if (queryType == SSAPQueryType.SQLLIKE) {
 				body.setQuery(datos);
-			}else{
+			} else {
 				body.setData(datos);
 			}
-		}else{
-			throw new SQLSentenceNotAllowedForThisOperationException (new Exception("ERROR - Expected insert values"));
+		} else {
+			throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - Expected insert values"));
 		}
 		body.setQueryType(queryType);
 		mensaje.setDirection(SSAPMessageDirection.REQUEST);
@@ -310,22 +326,23 @@ public class SSAPMessageGenerator {
 		return mensaje;
 	}
 
-	private boolean isInsert(String datos, SSAPQueryType queryType){
-		if(queryType != null && datos.length()>0){
-			switch(queryType){
-			case SQLLIKE:			
+	private boolean isInsert(String datos, SSAPQueryType queryType) {
+		if (queryType != null && datos.length() > 0) {
+			switch (queryType) {
+			case SQLLIKE:
 			case NATIVE:
 				return datos.toUpperCase().contains("INSERT");
 			default:
 				return false;
 			}
-		}else {
+		} else {
 			return datos.length() > 0;
 		}
 	}
 
 	/**
 	 * Genera un mensaje UPDATE de tipo nativo
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param datos
@@ -346,10 +363,9 @@ public class SSAPMessageGenerator {
 		return mensaje;
 	}
 
-
-
 	/**
 	 * Genera un mensaje UPDATE del tipo indicado en el argumento queryType
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param datos
@@ -362,10 +378,10 @@ public class SSAPMessageGenerator {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
-		
-		if ( isUpdate(query, queryType)){
+
+		if (isUpdate(query, queryType)) {
 			body.setQuery(query);
-		}else{
+		} else {
 			throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - Expected update query"));
 		}
 		body.setData(datos);
@@ -379,12 +395,13 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje REMOVE de tipo nativo
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param query
 	 * @return
 	 */
-	public SSAPMessage generateRemoveMessage(String sessionKey, String ontologia, String query) {
+	public SSAPMessage generateDeleteMessage(String sessionKey, String ontologia, String query) {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -399,6 +416,7 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje REMOVE del tipo indicado en el argumento queryType
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param query
@@ -406,13 +424,14 @@ public class SSAPMessageGenerator {
 	 * @return
 	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateRemoveMessage(String sessionKey, String ontologia, String query, SSAPQueryType queryType)throws SQLSentenceNotAllowedForThisOperationException{
+	public SSAPMessage generateDeleteMessage(String sessionKey, String ontologia, String query, SSAPQueryType queryType)
+			throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
-		if(isRemove(query, queryType)){
+		if (isRemove(query, queryType)) {
 			body.setQuery(query);
-		}else{
+		} else {
 			throw new SQLSentenceNotAllowedForThisOperationException(new Exception("Error - statement no expected"));
 		}
 		body.setQueryType(queryType);
@@ -423,9 +442,9 @@ public class SSAPMessageGenerator {
 		return mensaje;
 	}
 
-
 	/**
 	 * Genera un mensaje QUERY de tipo nativo
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param queryType
@@ -445,19 +464,21 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje QUERY del tipo pasado por parámetros
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param queryType
 	 * @return
 	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query, SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException{
+	public SSAPMessage generateQueryMessage(String sessionKey, String ontologia, String query, SSAPQueryType queryType)
+			throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
-		if(isQuery(query, queryType)){
+		if (isQuery(query, queryType)) {
 			body.setQuery(query);
-		}else{
+		} else {
 			throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - statement no expected"));
 		}
 		body.setQueryType(queryType);
@@ -470,12 +491,13 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje QUERY para queries predefinidas en el SIB
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param queryType
 	 * @return
 	 */
-	public SSAPMessage generateQueryMessage (String sessionKey, String idQuery) {
+	public SSAPMessage generateQueryMessage(String sessionKey, String idQuery) {
 		SSAPMessage message = new SSAPMessage();
 		message.setSessionKey(sessionKey);
 		SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
@@ -488,7 +510,9 @@ public class SSAPMessageGenerator {
 	}
 
 	/**
-	 * Genera mensaje QUERY para queries predefinidas en el SIB y permite pasar parametros a la query
+	 * Genera mensaje QUERY para queries predefinidas en el SIB y permite pasar
+	 * parametros a la query
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param params
@@ -499,24 +523,27 @@ public class SSAPMessageGenerator {
 			throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage message = new SSAPMessage();
 		message.setSessionKey(sessionKey);
-		//Segun el tipo de query que llege se creara un body diferente
-		//para el tipo SIB_DIFINED pueden venir parametros y es necesario utilizar SSAPBodyQueryWithParamMessage en lugar de SSAPQueryMessage
-		if(idQuery.length()>0 && params != null){
+		// Segun el tipo de query que llege se creara un body diferente
+		// para el tipo SIB_DIFINED pueden venir parametros y es necesario
+		// utilizar SSAPBodyQueryWithParamMessage en lugar de SSAPQueryMessage
+		if (idQuery.length() > 0 && params != null) {
 			SSAPBodyQueryWithParamMessage body = new SSAPBodyQueryWithParamMessage();
-			if(isQuery(idQuery, SSAPQueryType.SIB_DEFINED)){
+			if (isQuery(idQuery, SSAPQueryType.SIB_DEFINED)) {
 				body.setQuery(idQuery);
-			}else{
-				throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - statement no expected"));
+			} else {
+				throw new SQLSentenceNotAllowedForThisOperationException(
+						new Exception("ERROR - statement no expected"));
 			}
 			body.setQueryType(SSAPQueryType.SIB_DEFINED);
 			body.setQueryParams(params);
 			message.setBody(body.toJson());
-		}else{
+		} else {
 			SSAPBodyOperationMessage body = new SSAPBodyOperationMessage();
-			if(isQuery(idQuery, SSAPQueryType.SIB_DEFINED)){
+			if (isQuery(idQuery, SSAPQueryType.SIB_DEFINED)) {
 				body.setQuery(idQuery);
-			}else{
-				throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - statement no expected"));
+			} else {
+				throw new SQLSentenceNotAllowedForThisOperationException(
+						new Exception("ERROR - statement no expected"));
 			}
 			body.setQueryType(SSAPQueryType.SIB_DEFINED);
 			message.setBody(body.toJson());
@@ -529,6 +556,7 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje SUBSCRIBE del tipo nativo
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param queryType
@@ -549,25 +577,27 @@ public class SSAPMessageGenerator {
 
 	/**
 	 * Genera un mensaje SUBSCRIBE de tipo pasado por parametros
+	 * 
 	 * @param sessionKey
 	 * @param idQuery
 	 * @param queryType
 	 * @return
 	 * @throws NotJoinedException
 	 */
-	public SSAPMessage generateSubscribeMessage(String sessionKey, String ontologia, int msRefresh, String query, SSAPQueryType queryType)throws SQLSentenceNotAllowedForThisOperationException{
+	public SSAPMessage generateSubscribeMessage(String sessionKey, String ontologia, int msRefresh, String query,
+			SSAPQueryType queryType) throws SQLSentenceNotAllowedForThisOperationException {
 		SSAPMessage mensaje = new SSAPMessage();
 		mensaje.setSessionKey(sessionKey);
 		SSAPBodySubscribeMessage body = new SSAPBodySubscribeMessage();
 
-
 		body.setQueryType(queryType);
 
-//		if(isQuery(query, queryType)){
-//			body.setQuery(query);
-//		}else{
-//			throw new SQLSentenceNotAllowedForThisOperationException(new Exception("ERROR - statement no expected"));
-//		}
+		// if(isQuery(query, queryType)){
+		// body.setQuery(query);
+		// }else{
+		// throw new SQLSentenceNotAllowedForThisOperationException(new
+		// Exception("ERROR - statement no expected"));
+		// }
 
 		body.setQuery(query);
 
@@ -579,11 +609,9 @@ public class SSAPMessageGenerator {
 		return mensaje;
 	}
 
-
-
-
 	/**
 	 * Genera un mensaje UNSUBSCRIBE
+	 * 
 	 * @param sessionKey
 	 * @param ontologia
 	 * @param idSuscripcion
@@ -601,24 +629,23 @@ public class SSAPMessageGenerator {
 		return mensaje;
 	}
 
-
-	private boolean isUpdate(String query, SSAPQueryType queryType){
-		if(queryType != null && query.length()>0){
-			switch (queryType){
+	private boolean isUpdate(String query, SSAPQueryType queryType) {
+		if (queryType != null && query.length() > 0) {
+			switch (queryType) {
 			case SQLLIKE:
 			case NATIVE:
 				return query.toUpperCase().contains("UPDATE");
 			default:
 				return false;
 			}
-		}else{
+		} else {
 			return query.length() > 0;
 		}
 	}
 
-	private boolean isRemove(String query, SSAPQueryType queryType){
-		if(queryType !=null && query.length()>0){
-			switch(queryType){
+	private boolean isRemove(String query, SSAPQueryType queryType) {
+		if (queryType != null && query.length() > 0) {
+			switch (queryType) {
 			case SQLLIKE:
 				return query.toUpperCase().contains("DELETE ");
 			case NATIVE:
@@ -626,21 +653,23 @@ public class SSAPMessageGenerator {
 			default:
 				return false;
 			}
-		}else{
+		} else {
 			return query.length() > 0;
 		}
 	}
 
-	private boolean isQuery(String query, SSAPQueryType queryType){
-		if(queryType !=null && query.length()>0){
-			switch(queryType){
+	private boolean isQuery(String query, SSAPQueryType queryType) {
+		if (queryType != null && query.length() > 0) {
+			switch (queryType) {
 			case SQLLIKE:
 			case BDH:
-				return query.toUpperCase().contains("SELECT ")||query.toUpperCase().contains("INSERT ")||query.toUpperCase().contains("UPDATE ")||query.toUpperCase().contains("DELETE ");
+				return query.toUpperCase().contains("SELECT ") || query.toUpperCase().contains("INSERT ")
+						|| query.toUpperCase().contains("UPDATE ") || query.toUpperCase().contains("DELETE ");
 			case NATIVE:
-					return query.toUpperCase().contains("FIND") || query.toUpperCase().startsWith("DB.") || query.toUpperCase().contains("SELECT ") ||
-							query.toUpperCase().contains("INSERT ") || query.toUpperCase().contains("UPDATE ") || query.toUpperCase().contains("DELETE ");
-					
+				return query.toUpperCase().contains("FIND") || query.toUpperCase().startsWith("DB.")
+						|| query.toUpperCase().contains("SELECT ") || query.toUpperCase().contains("INSERT ")
+						|| query.toUpperCase().contains("UPDATE ") || query.toUpperCase().contains("DELETE ");
+
 			case SIB_DEFINED:
 			case CEP:
 				return true;
@@ -649,11 +678,11 @@ public class SSAPMessageGenerator {
 			default:
 				return false;
 			}
-		}else{
+		} else {
 			return query.length() > 0;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param kp
@@ -661,7 +690,8 @@ public class SSAPMessageGenerator {
 	 * @param token
 	 * @return
 	 */
-	public SSAPMessage generateGetConfigMessage(String kp, String instanciaKp, String token, String assetService, HashMap<String,String> assetServiceParam ){
+	public SSAPMessage generateGetConfigMessage(String kp, String instanciaKp, String token, String assetService,
+			HashMap<String, String> assetServiceParam) {
 		SSAPMessage mensaje = new SSAPMessage();
 		SSAPBodyConfigMessage body = new SSAPBodyConfigMessage();
 		body.setInstanciaKp(instanciaKp);
@@ -674,23 +704,19 @@ public class SSAPMessageGenerator {
 		mensaje.setMessageType(SSAPMessageTypes.CONFIG);
 		return mensaje;
 	}
-	
-	
-	
+
 	/**
 	 * Genera un mensaje de tipo BULK
+	 * 
 	 * @param sessionKey
-	 * @param ontologia
 	 * @param query
 	 * @return
 	 */
-	public SSAPBulkMessage generateBulkMessage(String sessionKey, String ontologia){
+	public SSAPBulkMessage generateBulkMessage(String sessionKey) {
 		SSAPBulkMessage mensaje = new SSAPBulkMessage();
 		mensaje.setSessionKey(sessionKey);
 		mensaje.setDirection(SSAPMessageDirection.REQUEST);
 		mensaje.setMessageType(SSAPMessageTypes.BULK);
-		mensaje.setOntology(ontologia);
-		
 		return mensaje;
 	}
 

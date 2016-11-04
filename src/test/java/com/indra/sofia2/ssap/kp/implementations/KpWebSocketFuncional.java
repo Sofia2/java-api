@@ -481,10 +481,10 @@ public class KpWebSocketFuncional {
 		
 		
 		//Genera un mensaje DELETE
-		SSAPMessage msgDelete1=SSAPMessageGenerator.getInstance().generateRemoveMessage(sessionKey, ONTOLOGY_NAME, "db.TestSensorTemperatura.remove({'Sensor.assetId':'S_Temperatura_00066'})");
+		SSAPMessage msgDelete1=SSAPMessageGenerator.getInstance().generateDeleteMessage(sessionKey, ONTOLOGY_NAME, "db.TestSensorTemperatura.remove({'Sensor.assetId':'S_Temperatura_00066'})");
 		
 		
-		SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey, ONTOLOGY_NAME);
+		SSAPBulkMessage msgBulk=SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey);
 		try {
 			msgBulk.addMessage(msgInsert1);
 			msgBulk.addMessage(msgInsert2);
