@@ -151,7 +151,7 @@ public class MQTTConnectionConfig extends ConnectionConfig {
 		this.maxReadRate = 0;
 		this.maxWriteRate = 0;
 		this.checkInternetConnection = false;
-		this.clientId = UUID.randomUUID().toString().substring(0, MqttConstants.CLIENT_ID_LENGTH);
+		this.clientId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, MqttConstants.CLIENT_ID_LENGTH);
 		this.qualityOfService = QoS.AT_LEAST_ONCE;
 	}
 

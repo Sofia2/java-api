@@ -96,7 +96,7 @@ public class KpMqttIsConnected {
 	
 	private void sendData(){
 		try {
-			if (!kp.isConnectionEstablished()){
+			if (!kp.isPhysicalConnectionEstablished()){
 				kp.disconnect();
 				kp = new KpMQTTClient(config);
 				kp.connect();
@@ -135,7 +135,7 @@ public class KpMqttIsConnected {
 		for (int i = 0; i < 1000; i++){
 			try {
 				log.info("Checking physical connection status");
-				boolean retval = this.kp.isConnectionEstablished();
+				boolean retval = this.kp.isPhysicalConnectionEstablished();
 				if (i % 2 == 0){
 					sendData();
 				}

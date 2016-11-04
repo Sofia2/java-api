@@ -171,7 +171,7 @@ public class KpWebSocketClient extends KpToExtend {
 	
 	
 	@Override
-	public boolean isConnectionEstablished() {
+	public boolean isPhysicalConnectionEstablished() {
 		// TODO Auto-generated method stub
 		return this.socket!=null && (this.socket.status()==STATUS.OPEN || this.socket.status()==STATUS.REOPENED);
 	}

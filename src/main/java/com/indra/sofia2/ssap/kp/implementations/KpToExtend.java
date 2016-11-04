@@ -44,7 +44,6 @@ public abstract class KpToExtend implements Kp {
 	/**
 	 * Subscription listeners thread pool
 	 */
-
 	private ExecutorService indicationThreadPool;
 
 	/**
@@ -87,6 +86,9 @@ public abstract class KpToExtend implements Kp {
 	 */
 	protected String statusControlRequestSubscriptionId;
 
+	/**
+	 * response timeout for all the SSAP messages sent to the SIB server
+	 */
 	protected static int ssapResponseTimeout;
 
 	public int getSsapResponseTimeout() {
@@ -97,9 +99,6 @@ public abstract class KpToExtend implements Kp {
 		ssapResponseTimeout = timeout;
 	}
 
-	/**
-	 * Hace la desconexion del protocolo físico
-	 */
 	public void setConnectionConfig(ConnectionConfig config) {
 		this.config = config;
 	}
@@ -165,7 +164,7 @@ public abstract class KpToExtend implements Kp {
 	}
 
 	protected void initializeIndicationPool() {
-		log.info("Initializing INDICATION listener thread pool.");
+		log.info("Initializing SSAP INDICATION listener thread pool.");
 		this.indicationThreadPool = Executors.newFixedThreadPool(config.getSubscriptionListenersPoolSize());
 	}
 
@@ -191,7 +190,6 @@ public abstract class KpToExtend implements Kp {
 				public void run() {
 					connectionEventsListener.notifyConnection();
 				}
-
 			}.start();
 		}
 	}

@@ -105,42 +105,44 @@ public class KpMQTTClient extends KpToExtend {
 	@Override
 	public void connect() throws ConnectionToSIBException {
 
-		String sibAddress = null;
 		try {
 			log.info("Establishing MQTT connection with SIB server {} using port {}.", config.getSibHost(),
 					config.getSibPort());
 
 			MQTTConnectionConfig cfg = (MQTTConnectionConfig) config;
 
-			sibAddress = getSibAddress(cfg);
-			this.initializeIndicationPool();
+			String sibHost = getSibHost(cfg);
+			initializeIndicationPool();
 
 			ssapResponseTimeout = cfg.getSsapResponseTimeout();
 			boolean cleanSession = cfg.isCleanSession();
 
 			// Creates the client (if needed) and open a connection to the SIB
 			// server
-			configureMqttClient(cfg, sibAddress);
+			configureMqttClient(cfg, sibHost);
 
 			if (mqttConnection == null || !mqttConnection.isConnected()) {
 				mqttClient.setCleanSession(cleanSession);
 				mqttConnection = mqttClient.futureConnection();
-
-				int timeout = config.getSibConnectionTimeout();
-				if (timeout == 0) {
+				int connectTimeout = config.getSibConnectionTimeout();
+				log.info("Establishing MQTT connection with the SIB server. MqttClientId = {}.", mqttClientId);
+				if (connectTimeout == 0) {
+					log.warn(
+							"The SIB connect timeout is zero. We will wait for a connection indefinitely. MqttClientId = {}.",
+							mqttClientId);
 					mqttConnection.connect().await();
 				} else {
-					mqttConnection.connect().await(timeout, TimeUnit.MILLISECONDS);
+					mqttConnection.connect().await(connectTimeout, TimeUnit.MILLISECONDS);
 				}
 			}
 
 			// Subscribes to the KP in order to receive any kind of SIB
 			// notifications
-			this.subscribeToSibMqttTopics();
+			subscribeToSibMqttTopics();
 
 			// Notifica que se ha realizado la conexión a los listener
-			if (this.isConnectionEstablished()) {
-				this.notifyConnectionEvent();
+			if (isPhysicalConnectionEstablished()) {
+				notifyConnectionEvent();
 			}
 			log.info("The internal MQTT client {} has established a connection to the SIB server.", mqttClientId);
 
@@ -156,7 +158,7 @@ public class KpMQTTClient extends KpToExtend {
 	}
 
 	@Override
-	public boolean isConnectionEstablished() {
+	public boolean isPhysicalConnectionEstablished() {
 		return mqttConnection != null && mqttConnection.isConnected();
 	}
 
@@ -165,12 +167,9 @@ public class KpMQTTClient extends KpToExtend {
 	 */
 	@Override
 	public synchronized void disconnect() {
-		log.info("Disconnecting internal MQTT client {} from the SIB server.", mqttClientId);
-
 		if (mqttConnection != null) {
-			// Cierra el hilo de recepción
 			try {
-				// Stop the thread that waits for notifications from SIB
+				// Stop the thread that handles notifications from the SIB server
 				if (this.subscriptionThread != null && !this.subscriptionThread.isStopped()) {
 					log.info("Stopping SIB subscription thread of the internal MQTT client {}.", mqttClientId);
 					this.subscriptionThread.myStop();
@@ -181,16 +180,17 @@ public class KpMQTTClient extends KpToExtend {
 						mqttClientId, e.getCause(), e.getMessage());
 			}
 
-			// Se desuscribe de topicos de notificacion
 			if (mqttConnection.isConnected()) {
 				unsubscribeFromSibMqttTopics();
 			}
 
-			// Cierra la conexión física
 			try {
-
+				log.info("Disconnecting internal MQTT client {} from the SIB server.", mqttClientId);
 				int timeout = config.getSibConnectionTimeout();
 				if (timeout == 0) {
+					log.warn(
+							"The SIB connect timeout is zero. We will wait for {} milliseconds before interrupting the connection. MqttClientId = {}.",
+							DEFAULT_DISCONNECTION_TIMEOUT, mqttClientId);
 					mqttConnection.kill().await(DEFAULT_DISCONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
 				} else {
 					try {
@@ -218,8 +218,6 @@ public class KpMQTTClient extends KpToExtend {
 		} else {
 			log.info("The internal MQTT client {} is already disconnected from the SIB server. Nothing will be done.",
 					mqttClientId);
-			this.destroyIndicationPool();
-			this.notifyDisconnectionEvent();
 		}
 	}
 
@@ -268,10 +266,8 @@ public class KpMQTTClient extends KpToExtend {
 	 * notify SSAP responses
 	 */
 	private void unsubscribeFromSibMqttTopics() {
-
 		unsubscribeFromMqttTopic(MqttConstants.getSsapResponseMqttTopic(mqttClientId));
 		unsubscribeFromMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
-
 	}
 
 	/**
@@ -393,9 +389,10 @@ public class KpMQTTClient extends KpToExtend {
 	 * ********************************************************************
 	 */
 
-	private void configureMqttClient(MQTTConnectionConfig cfg, String sibAddress)
+	private void configureMqttClient(MQTTConnectionConfig cfg, String sibHost)
 			throws SSLContextInitializationError, ConnectionToSIBException, URISyntaxException {
 		if (mqttClient == null) {
+			log.info("Configuring internal MQTT client. MqttClientId = {}.", cfg.getClientId());
 			mqttClient = new MQTT();
 			String username = cfg.getUser();
 			String password = cfg.getPassword();
@@ -406,16 +403,14 @@ public class KpMQTTClient extends KpToExtend {
 				mqttClient.setPassword(password);
 			}
 
-			mqttClientId = buildMqttClientId(cfg);
-			mqttClient.setClientId(mqttClientId);
+			mqttClientId = cfg.getClientId();
+			mqttClient.setClientId(cfg.getClientId());
 
-			if (sibAddress.startsWith("ssl://")) {
-				// Inicializar solo una vez
-				mqttClient.setHost(sibAddress + ":" + config.getSibPort());
+			if (sibHost.startsWith("ssl://")) {
 				mqttClient.setSslContext(SSLContextHolder.getSSLContext());
-			} else {
-				mqttClient.setHost(sibAddress, config.getSibPort());
 			}
+			
+			mqttClient.setHost(sibHost, config.getSibPort());
 
 			// Configure low-level parameters of the fuse MQTT client
 			mqttClient.setReconnectAttemptsMax(cfg.getReconnectAttemptsMax());
@@ -429,18 +424,19 @@ public class KpMQTTClient extends KpToExtend {
 			mqttClient.setMaxReadRate(cfg.getMaxReadRate());
 			mqttClient.setMaxWriteRate(cfg.getMaxWriteRate());
 			mqttClient.setKeepAlive((short) cfg.getKeepAliveInSeconds());
+			log.info("The internal MQTT client has been configured. MqttClientId = {}.", cfg.getClientId());
 		}
 	}
 
-	private String getSibAddress(MQTTConnectionConfig cfg) throws ConnectionToSIBException {
-		String sibAddress;
+	private String getSibHost(MQTTConnectionConfig cfg) throws ConnectionToSIBException {
+		String sibHost;
 		try {
 			if (config.getSibHost().startsWith("tcp://") || config.getSibHost().startsWith("ssl://")) {
 				InetAddress.getByName(config.getSibHost().substring(6));
 			} else {
 				InetAddress.getByName(config.getSibHost());
 			}
-			sibAddress = config.getSibHost();
+			sibHost = config.getSibHost();
 			log.info("The hostname of the SIB server ({}) can be resolved. The connection process will continue.",
 					config.getSibHost());
 		} catch (java.net.UnknownHostException e) {
@@ -450,24 +446,12 @@ public class KpMQTTClient extends KpToExtend {
 				internetConnectionTester.testInternetConnectivity();
 				throw new DnsResolutionException("Unable to resolve hostname of the SIB server");
 			} else {
-				sibAddress = cfg.getDnsFailHostSIB();
+				sibHost = cfg.getDnsFailHostSIB();
 				log.warn("Unable to resolve hostname of the SIB server ({}). Using fallback IP address ({}).",
 						config.getSibHost(), cfg.getDnsFailHostSIB());
 			}
 		}
-		return sibAddress;
-	}
-
-	private static String buildMqttClientId(MQTTConnectionConfig cfg) {
-		String mqttClientId;
-		if (cfg.getClientId().length() > MqttConstants.CLIENT_ID_LENGTH) {
-			log.warn("The MQTT client ID '{}' is too long. It will be trimmed to {} characters long.",
-					cfg.getClientId(), MqttConstants.CLIENT_ID_LENGTH);
-			mqttClientId = cfg.getClientId().substring(0, MqttConstants.CLIENT_ID_LENGTH);
-		} else {
-			mqttClientId = cfg.getClientId();
-		}
-		return mqttClientId;
+		return sibHost;
 	}
 
 	private void subscribeToMqttTopic(String topicName) throws ConnectionToSIBException {

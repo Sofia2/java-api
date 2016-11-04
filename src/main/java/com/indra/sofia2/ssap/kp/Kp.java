@@ -32,7 +32,7 @@ public interface Kp {
 	 * indica si la conexión física está establecida para los protocolos
 	 * que la utilicen.
 	 */
-	boolean isConnectionEstablished();
+	boolean isPhysicalConnectionEstablished();
 	
 	/**
 	 * conecta con el SIB
