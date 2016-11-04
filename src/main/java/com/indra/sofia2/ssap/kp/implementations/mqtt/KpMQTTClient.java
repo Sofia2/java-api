@@ -20,8 +20,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.codec.binary.Base64;
 import org.fusesource.mqtt.client.Future;
@@ -52,6 +50,7 @@ public class KpMQTTClient extends KpToExtend {
 
 	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;
+	private static final String SIB_REQUESTS_TOPIC = "";
 
 	/**
 	 * MQTT client to be used by the protocol to connect it to the MQTT server
@@ -73,11 +72,6 @@ public class KpMQTTClient extends KpToExtend {
 	 * Thread to receive SIB notifications, regardless if it is SSAP or not
 	 */
 	private MqttSubscriptionThread subscriptionThread;
-
-	/**
-	 * Lock to block a request until receive the synchronous response from SIB
-	 */
-	private final Lock lock = new ReentrantLock();
 
 	/**
 	 * Queue to store ssap message responses
@@ -269,16 +263,24 @@ public class KpMQTTClient extends KpToExtend {
 		unsubscribeFromMqttTopic(MqttConstants.getSsapResponseMqttTopic(mqttClientId));
 		unsubscribeFromMqttTopic(MqttConstants.getSsapIndicationMqttTopic(mqttClientId));
 	}
-
-	/**
-	 * Send a SSAP message to the server, and returns the response
-	 */
-	@Override
-	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException {
+	
+	private byte[] encryptPayload(SSAPMessage msg) {
+		byte[] encrypted = XXTEA.encrypt(msg.toJson().getBytes(), this.xxteaCipherKey.getBytes());
+		if (msg.getMessageType() == SSAPMessageTypes.JOIN) {
+			SSAPBodyJoinUserAndPasswordMessage body = SSAPBodyJoinUserAndPasswordMessage
+					.fromJsonToSSAPBodyJoinUserAndPasswordMessage(msg.getBody());
+			String kpName = body.getInstance().split(":")[0];
+			String completeMessage = kpName.length() + "#" + kpName + Base64.encodeBase64String(encrypted);
+			return completeMessage.getBytes();
+		} else {
+			return Base64.encodeBase64(encrypted);
+		}
+	}
+	
+	private SSAPMessage sendSsapMessageToSib(SSAPMessage msg, boolean encryptPayload) throws ConnectionToSIBException {
 		log.debug("Sending SSAP message to the SIB server using the internal MQTT client {}. Payload={}.", mqttClientId,
 				msg.toJson());
 		internetConnectionTester.testInternetConnectivity();
-		// Sends the message to Server
 		try {
 			MqttReceptionCallback callback = new MqttReceptionCallback(this);
 			SSAPMessage ssapResponse;
@@ -290,9 +292,14 @@ public class KpMQTTClient extends KpToExtend {
 				// received by the handler in server
 				QoS qosLevel = ((MQTTConnectionConfig) config).getQualityOfService();
 				log.debug(
-						"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client {}. QoS={}, Payload={}.",
-						mqttClientId, qosLevel, msg.toJson());
-				mqttConnection.publish("", msg.toJson().getBytes(), qosLevel, false);
+						"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client {}. QoS={}, encryptPayload = {}, payload = {}.",
+						mqttClientId, qosLevel, encryptPayload, msg.toJson());
+				byte[] payload;
+				if (encryptPayload)
+					payload = encryptPayload(msg);
+				else
+					payload = msg.toJson().getBytes();
+				mqttConnection.publish(SIB_REQUESTS_TOPIC, payload, qosLevel, false);
 				ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
 				log.debug(
 						"The internal MQTT client {} received a SSAP response from the SIB server. Response={}, request={}.",
@@ -310,62 +317,21 @@ public class KpMQTTClient extends KpToExtend {
 			throw new ConnectionToSIBException("Unable to send SSAP message to the SIB server", e);
 		}
 	}
-
+	
 	/**
 	 * Send a SSAP message to the server, and returns the response
 	 */
 	@Override
+	public SSAPMessage send(SSAPMessage msg) throws ConnectionToSIBException {
+		return sendSsapMessageToSib(msg, false);
+	}
+
+	/**
+	 * Send an encrypted SSAP message to the server, and returns the response
+	 */
+	@Override
 	public SSAPMessage sendCipher(SSAPMessage msg) throws ConnectionToSIBException {
-		log.debug("Sending cyphered SSAP message to the SIB server using the internal MQTT client {}. Payload={}.",
-				mqttClientId, msg.toJson());
-		// Sends the message to Server
-		try {
-
-			MqttReceptionCallback callback = new MqttReceptionCallback(this);
-			lock.lock();// Blocks until receive the ssap response
-			try {
-				// callbacks.add(callback);
-				this.responseCallback = callback;
-				byte[] encrypted = XXTEA.encrypt(msg.toJson().getBytes(), this.xxteaCipherKey.getBytes());
-				byte[] base64Payload;
-				if (msg.getMessageType() == SSAPMessageTypes.JOIN) {
-					SSAPBodyJoinUserAndPasswordMessage body = SSAPBodyJoinUserAndPasswordMessage
-							.fromJsonToSSAPBodyJoinUserAndPasswordMessage(msg.getBody());
-
-					String kpName = body.getInstance().split(":")[0];
-
-					String completeMessage = kpName.length() + "#" + kpName + Base64.encodeBase64String(encrypted);
-
-					base64Payload = completeMessage.getBytes();
-				} else {
-					base64Payload = Base64.encodeBase64(encrypted);
-				}
-
-				// Publish a QoS message
-				// It is not necessary publish topic. The message will be
-				// received by the handler in server
-				QoS qosLevel = ((MQTTConnectionConfig) config).getQualityOfService();
-				log.debug(
-						"Sending MQTT PUBLISH message to the SIB server using the internal MQTT client {}. QoS={}, Payload={}.",
-						mqttClientId, qosLevel, msg.toJson());
-				mqttConnection.publish("", base64Payload, qosLevel, false);
-
-			} finally {
-				lock.unlock();
-			}
-
-			SSAPMessage ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
-			log.debug(
-					"The internal MQTT client {} received a SSAP response from the SIB server. Payload={}, Original request={}.",
-					mqttClientId, ssapResponse.toJson(), msg.toJson());
-			return ssapResponse;
-
-		} catch (Exception e) {
-			log.error(
-					"Unable to send SSAP message to the SIB server using internal MQTT client {}. Payload = {}, cause = {}, errorMessage = {}.",
-					mqttClientId, msg.toJson(), e.getCause(), e.getMessage());
-			throw new ConnectionToSIBException("Unable to send SSAP message to the SIB server", e);
-		}
+		return sendSsapMessageToSib(msg, true);
 	}
 
 	/**
