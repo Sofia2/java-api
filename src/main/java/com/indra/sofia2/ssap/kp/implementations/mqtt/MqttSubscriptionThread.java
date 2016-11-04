@@ -20,18 +20,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.commons.codec.binary.Base64;
 import org.fusesource.mqtt.client.Future;
 import org.fusesource.mqtt.client.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
-import com.indra.sofia2.ssap.kp.encryption.XXTEA;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
-import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 
 /**
  * This thread will be continuously running to receive any kind of messages from
@@ -103,43 +100,14 @@ class MqttSubscriptionThread extends Thread {
 					message.ack();
 					String messageTopic = message.getTopic();
 					if (messageTopic.equals(MqttConstants.getSsapResponseMqttTopic(kpMqttClient.getMqttClientId()))) {
-						/* Notification for SSAP response messages */
-						payload = decodeJsonMessage(payload);
-						SSAPMessage ssapMessage = SSAPMessage.fromJsonToSSAPMessage(payload);
-						// Si el mensaje es un JOIN recupera el SessionKey
-						try {
-							SSAPMessageTypes messageType = ssapMessage.getMessageType();
-							if (messageType != null && ssapMessage.getMessageType().equals(SSAPMessageTypes.JOIN)) {
-								String sessionKey = SSAPBodyReturnMessage
-										.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).getData();
-								if (SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody()).isOk()
-										&& sessionKey != null) {
-									log.info("The internal MQTT client {} has opened the SSAP session {}.",
-											kpMqttClient.getMqttClientId(), sessionKey);
-								}
-							} else if (messageType != null
-									&& ssapMessage.getMessageType().equals(SSAPMessageTypes.LEAVE)
-									&& SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody())
-											.isOk()) {
-								log.info("The internal MQTT client {} has closed the SSAP session {}.",
-										kpMqttClient.getMqttClientId(), ssapMessage.getSessionKey());
-							}
-
-							// Notifies the reception to unlock the
-							// synchronous waiting
-						} catch (Throwable e) {
-							log.error(
-									"An exception was raised while the internal MQTT client {} was processing a SSAP response. Payload={}, cause = {}, errorMessage = {}.",
-									kpMqttClient.getMqttClientId(), payload, e.getCause(), e.getMessage());
-						}
 						if (kpMqttClient.getResponseCallback() != null) {
 							kpMqttClient.getResponseCallback().handle(payload);
 						}
 					} else if (messageTopic
 							.equals(MqttConstants.getSsapIndicationMqttTopic(kpMqttClient.getMqttClientId()))) {
 						/* Notification for ssap INDICATION message */
-						// gets the message payload (SSAPMessage)
-						payload = decodeJsonMessage(payload);
+						if (kpMqttClient.getCypheredPayloadHandler() != null)
+							payload = kpMqttClient.getCypheredPayloadHandler().getDecryptedPayload(payload);
 						Collection<IndicationTask> tasks = new ArrayList<IndicationTask>();
 						SSAPMessage ssapMessage = SSAPMessage.fromJsonToSSAPMessage(payload);
 						if (ssapMessage.getMessageType() == SSAPMessageTypes.INDICATION) {
@@ -187,25 +155,6 @@ class MqttSubscriptionThread extends Thread {
 					kpMqttClient.getResponseCallback().handle("");
 				}
 			}
-		}
-	}
-
-	private String decodeJsonMessage(String payload) {
-		if (payload.startsWith("{") && payload.endsWith("}") && payload.contains("direction") && payload
-				.contains("sessionKey")) { /* non XXTEA-cyphered message */
-			return payload;
-		} else {
-			byte[] bCifradoBaseado = Base64.decodeBase64(payload);
-
-			for (int i = 0; i < bCifradoBaseado.length; i++) {
-				bCifradoBaseado[i] = (byte) (bCifradoBaseado[i] & 0xFF);
-			}
-
-			String clearMessage = new String(
-					XXTEA.decrypt(bCifradoBaseado, kpMqttClient.getXxteaCipherKey().getBytes()));
-			log.debug("The internal MQTT client {} has decoded a SSAP message. Payload={}.",
-					kpMqttClient.getMqttClientId(), clearMessage);
-			return clearMessage;
 		}
 	}
 }
