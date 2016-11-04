@@ -50,7 +50,6 @@ public class KpMQTTClient extends KpToExtend {
 
 	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;
-	private static final String SIB_REQUESTS_TOPIC = "";
 
 	/**
 	 * MQTT client to be used by the protocol to connect it to the MQTT server
@@ -299,7 +298,7 @@ public class KpMQTTClient extends KpToExtend {
 					payload = encryptPayload(msg);
 				else
 					payload = msg.toJson().getBytes();
-				mqttConnection.publish(SIB_REQUESTS_TOPIC, payload, qosLevel, false);
+				mqttConnection.publish(MqttConstants.SIB_REQUESTS_TOPIC, payload, qosLevel, false);
 				ssapResponse = SSAPMessage.fromJsonToSSAPMessage(callback.get());
 				log.debug(
 						"The internal MQTT client {} received a SSAP response from the SIB server. Response={}, request={}.",

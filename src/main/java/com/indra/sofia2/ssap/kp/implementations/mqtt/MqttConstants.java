@@ -22,6 +22,12 @@ public class MqttConstants {
 	 * Maximum MQTT ClientID length
 	 */
 	public static final int CLIENT_ID_LENGTH = 23;
+	
+	/**
+	 * Topic for SSAP requests
+	 */
+	public static final String SIB_REQUESTS_TOPIC = "";
+	
 	/**
 	 * Topic for SSAP responses
 	 */
