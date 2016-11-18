@@ -376,10 +376,11 @@ public class KpMQTTClient extends KpToExtend {
 			mqttClient.setClientId(cfg.getClientId());
 
 			if (sibHost.startsWith("ssl://")) {
+				mqttClient.setHost( sibHost + ":" + config.getSibPort());
 				mqttClient.setSslContext(SSLContextHolder.getSSLContext());
-			}
-			
-			mqttClient.setHost(sibHost, config.getSibPort());
+			} else {
+				mqttClient.setHost(sibHost, config.getSibPort());
+			}				
 
 			// Configure low-level parameters of the fuse MQTT client
 			mqttClient.setReconnectAttemptsMax(cfg.getReconnectAttemptsMax());

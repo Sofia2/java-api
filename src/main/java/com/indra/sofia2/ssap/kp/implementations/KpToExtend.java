@@ -188,7 +188,10 @@ public abstract class KpToExtend implements Kp {
 		if (this.connectionEventsListener != null) {
 			new Thread() {
 				public void run() {
-					connectionEventsListener.notifyConnection();
+					if (connectionEventsListener != null) {
+						// This IF prevents a NullPointerException when several threads call this method
+						connectionEventsListener.notifyConnection();
+					}
 				}
 			}.start();
 		}
@@ -198,7 +201,10 @@ public abstract class KpToExtend implements Kp {
 		if (this.connectionEventsListener != null) {
 			new Thread() {
 				public void run() {
-					connectionEventsListener.notifyDisconnection();
+					if (connectionEventsListener != null) {
+						// This IF prevents a NullPointerException when several threads call this method
+						connectionEventsListener.notifyDisconnection();
+					}
 				}
 			}.start();
 		}

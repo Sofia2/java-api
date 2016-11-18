@@ -237,6 +237,10 @@ public class MQTTConnectionConfig extends ConnectionConfig {
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
 	}
+	
+	public void resetClientId() {
+		this.clientId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, MqttConstants.CLIENT_ID_LENGTH);
+	}
 
 	public int getConnectAttemptsMax() {
 		return maxConnectAttempts;

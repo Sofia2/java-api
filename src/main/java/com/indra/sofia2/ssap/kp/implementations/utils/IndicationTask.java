@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2013-15 Indra Sistemas S.A.
+ * Copyright 2013-16 Indra Sistemas S.A.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,13 @@ public class IndicationTask implements Runnable {
 
 	@Override
 	public void run() {
-		if (this.indicationListener != null) {
-			this.indicationListener.onIndication(messageId, message);
-		} else {
-			this.commandListener.onCommandMessage(commandMessageRequest);
-		}
+		try {
+			if (this.indicationListener != null) {
+				this.indicationListener.onIndication(messageId, message);
+			} else {
+				this.commandListener.onCommandMessage(commandMessageRequest);
+			}
+		} catch(Throwable e){}
 	}
 
 }
