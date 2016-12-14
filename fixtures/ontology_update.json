@@ -1,0 +1,19 @@
+{
+  "_id":{
+    "$oid":"NO_ID"
+  },
+  "Sensor":{
+    "geometry":{
+      "coordinates":[
+        40.512967,
+        -3.67495
+      ],
+      "type":"Point"
+    },
+    "assetId":"S_Temperatura_00066",
+    "measure":20,
+    "timestamp":{
+      "$date":"2014-04-29T08:24:54.005Z"
+    }
+  }
+}

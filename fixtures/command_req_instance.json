@@ -1,0 +1,26 @@
+{
+  "Request":{
+    "commandId":"string",
+    "timestamp":{
+      "$date":"2014-01-30T17:14:00Z"
+    },
+    "assetId":"miassedt",
+    "signalId":"string",
+    "assetSource":"string",
+    "targetKpInstance":"string",
+    "requestId":"string",
+    "instancekp":"string",
+    "command":{
+      "type":"SEND",
+      "unit":"string",
+      "signal":"ACTIVEPOWER",
+      "value1":"string",
+      "value2":"string",
+      "value3":"string",
+      "valuelist":[
+        "string"
+      ]
+    },
+    "description":"string"
+  }
+}

@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.MqttConstants;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;

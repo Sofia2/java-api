@@ -15,15 +15,18 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.config;
 
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 import org.fusesource.mqtt.client.QoS;
 
+import com.indra.sofia2.ssap.kp.config.ConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.MqttConstants;
 
 public class MQTTConnectionConfig extends ConnectionConfig {
 
+	private static Response kk;
 	private static final long serialVersionUID = 1L;
 
 	/**

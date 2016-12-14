@@ -29,23 +29,24 @@ import org.fusesource.mqtt.client.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.indra.sofia2.ssap.kp.KpToExtend;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
-import com.indra.sofia2.ssap.kp.encryption.CypheredSSAPPayloadHandler;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.DnsResolutionException;
 import com.indra.sofia2.ssap.kp.exceptions.SSLContextInitializationError;
-import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.MqttConstants;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.exceptions.MQTTClientNotConfiguredException;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.kp.implementations.utils.SSLContextHolder;
 import com.indra.sofia2.ssap.kp.utils.InternetConnectionTester;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
+import com.indra.sofia2.ssap.ssap.encryption.CypheredSSAPPayloadHandler;
 
 public class KpMQTTClient extends KpToExtend {
 
-	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class);
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;
 
 	/**
@@ -89,8 +90,8 @@ public class KpMQTTClient extends KpToExtend {
 	 * @param config
 	 * @throws ConnectionConfigException
 	 */
-	public KpMQTTClient(MQTTConnectionConfig config) throws ConnectionConfigException {
-		super(config);
+	public KpMQTTClient(MQTTConnectionConfig config, String kp, String kpInstance, String token) throws ConnectionConfigException {
+		super(config, kp, kpInstance, token);
 		this.internetConnectionTester = new InternetConnectionTester(config.isCheckInternetConnection());
 	}
 

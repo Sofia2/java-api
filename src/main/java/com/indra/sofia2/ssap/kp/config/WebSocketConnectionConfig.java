@@ -17,6 +17,7 @@ package com.indra.sofia2.ssap.kp.config;
 
 import org.atmosphere.wasync.Request;
 
+import com.indra.sofia2.ssap.kp.config.ConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 
 public class WebSocketConnectionConfig extends ConnectionConfig {

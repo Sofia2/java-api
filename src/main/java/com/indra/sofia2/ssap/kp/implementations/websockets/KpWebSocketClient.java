@@ -37,12 +37,12 @@ import org.atmosphere.wasync.RequestBuilder;
 import org.atmosphere.wasync.Socket;
 import org.atmosphere.wasync.Socket.STATUS;
 
+import com.indra.sofia2.ssap.kp.KpToExtend;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
 import com.indra.sofia2.ssap.kp.exceptions.SSAPResponseTimeoutException;
-import com.indra.sofia2.ssap.kp.implementations.KpToExtend;
 import com.indra.sofia2.ssap.kp.implementations.listener.KpConnectorEventListener;
 import com.indra.sofia2.ssap.kp.implementations.utils.IndicationTask;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
@@ -50,6 +50,8 @@ import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
 
 @SuppressWarnings("rawtypes")
 public class KpWebSocketClient extends KpToExtend {
+	
+	
 	private Client client;
 	private RequestBuilder request;
 	private Socket socket;
@@ -67,8 +69,9 @@ public class KpWebSocketClient extends KpToExtend {
      */
     private final Queue<Callback> callbacks = new ConcurrentLinkedQueue<Callback>();
     //Correc: Renombrada variable local
-	public KpWebSocketClient(WebSocketConnectionConfig config) throws ConnectionConfigException {
-		super(config);
+	public KpWebSocketClient(WebSocketConnectionConfig config, String kp, String kpInstance, String token) throws ConnectionConfigException {
+		super(config, kp, kpInstance, token);
+		
 		ssapResponseTimeout = config.getSibConnectionTimeout();
 
 		this.ssapKeepAlive = config.getKeepAliveInSeconds();
@@ -105,9 +108,9 @@ public class KpWebSocketClient extends KpToExtend {
                 .transport(Request.TRANSPORT.LONG_POLLING);
 	}
 	
-	public KpWebSocketClient(WebSocketConnectionConfig config, KpConnectorEventListener eventListener)
+	public KpWebSocketClient(WebSocketConnectionConfig config, String kp, String kpInstance, String token, KpConnectorEventListener eventListener)
 			throws ConnectionConfigException {
-		this(config);
+		this(config, kp, kpInstance, token);
 		this.connectionEventListener = eventListener;
 	}
 
