@@ -21,3 +21,4 @@ target/*
 
 # Log files
 *.log
+/target/

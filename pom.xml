@@ -19,7 +19,7 @@
 	<groupId>com.indra.sofia2.ssap</groupId>
 	<artifactId>client-api</artifactId>
 	<packaging>jar</packaging>
-	<version>3.4.0-SNAPSHOT</version>
+	<version>3.4.0</version>
 	<name>client-api</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -141,7 +141,6 @@
 				</dependency>
 	      	</dependencies>
 			<build>
-				<finalName>client-api-${project.version}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -182,7 +181,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>sofia2</id>
+			<id>nexus</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
@@ -206,6 +205,88 @@
 					<!-- 	      <url>http://sofia2.org/nexus/content/repositories/releases/</url> -->
 					<!-- 	   </repository> -->
 			</distributionManagement>
+		</profile>
+		<profile>
+			<id>sofiacom</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+		      	<dependency>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-rs-client</artifactId>
+					<version>3.1.8</version>				
+				</dependency>
+	      	</dependencies>
+			<build>
+				<plugins>
+			      <plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+	                	<version>2.10</version>
+	                	<executions>
+	                		<execution>
+		                    	<id>copy-dependencies</id>
+					            <phase>package</phase>
+					            <goals>
+					              <goal>copy-dependencies</goal>
+					            </goals>
+					            <configuration>
+					              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					              <overWriteReleases>false</overWriteReleases>
+					              <overWriteSnapshots>false</overWriteSnapshots>
+					              <overWriteIfNewer>true</overWriteIfNewer>
+				          	  </configuration>
+	                   	 </execution>
+	                	</executions>
+	            	</plugin>
+	            	<plugin>
+				        <artifactId>maven-resources-plugin</artifactId>
+				        <version>3.0.2</version>
+				        <executions>
+				          <execution>
+				            <id>copy-resources</id>
+				            <!-- here the phase you need -->
+				            <phase>install</phase>
+				            <goals>
+				              <goal>copy-resources</goal>
+				            </goals>
+				            <configuration>
+				              <outputDirectory>${basedir}/target/Api-Java/</outputDirectory>
+				              <resources>    
+				              	<resource>
+				              		<directory>${basedir}/target</directory>
+				              		<excludes>
+				              			<exclude>generated-sources/</exclude>
+				              			<exclude>maven-archiver/</exclude>
+				              			<exclude>classes/</exclude>
+				              			<exclude>java/</exclude>
+				              			<exclude>**/*.class</exclude>
+				              			<exclude>**/*.java</exclude>
+				              		</excludes>
+				              	</resource>      
+				                <resource>
+				                  <targetPath>${basedir}/target/Api-Java/TestApi/src/test</targetPath>
+				                  <directory>src/test</directory>
+				                  <filtering>true</filtering>
+				                </resource>
+				                <resource>
+				                  <targetPath>${basedir}/target/Api-Java/TestApi/lib</targetPath>
+				                  <directory>${basedir}/target/lib</directory>
+				                  <filtering>true</filtering>
+				                </resource>
+				                <resource>
+				                  <targetPath>${basedir}/target/Api-Java/TestApi/lib</targetPath>
+				                  <directory>${basedir}/target/Api-Java</directory>
+				                  <include>**/client-api*.jar</include>
+				                  <filtering>true</filtering>
+				                </resource>
+				              </resources>              
+				            </configuration>            
+				          </execution>
+				        </executions>
+				      </plugin>
+			    </plugins>
+			</build>
 		</profile>
 	</profiles>
 
