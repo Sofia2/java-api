@@ -160,7 +160,7 @@
 					<executions>
 						<execution>
 							<id>make-assembly</id>
-							<phase>install</phase>
+							<phase>package</phase>
 							<goals>
 								<goal>single</goal>
 							</goals>
@@ -253,7 +253,7 @@
 						<executions>
 							<execution>
 								<id>make-assembly</id>
-								<phase>install</phase>
+								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
 								</goals>
