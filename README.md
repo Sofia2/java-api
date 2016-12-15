@@ -21,13 +21,13 @@ The Java API is distributed as a maven project. Its artifact can be built and in
 ```
 cd <root of your copy of the repository>
 mvn clean package [-Dmaven.test.skip]
-mvn install:install-file -DpomFile=pom.xml -Dfile=target/ssap-standalone-<API version>.jar
+mvn install:install-file -DpomFile=pom.xml -Dfile=target/client-api-<API version>.jar
 ```
 
 During the compilation process, a "fat" JAR containing the API and its dependencies will also be generated. It will be placed in the path
 
 ```
-<root of your copy of the repository>/target/ssap-standalone-with-deps-<API-version>.jar
+<root of your copy of the repository>/target/client-api-standalone-<API-version>.jar
 ```
 
 ## Contact information

@@ -23,13 +23,13 @@ siguientes comandos.
 ```
 cd <raíz de su copia del repositorio>
 mvn clean package [-Dmaven.test.skip]
-mvn install:install-file -DpomFile=pom.xml -Dfile=target/ssap-standalone-<API version>.jar
+mvn install:install-file -DpomFile=pom.xml -Dfile=target/client-api-<API version>.jar
 ```
 
 Durante el proceso de compilación, se generará un fichero JAR que contiene el API y sus dependencias. Este fichero se depositará en la ruta
 
 ```
-<raíz de su copia del repositorio>/target/ssap-standalone-with-deps-<API-version>.jar
+<raíz de su copia del repositorio>/target/client-api-standalone-<API-version>.jar
 ```
 
 ## Información de contacto

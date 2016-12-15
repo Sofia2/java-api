@@ -274,9 +274,13 @@
 					                <tasks>
 					                    <echo>Creating bundle to upload to sofia.com</echo>
 					                    <copy toDir="${basedir}/target/Api-Java"><fileset dir="${basedir}/target" includes="*.jar"/></copy>
-					                    <copy toDir="${basedir}/Api-Java/lib"><fileset dir="${basedir}/target/lib" INCLUDES="*.jar"/></copy>
+					                    <copy toDir="${basedir}/Api-Java/lib"><fileset dir="${basedir}/target/lib" includes="*.jar"/></copy>
 					                    <copy file="${basedir}/target/client-api-standalone.jar" tofile="${basedir}/target/Api-Java/TestApi/lib/client-api-standalone.jar"/>
-					                    <copy toDir="${basedir}/target/Api-Java/TestApi/"><fileset dir="${basedir}/build_resources"/></copy>
+					                    
+					                    <copy file="${basedir}/build_resources/classpath" tofile="${basedir}/target/Api-Java/TestApi/.classpath"/>
+					                    <copy file="${basedir}/build_resources/project" tofile="${basedir}/target/Api-Java/TestApi/.project"/>
+					                    <copy file="${basedir}/build_resources/settings/org.eclipse.jdt.core.prefs" tofile="${basedir}/target/Api-Java/TestApi/.settings/org.eclipse.jdt.core.prefs"/>
+					                    
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/resources"><fileset dir="${basedir}/src/test/resources"/></copy>
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/fixtures"><fileset dir="${basedir}/fixtures"/></copy>
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/test/"><fileset dir="${basedir}/src/test/java"/></copy>
