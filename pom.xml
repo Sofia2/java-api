@@ -266,7 +266,7 @@
 					    <version>1.8</version>
 				    	<executions>
 				        	<execution>
-				         	   <phase>install</phase>
+				         	   <phase>package</phase>
 				            	<goals>
 				                	<goal>run</goal>
 				            	</goals>
