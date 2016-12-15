@@ -37,7 +37,7 @@ import org.atmosphere.wasync.RequestBuilder;
 import org.atmosphere.wasync.Socket;
 import org.atmosphere.wasync.Socket.STATUS;
 
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
@@ -49,7 +49,7 @@ import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPMessageTypes;
 
 @SuppressWarnings("rawtypes")
-public class KpWebSocketClient extends KpToExtend {
+public class KpWebSocketClient extends KpToExtendApi {
 	
 	
 	private Client client;

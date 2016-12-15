@@ -4,8 +4,7 @@ import org.fusesource.mqtt.client.QoS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.indra.sofia2.ssap.kp.Kp;
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.kp.implementations.oficials.abstracts.KpErrorsAbstract;
@@ -22,7 +21,7 @@ public class TestKpErrosMqtt extends KpErrorsAbstract {
 
 
 	@Override
-	public KpToExtend getImplementation() {
+	public KpToExtendApi getImplementation() {
 		
 		MQTTConnectionConfig config = new MQTTConnectionConfig();
 		config.setSibHost(HOST);

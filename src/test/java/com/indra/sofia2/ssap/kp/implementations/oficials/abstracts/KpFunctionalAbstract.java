@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionToSIBException;
@@ -65,12 +65,12 @@ public abstract class KpFunctionalAbstract {
 	
 	private final static String ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 20 where Sensor.assetId = \"S_Temperatura_00067\"";
 	
-	private static KpToExtend kp;
+	private static KpToExtendApi kp;
 	
 	private boolean indicationReceived;
 	private String sessionKey;
 	
-	public abstract KpToExtend getImplementation();
+	public abstract KpToExtendApi getImplementation();
 	public abstract Logger getLog();
 	
 	@BeforeClass
@@ -469,7 +469,7 @@ public abstract class KpFunctionalAbstract {
 			
 			SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseStatus.getBody());
 			assertTrue(returned.isOk());
-			((KpToExtend)this.kp).setStatusReportPeriod(500);
+			((KpToExtendApi)this.kp).setStatusReportPeriod(500);
 		}
 	}
 	

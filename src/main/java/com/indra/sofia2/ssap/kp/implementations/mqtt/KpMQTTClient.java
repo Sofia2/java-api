@@ -29,7 +29,7 @@ import org.fusesource.mqtt.client.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
@@ -44,7 +44,7 @@ import com.indra.sofia2.ssap.kp.utils.InternetConnectionTester;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.encryption.CypheredSSAPPayloadHandler;
 
-public class KpMQTTClient extends KpToExtend {
+public class KpMQTTClient extends KpToExtendApi {
 
 	private static final Logger log = LoggerFactory.getLogger(KpMQTTClient.class);
 	private static final int DEFAULT_DISCONNECTION_TIMEOUT = 5000;

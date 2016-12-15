@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.indra.sofia2.ssap.kp.Kp;
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.implementations.oficials.abstracts.KpErrorsAbstract;
 import com.indra.sofia2.ssap.kp.implementations.websockets.KpWebSocketClient;
@@ -13,7 +13,7 @@ import com.indra.sofia2.ssap.testutils.TestProperties;
 
 public class TestKpErrosWebSoscket extends KpErrorsAbstract {
 	@Override
-	public KpToExtend getImplementation() {
+	public KpToExtendApi getImplementation() {
 		
 		WebSocketConnectionConfig config=new WebSocketConnectionConfig();
 		config.setEndpointUri(TestProperties.getInstance().get("test.officials.websockets.url"));

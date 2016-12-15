@@ -4,7 +4,7 @@ import org.fusesource.mqtt.client.QoS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.config.MQTTConnectionConfig;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.kp.implementations.oficials.abstracts.KpFunctionalAbstract;
@@ -20,7 +20,7 @@ public class TestKpFunctionalMqtt extends KpFunctionalAbstract{
 	private final static boolean ENABLE_MQTT_AUTHENTICATION = Boolean.valueOf(TestProperties.getInstance().get("test.officials.mqtt.enable_athentication"));
 
 	@Override
-	public KpToExtend getImplementation() {
+	public KpToExtendApi getImplementation() {
 		
 		MQTTConnectionConfig config = new MQTTConnectionConfig();
 		config.setSibHost(HOST);

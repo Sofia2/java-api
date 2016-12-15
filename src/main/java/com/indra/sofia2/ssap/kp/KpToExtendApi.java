@@ -36,9 +36,9 @@ import com.indra.sofia2.ssap.kp.utils.OsHwInfo;
 import com.indra.sofia2.ssap.kp.utils.functions.Supplier;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 
-public abstract class KpToExtend implements Kp {
+public abstract class KpToExtendApi implements Kp {
 
-	private static final Logger log = LoggerFactory.getLogger(KpToExtend.class);
+	private static final Logger log = LoggerFactory.getLogger(KpToExtendApi.class);
 
 	/**
 	 * XXTEA algorithm cipher key
@@ -104,7 +104,7 @@ public abstract class KpToExtend implements Kp {
 	private boolean reportingStatus;
 	
 	
-	protected KpToExtend(ConnectionConfig config, final String kp, final String kpInstance, final String token) throws ConnectionConfigException {
+	protected KpToExtendApi(ConnectionConfig config, final String kp, final String kpInstance, final String token) throws ConnectionConfigException {
 		this.config = config;
 		this.kp = kp;
 		this.kpInstance = kpInstance;

@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
 import com.indra.sofia2.ssap.kp.logging.LogMessages;
@@ -62,12 +62,12 @@ public abstract class KpErrorsAbstract {
 	private final static String ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 20 where Sensor.assetId = \"S_Temperatura_00066\"";
 	private final static String MALFORMED_ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 20 where SensorXX.assetId = \"S_Temperatura_00066\"";
 	
-	private static KpToExtend kp;
+	private static KpToExtendApi kp;
 	
 	private boolean indicationReceived;
 	private String sessionKey;
 	
-	public abstract KpToExtend getImplementation();
+	public abstract KpToExtendApi getImplementation();
 	public abstract Logger getLog();
 
 	@BeforeClass

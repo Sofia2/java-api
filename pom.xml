@@ -95,16 +95,12 @@
 		    <version>${version}</version>
 		    <optional>true</optional>
 		</dependency>
-		
 		<dependency>
 		    <groupId>com.github.dblock</groupId>
 		    <artifactId>oshi-core</artifactId>
 		    <version>${oshi-core.version}</version>
 		</dependency>
-		
-
 	</dependencies>
-	
 	<repositories>
 		<repository>
 			<id>SOFIA2</id>
@@ -126,7 +122,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	
 	<profiles>
 		<profile>
 			<id>github</id>
@@ -155,15 +150,10 @@
 					<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<configuration>
-						<archive>
-							<manifest>
-								<mainClass>com.indra.sofia2.client.kp.examples.Example</mainClass>
-							</manifest>
-						</archive>
 						<descriptorRefs>
 							<descriptorRef>jar-with-dependencies</descriptorRef>
 						</descriptorRefs>
-						<finalName>ssap-standalone-with-deps-${project.version}</finalName>
+						<finalName>client-api-standalone</finalName>
 						<outputDirectory>${project.build.directory}</outputDirectory>
 						<appendAssemblyId>false</appendAssemblyId>
 					</configuration>
@@ -240,54 +230,64 @@
 	                	</executions>
 	            	</plugin>
 	            	<plugin>
-				        <artifactId>maven-resources-plugin</artifactId>
-				        <version>3.0.2</version>
-				        <executions>
-				          <execution>
-				            <id>copy-resources</id>
-				            <!-- here the phase you need -->
-				            <phase>install</phase>
-				            <goals>
-				              <goal>copy-resources</goal>
-				            </goals>
-				            <configuration>
-				              <outputDirectory>${basedir}/target/Api-Java/</outputDirectory>
-				              <resources>    
-				              	<resource>
-				              		<directory>${basedir}/target</directory>
-				              		<excludes>
-				              			<exclude>generated-sources/</exclude>
-				              			<exclude>maven-archiver/</exclude>
-				              			<exclude>classes/</exclude>
-				              			<exclude>java/</exclude>
-				              			<exclude>**/*.class</exclude>
-				              			<exclude>**/*.java</exclude>
-				              		</excludes>
-				              	</resource>      
-				                <resource>
-				                  <targetPath>${basedir}/target/Api-Java/TestApi/src/test</targetPath>
-				                  <directory>src/test</directory>
-				                  <filtering>true</filtering>
-				                </resource>
-				                <resource>
-				                  <targetPath>${basedir}/target/Api-Java/TestApi/lib</targetPath>
-				                  <directory>${basedir}/target/lib</directory>
-				                  <filtering>true</filtering>
-				                </resource>
-				                <resource>
-				                  <targetPath>${basedir}/target/Api-Java/TestApi/lib</targetPath>
-				                  <directory>${basedir}/target/Api-Java</directory>
-				                  <include>**/client-api*.jar</include>
-				                  <filtering>true</filtering>
-				                </resource>
-				              </resources>              
-				            </configuration>            
-				          </execution>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>2.3.2</version>
+						<configuration>
+							<source>${maven.compiler.source}</source>
+							<target>${maven.compiler.target}</target>
+							<encoding>UTF-8</encoding>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>client-api-standalone</finalName>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<appendAssemblyId>false</appendAssemblyId>
+							
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>install</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+	           		<plugin>
+					    <groupId>org.apache.maven.plugins</groupId>
+					    <artifactId>maven-antrun-plugin</artifactId>
+					    <version>1.8</version>
+				    	<executions>
+				        	<execution>
+				         	   <phase>install</phase>
+				            	<goals>
+				                	<goal>run</goal>
+				            	</goals>
+					            <configuration>
+					                <tasks>
+					                    <echo>Creating bundle to upload to sofia.com</echo>
+					                    <copy toDir="${basedir}/target/Api-Java"><fileset dir="${basedir}/target" includes="*.jar"/></copy>
+					                    <copy toDir="${basedir}/Api-Java/lib"><fileset dir="${basedir}/target/lib" INCLUDES="*.jar"/></copy>
+					                    <copy file="${basedir}/target/client-api-standalone.jar" tofile="${basedir}/target/Api-Java/TestApi/lib/client-api-standalone.jar"/>
+					                    <copy toDir="${basedir}/target/Api-Java/TestApi/"><fileset dir="${basedir}/build_resources"/></copy>
+					                    <copy toDir="${basedir}/target/Api-Java/TestApi/resources"><fileset dir="${basedir}/src/test/resources"/></copy>
+					                    <copy toDir="${basedir}/target/Api-Java/TestApi/fixtures"><fileset dir="${basedir}/fixtures"/></copy>
+					                    <copy toDir="${basedir}/target/Api-Java/TestApi/test/"><fileset dir="${basedir}/src/test/java"/></copy>
+					                    <zip destfile="${basedir}/target/Api-Java.zip"  basedir="${basedir}/target/Api-Java"/>
+					               </tasks>
+				                </configuration>
+				            </execution>
 				        </executions>
-				      </plugin>
+				    </plugin>
 			    </plugins>
 			</build>
 		</profile>
 	</profiles>
-
 </project>

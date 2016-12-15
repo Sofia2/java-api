@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.indra.sofia2.ssap.kp.KpToExtend;
+import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.logging.LogMessages;
 import com.indra.sofia2.ssap.kp.utils.functions.Supplier;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
@@ -18,7 +18,7 @@ public class KpReporter {
 	private static Logger log = Logger.getLogger(KpReporter.class);
 	private int period = 5000;
 	
-	private final KpToExtend kp;
+	private final KpToExtendApi kp;
 
 	private ScheduledExecutorService executor;
 	private Supplier<SSAPMessage> supplier = null;
@@ -26,7 +26,7 @@ public class KpReporter {
 	private ScheduledFuture<?> futureTask;
 	private Runnable runnable;
 	
-	public KpReporter(final KpToExtend kp, int period, Supplier<SSAPMessage> supplier) {
+	public KpReporter(final KpToExtendApi kp, int period, Supplier<SSAPMessage> supplier) {
 		this.kp = kp;
 		this.period = period;
 		this.supplier = supplier;
