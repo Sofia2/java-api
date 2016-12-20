@@ -32,6 +32,7 @@ import com.indra.sofia2.ssap.ssap.SSAPLogLevel;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 import com.indra.sofia2.ssap.ssap.SSAPSeverityLevel;
+import com.indra.sofia2.ssap.ssap.body.SSAPBodyLocationMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyOperationMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
@@ -343,7 +344,9 @@ public abstract class KpFunctionalAbstract {
 		String timeStamp = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").format(new Date());
 		
 		SSAPMessage msgError=SSAPMessageGenerator.getInstance().generateErrorMessage(KP, KP_INSTANCE, TOKEN, SSAPSeverityLevel.ERROR, "1", "Mensaje de error enviado", timeStamp);
-
+		SSAPMessage msgLog=SSAPMessageGenerator.getInstance().generateLogMessage(KP, KP_INSTANCE, TOKEN, SSAPLogLevel.INFO, "1", "Mensaje de info enviado", timeStamp);
+		
+		
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgError.toJson()));
 		
 		SSAPMessage responseError=kp.send(msgError);
@@ -386,7 +389,6 @@ public abstract class KpFunctionalAbstract {
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date());
 		
 		SSAPMessage msgLocation=SSAPMessageGenerator.getInstance().generateLocationMessage(KP, KP_INSTANCE, TOKEN, Double.parseDouble("90"), Double.parseDouble("10"), Double.parseDouble("4.5"), Double.parseDouble("0.0"), Double.parseDouble("90.0"), Double.parseDouble("10"), timeStamp);
-
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgLocation.toJson()));
 		
 		SSAPMessage responseLocation=kp.send(msgLocation);
@@ -469,8 +471,10 @@ public abstract class KpFunctionalAbstract {
 			
 			SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseStatus.getBody());
 			assertTrue(returned.isOk());
+						
 			((KpToExtendApi)this.kp).setStatusReportPeriod(500);
 		}
+		
 	}
 	
 	

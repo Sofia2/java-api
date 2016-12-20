@@ -1,0 +1,31 @@
+*********************************************
+API Java - Sofia2
+*********************************************
+Utilización del API:
+ 1) Para KPs creados como proyectos Maven con el SDK de Sofia2. Añadir al fichero pom.xml del KP la siguiente dependencia:
+		<dependency>
+			<groupId>com.indra.sofia2.ssap</groupId>
+			<artifactId>client-api</artifactId>
+			<version>[version_release_sofia]</version>
+		</dependency>
+		
+ 2) Para KPs creados como proyectos Java sin utilizar el SDK de Sofia2. Utilizar las librerias proporcionadas en este zip
+
+Estructura del API:
+	client-api-<version>.jar: Libreria principal del API, incorpora las utilidades para el desarrollo de KPs
+	lib/dependencias: Dependencias de la libreria client-api-<version>.jar
+	
+
+Para empezar a trabajar con el API, se puede partir del proyecto de prueba proporcionado:
+Proyecto de Prueba:
+	TestApi: Proyecto Eclipse con dos test listos para ser lanzados:
+		* KpGatewayRestFuncional.java: Test del API funcionando con el Gateway RESTFul de Sofia2
+		* KpMqttFuncional.java: Test del API funcionando con el Gateway MQTT de Sofia2
+		
+Sustituir en estos test las constantes:
+	private final static String TOKEN = "e5e8a005d0a248f1ad2cd60a821e6838";
+	private final static String KP_INSTANCE = "KPTestTemperatura:KPTestTemperatura01";
+	
+	private final static String ONTOLOGY_NAME = "TestSensorTemperatura";
+	
+por el token, instancia de kp y ontologia creados por el usuario en la consola de http://sofia2.com/console

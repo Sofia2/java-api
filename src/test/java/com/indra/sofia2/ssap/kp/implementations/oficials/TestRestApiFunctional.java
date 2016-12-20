@@ -19,8 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.Response;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -43,6 +41,8 @@ import com.indra.sofia2.ssap.testutils.FixtureLoader;
 import com.indra.sofia2.ssap.testutils.LightHttpListener;
 import com.indra.sofia2.ssap.testutils.RestApiUtils;
 import com.indra.sofia2.ssap.testutils.TestProperties;
+
+import javax.ws.rs.core.Response;
 
 public class TestRestApiFunctional {
 

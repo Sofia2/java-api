@@ -15,19 +15,23 @@
  ******************************************************************************/
 package com.indra.sofia2.ssap.kp.config;
 
-import javax.ws.rs.core.Response;
+//import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 import org.fusesource.mqtt.client.QoS;
 
 import com.indra.sofia2.ssap.kp.config.ConnectionConfig;
 import com.indra.sofia2.ssap.kp.exceptions.ConnectionConfigException;
+import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.kp.implementations.mqtt.MqttConstants;
 
 public class MQTTConnectionConfig extends ConnectionConfig {
 
-	private static Response kk;
 	private static final long serialVersionUID = 1L;
+	
+	private static final String SEPARADOR_CLIENTID = "_";
+	private static final int PREFIX_MAX_LENGHT = 15;
+
 
 	/**
 	 * Sets the quality of service to use for the Will message. Defaults to
@@ -141,6 +145,11 @@ public class MQTTConnectionConfig extends ConnectionConfig {
 	 * attempt.
 	 */
 	private boolean checkInternetConnection;
+	
+	/**
+	 * ClientId prefix
+	 */
+	private String clientIdPrefix;
 
 	public MQTTConnectionConfig() {
 		this.maxConnectAttempts = 0;
@@ -239,6 +248,18 @@ public class MQTTConnectionConfig extends ConnectionConfig {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+	
+	public String getClientIdPrefix() {
+		return clientIdPrefix;
+	}
+	
+	public void setClientIdPrefix(String prefix){
+		if(prefix.length() > PREFIX_MAX_LENGHT) throw new ConnectionConfigException("ClientId prefix must be smaller than " + PREFIX_MAX_LENGHT);
+		this.clientIdPrefix = prefix;
+		String clientId = UUID.randomUUID().toString().substring(0, MqttConstants.CLIENT_ID_LENGTH - prefix.length() - 1);
+		StringBuffer str = new StringBuffer();
+		this.clientId = str.append(prefix).append(SEPARADOR_CLIENTID).append(clientId).toString();
 	}
 	
 	public void resetClientId() {

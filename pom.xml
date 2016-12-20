@@ -28,7 +28,7 @@
 		<commons-codec.version>1.5</commons-codec.version>
 		<commons-io.version>2.4</commons-io.version>
 		<commons-lang3.version>3.2.1</commons-lang3.version>
-<!-- 		<cxf.version>3.1.8</cxf.version> -->
+		<cxf.version>2.6.10</cxf.version>
 		<jackson.version>2.6.3</jackson.version>
 		<junit.version>4.11</junit.version>
 		<log4j.version>1.2.17</log4j.version>
@@ -39,6 +39,11 @@
 		<oshi-core.version>2.6-m-java7</oshi-core.version>
 	</properties>
 	<dependencies>
+		<dependency>
+		    <groupId>com.indra.sofia2</groupId>
+		    <artifactId>ssap</artifactId>
+		    <version>${version}</version>
+		</dependency>
 		<!-- Common dependencies -->
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -88,19 +93,20 @@
 			<version>${wasync.version}</version>
 		</dependency>
 		<!-- REST dependencies -->
-
-		<dependency>
-		    <groupId>com.indra.sofia2</groupId>
-		    <artifactId>ssap</artifactId>
-		    <version>${version}</version>
-		    <optional>true</optional>
-		</dependency>
 		<dependency>
 		    <groupId>com.github.dblock</groupId>
 		    <artifactId>oshi-core</artifactId>
 		    <version>${oshi-core.version}</version>
-		</dependency>
+		</dependency>		
+		<dependency>
+		    <groupId>org.fusesource.hawtdispatch</groupId>
+		    <artifactId>hawtdispatch-transport</artifactId>
+		    <version>1.22</version>
+		</dependency>		
 	</dependencies>
+	
+	
+	
 	<repositories>
 		<repository>
 			<id>SOFIA2</id>
@@ -128,13 +134,6 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-			<dependencies>
-		      	<dependency>
-					<groupId>org.apache.cxf</groupId>
-					<artifactId>cxf-rt-rs-client</artifactId>
-					<version>3.1.8</version>
-				</dependency>
-	      	</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -175,25 +174,17 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			<dependencies>
-		      	<dependency>
-					<groupId>org.apache.cxf</groupId>
-					<artifactId>cxf-rt-rs-client</artifactId>
-					<version>3.1.8</version>
-					<optional>true</optional>
-				</dependency>
-	      	</dependencies>
 			<distributionManagement>
-				   <repository>
-				      <id>com.indra.sofia2.snapshots</id>
-				      <name>snapshots</name>
-				      <url>http://sofia2.org/nexus/content/repositories/snapshots/</url>
-				   </repository>
-					<!-- 	   <repository> -->
-					<!-- 	      <id>com.indra.sofia2.releases</id> -->
-					<!-- 	      <name>snapshots</name> -->
-					<!-- 	      <url>http://sofia2.org/nexus/content/repositories/releases/</url> -->
-					<!-- 	   </repository> -->
+<!-- 				   <repository> -->
+<!-- 				      <id>com.indra.sofia2.snapshots</id> -->
+<!-- 				      <name>snapshots</name> -->
+<!-- 				      <url>http://sofia2.org/nexus/content/repositories/snapshots/</url> -->
+<!-- 				   </repository> -->
+						   <repository>
+						      <id>com.indra.sofia2.releases</id>
+						      <name>snapshots</name>
+						      <url>http://sofia2.org/nexus/content/repositories/releases/</url>
+						   </repository>
 			</distributionManagement>
 		</profile>
 		<profile>
@@ -201,13 +192,18 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			<dependencies>
-		      	<dependency>
-					<groupId>org.apache.cxf</groupId>
-					<artifactId>cxf-rt-rs-client</artifactId>
-					<version>3.1.8</version>				
-				</dependency>
-	      	</dependencies>
+							<distributionManagement>
+<!-- 				   <repository> -->
+<!-- 				      <id>com.indra.sofia2.snapshots</id> -->
+<!-- 				      <name>snapshots</name> -->
+<!-- 				      <url>http://sofia2.org/nexus/content/repositories/snapshots/</url> -->
+<!-- 				   </repository> -->
+						   <repository>
+						      <id>com.indra.sofia2.releases</id>
+						      <name>snapshots</name>
+						      <url>http://sofia2.org/nexus/content/repositories/releases/</url>
+						   </repository>
+			</distributionManagement>
 			<build>
 				<plugins>
 			      <plugin>
@@ -248,7 +244,6 @@
 							<finalName>client-api-standalone</finalName>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<appendAssemblyId>false</appendAssemblyId>
-							
 						</configuration>
 						<executions>
 							<execution>
@@ -274,13 +269,15 @@
 					                <tasks>
 					                    <echo>Creating bundle to upload to sofia.com</echo>
 					                    <copy toDir="${basedir}/target/Api-Java"><fileset dir="${basedir}/target" includes="*.jar"/></copy>
-					                    <copy toDir="${basedir}/Api-Java/lib"><fileset dir="${basedir}/target/lib" includes="*.jar"/></copy>
+					                    <copy toDir="${basedir}/target/Api-Java/lib"><fileset dir="${basedir}/target/lib" includes="*.jar"/></copy>
 					                    <copy file="${basedir}/target/client-api-standalone.jar" tofile="${basedir}/target/Api-Java/TestApi/lib/client-api-standalone.jar"/>
-					                    
+					                    <copy file="${basedir}/target/lib/cxf-rt-transports-http-2.6.10.jar" tofile="${basedir}/target/Api-Java/TestApi/lib/cxf-rt-transports-http-2.6.10.jar"/>					                    
+<!-- 					                    <copy file="${basedir}/target/lib/cxf-core-3.1.8.jar" tofile="${basedir}/target/Api-Java/TestApi/lib/cxf-core-3.1.8.jar"/>					                     -->
 					                    <copy file="${basedir}/build_resources/classpath" tofile="${basedir}/target/Api-Java/TestApi/.classpath"/>
 					                    <copy file="${basedir}/build_resources/project" tofile="${basedir}/target/Api-Java/TestApi/.project"/>
 					                    <copy file="${basedir}/build_resources/settings/org.eclipse.jdt.core.prefs" tofile="${basedir}/target/Api-Java/TestApi/.settings/org.eclipse.jdt.core.prefs"/>
-					                    
+					                    <copy file="${basedir}/build_resources/LEEME.txt" tofile="${basedir}/target/Api-Java/LEEME.txt"/>
+					                    <copy file="${basedir}/build_resources/LICENSE.txt" tofile="${basedir}/target/Api-Java/LICENSE.txt"/>					                    
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/resources"><fileset dir="${basedir}/src/test/resources"/></copy>
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/fixtures"><fileset dir="${basedir}/fixtures"/></copy>
 					                    <copy toDir="${basedir}/target/Api-Java/TestApi/test/"><fileset dir="${basedir}/src/test/java"/></copy>
