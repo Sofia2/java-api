@@ -57,7 +57,7 @@ public class KpReporter {
 	private synchronized void send() {
 		try {
 			SSAPMessage message = supplier.get();
-			System.out.println(message.toJson());
+			//System.out.println(message.toJson());
 			log.info(String.format(LogMessages.LOG_REQUEST_DATA, message.toJson()));
 			SSAPMessage responseStatus = kp.send(message);
 			
