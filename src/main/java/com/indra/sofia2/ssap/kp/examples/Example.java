@@ -176,7 +176,10 @@ public class Example {
 			queryType = this.askQueryType(); 	
 			System.out.println("insert insert statement");
 			stmt = Example.normalizeInut(in.nextLine()); 
-			message = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY, stmt);
+			if(queryType == SSAPQueryType.SQLLIKE)
+				message = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY, stmt, queryType);
+			else
+				message = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY, stmt);
 		}
 		else if(Commands.UPDATE.compareToIgnoreCase(operation) == 0) {
 			queryType = this.askQueryType(); 	
@@ -266,13 +269,6 @@ public class Example {
 		System.out.println("");
 		System.out.println("List of kp actions to perform (Type de option and pulse enter):");
 		System.out.println("");
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura {Sensor.assetId:\"S_Temperatura_00066\"}", Commands.QUERY_MONGODB, Commands.QUERY_MONGODB));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura SELECT * FROM TestSensorTemperatura WHERE Sensor.assetId = 'S_Temperatura_00066'", Commands.QUERY_SQL_LIKE, Commands.QUERY_SQL_LIKE));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura INSERT INTO TestSensorTemperatura(geometry, assetId, measure, timestamp) values (\"{ 'coordinates': [ 40.512967, -3.67495 ], 'type': 'Point' }\", \"S_Temperatura_00066\", 15, \"{ '$date': '2014-04-29T08:24:54.005Z'}\")", Commands.INSERT_MONGODB, Commands.INSERT_MONGODB));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura {Sensor.assetId:\"S_Temperatura_00067\"}", Commands.UPDATE_MONGODB, Commands.UPDATE_MONGODB));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura UPDATE TestSensorTemperatura SET measure = 20 WHERE Sensor.assetId = \"S_Temperatura_00067\"", Commands.UPDATE_SQL_LIKE, Commands.INSERT_SQL_LIKE));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura{\"_id\": {\"$oid\":\"YOUR_ID\" }}", Commands.DELETE_MONGODB, Commands.DELETE_MONGODB));
-//		System.out.println(String.format("%s [ONTOLOGY] [QUERY] :: \n\tExample: %s TestSensorTemperatura DELETE FROM TestSensorTemperatura WHERE Sensor.assetId = \"S_Temperatura_00067\"", Commands.DELETE_SQL_LIKE, Commands.DELETE_SQL_LIKE));
 				
 		System.out.println(String.format("\tquery <enter>"));
 		System.out.println(String.format("\tinsert <enter>"));
