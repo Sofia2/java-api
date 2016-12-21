@@ -176,7 +176,7 @@ public class Example {
 			queryType = this.askQueryType(); 	
 			System.out.println("insert insert statement");
 			stmt = Example.normalizeInut(in.nextLine()); 
-			message = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY, stmt, queryType);
+			message = SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY, stmt);
 		}
 		else if(Commands.UPDATE.compareToIgnoreCase(operation) == 0) {
 			queryType = this.askQueryType(); 	
