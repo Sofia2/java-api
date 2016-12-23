@@ -9,8 +9,14 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.validation.constraints.AssertFalse;
+
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,6 +25,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.indra.sofia2.ssap.json.JSON;
 import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
@@ -32,7 +39,6 @@ import com.indra.sofia2.ssap.ssap.SSAPLogLevel;
 import com.indra.sofia2.ssap.ssap.SSAPMessage;
 import com.indra.sofia2.ssap.ssap.SSAPQueryType;
 import com.indra.sofia2.ssap.ssap.SSAPSeverityLevel;
-import com.indra.sofia2.ssap.ssap.body.SSAPBodyLocationMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyOperationMessage;
 import com.indra.sofia2.ssap.ssap.body.SSAPBodyReturnMessage;
 import com.indra.sofia2.ssap.ssap.body.bulk.message.SSAPBodyBulkReturnMessage;
@@ -114,17 +120,23 @@ public abstract class KpFunctionalAbstract {
 		
 		SSAPMessage msgJoin=SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		SSAPMessage response=kp.send(msgJoin);
-				
+		String kk = response.toJson();
+		String kk2 = JSON.jsonizeString(response.toJson());
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, response.toJson()));
 		
 		assertNotSame(response.getSessionKey(), null);
 		
 		String sessionKey=response.getSessionKey();
 		
-		SSAPBodyReturnMessage bodyReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBodyAsJson().toString());
+		SSAPBodyReturnMessage bodyReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertEquals(bodyReturn.getData(), sessionKey);
 		assertTrue(bodyReturn.isOk());
 		assertSame(bodyReturn.getError(), null);
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertEquals(jBody.path("data").asText(), sessionKey);
+		assertTrue(jBody.path("ok").asBoolean());
+		assertTrue(jBody.path("error").isNull());
 		
 	}
 	
@@ -133,42 +145,54 @@ public abstract class KpFunctionalAbstract {
 		
 		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSTANCE.toString());
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgInsert.toJson()));
-		SSAPMessage responseInsert=kp.send(msgInsert);
+		SSAPMessage response = kp.send(msgInsert);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
-			
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jBody.path("data")));
 	}
 	
 	@Test
 	public void testUpdateNative() throws Exception {
 	
 		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSTANCE.toString());
-		SSAPMessage responseInsert=kp.send(msgInsert);
+		SSAPMessage response=kp.send(msgInsert);
 				
 		SSAPMessage msgUpate=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_UPDATE.toString(), ONTOLOGY_UPDATE_WHERE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgUpate.toJson()));
 		SSAPMessage responseUpdate=kp.send(msgUpate);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUpdate.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jBody.path("data")));
 		
 	}
 	
 	@Test
 	public void testQueryNative() throws Exception {
-		
 		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
-		
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBodyAsJson().toString());
+		SSAPMessage response=kp.send(msgQuery);
+				
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
-		
+
+		JsonNode jBody = response.getBodyAsJsonObject();
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
+		Iterator<JsonNode> iterator = jReturned.iterator();
+					
+		while(iterator.hasNext()) {
+			JsonNode item = iterator.next();
+			assertTrue(!item.path("_id").isNull());
+		}
 	}
 	
 	@Test
@@ -177,11 +201,16 @@ public abstract class KpFunctionalAbstract {
 		SSAPMessage msgInsert=SSAPMessageGenerator.getInstance().generateInsertMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_INSERT_SQLLIKE, SSAPQueryType.SQLLIKE);
 		SSAPBodyOperationMessage messageRequest = SSAPBodyOperationMessage.fromJsonToSSAPBodyOperationMessage(msgInsert.getBody());
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgInsert.toJson()));
-		SSAPMessage responseInsert=kp.send(msgInsert);
+		SSAPMessage response=kp.send(msgInsert);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));		
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
+				
 	}
 	
 	@Test
@@ -189,11 +218,15 @@ public abstract class KpFunctionalAbstract {
 		
 		SSAPMessage msgUpate=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, null, ONTOLOGY_UPDATE_SQLLIKE, SSAPQueryType.SQLLIKE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgUpate.toJson()));
-		SSAPMessage responseUpdate=kp.send(msgUpate);
+		SSAPMessage response=kp.send(msgUpate);
 
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUpdate.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
 	}
 	
 	@Test
@@ -203,7 +236,7 @@ public abstract class KpFunctionalAbstract {
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		SSAPMessage responseQuery=kp.send(msgQuery);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
 		assertTrue(returned.isOk());
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, responseQuery.toJson()));
 	}
@@ -214,10 +247,9 @@ public abstract class KpFunctionalAbstract {
 		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, null, "select * from Asset where identificacion='tweets_sofia'", SSAPQueryType.BDC);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		SSAPMessage responseQuery=kp.send(msgQuery);
-		
-		
+				
 		log.info(responseQuery.toJson());
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
 		assertTrue(returned.isOk());
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 	}
@@ -229,10 +261,37 @@ public abstract class KpFunctionalAbstract {
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		SSAPMessage responseQuery=kp.send(msgQuery);
 	
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		
 		assertTrue(returned.isOk());
+	}
+	
+	@Test
+	public void testQueryBDH() throws Exception {
+	
+		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
+		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
+		SSAPMessage response=kp.send(msgQuery);
+				
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		
+		returned.setData("{  \"columns\": [{ \"name\": \"_id\", \"type\": \"VARCHAR\",\"index\": 1},{\"name\": \"contextdata.session_key\",\"type\": \"VARCHAR\", \"index\": 2    }, {\"name\": \"contextdata.user\", \"type\": \"VARCHAR\", \"index\": 3 },{ \"name\": \"contextdata.kp\", \"type\": \"VARCHAR\",\"index\": 4 }, { \"name\": \"contextdata.kp_identificador\",  \"type\": \"VARCHAR\", \"index\": 5}, {\"name\": \"contextdata.timestamp\",  \"type\": \"TIMESTAMP\",  \"index\": 6}, { \"name\": \"feedid\", \"type\": \"VARCHAR\", \"index\": 7}, { \"name\": \"feedsource\", \"type\": \"VARCHAR\",  \"index\": 8 }, { \"name\": \"assetid\",  \"type\": \"VARCHAR\", \"index\": 9 }, { \"name\": \"assettype\", \"type\": \"VARCHAR\",       \"index\": 10    },     {      \"name\": \"assetsource\",       \"type\": \"VARCHAR\",       \"index\": 11    },     {      \"name\": \"assetname\",       \"type\": \"VARCHAR\",       \"index\": 12    },     {      \"name\": \"type\",       \"type\": \"VARCHAR\",       \"index\": 13    },     {      \"name\": \"timestamp\",       \"type\": \"TIMESTAMP\",       \"index\": 14    },     {      \"name\": \"measurestimestamp\",       \"type\": \"TIMESTAMP\",       \"index\": 15    },     {      \"name\": \"measurestimestampend_\",       \"type\": \"TIMESTAMP\",       \"index\": 16    },     {      \"name\": \"measurestype\",       \"type\": \"VARCHAR\",       \"index\": 17    },     {      \"name\": \"measuresperiod\",       \"type\": \"FLOAT\",       \"index\": 18    },     {      \"name\": \"measuresperiodunit\",       \"type\": \"VARCHAR\",       \"index\": 19    }  ],   \"values\": [    [      \"582fa47ee4b0045ff0087d22\",       \"2f1a1f0a-fcd0-4b65-8db4-402926a665d7\",       \"mazomacarra\",       \"kpBiciCoruna\",       \"kpBiciCoruna1\",       \"2016-11-19 01:01:50.39\",       \"feed_5_2016-11-19T00:54:59\",       \"BiciCoruna\",       \"5\",       \"BiciCoruna\",       \"BiciCoruna\",       \"Aquarium\",       \"VIRTUAL\",       \"2016-11-19 00:54:59.206\",       \"2016-11-19 00:54:59.206\",       null,       \"INSTANT\",       60,       \"s\"    ],     [      \"582fa47ee4b0045ff0087d1f\",       \"05b56a9b-70a0-405e-a0cd-ae24db51464d\",       \"mazomacarra\",       \"kpBiciCoruna\",       \"kpBiciCoruna1\",       \"2016-11-19 01:01:50.243\",       \"feed_11_2016-11-19T00:54:59\",       \"BiciCoruna\",       \"11\",       \"BiciCoruna\",       \"BiciCoruna\",       \"Castros\",       \"VIRTUAL\",       \"2016-11-19 00:54:59.281\",       \"2016-11-19 00:54:59.281\",       null,       \"INSTANT\",       60,       \"s\"    ],     [      \"582fa47de4b0045ff0087d19\",       \"05b56a9b-70a0-405e-a0cd-ae24db51464d\", \"mazomacarra\", \"kpBiciCoruna\", \"kpBiciCoruna1\", \"2016-11-19 01:01:49.818\", \"feed_8_2016-11-19T00:54:59\", \"BiciCoruna\", \"8\", \"BiciCoruna\", \"BiciCoruna\", \"Millenium\", \"VIRTUAL\", \"2016-11-19 00:54:59.282\",  \"2016-11-19 00:54:59.282\", null, \"INSTANT\", 60, \"s\"]]}");
+		
+		JsonNode jNode = returned.getDataAsJsonObject();
+		
+		assertTrue(returned.isOk());
+
+		JsonNode jBody = response.getBodyAsJsonObject();
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
+		Iterator<JsonNode> iterator = jReturned.iterator();
+					
+		while(iterator.hasNext()) {
+			JsonNode item = iterator.next();
+			assertTrue(!item.path("_id").isNull());
+		}
 	}
 	
 	
@@ -248,7 +307,7 @@ public abstract class KpFunctionalAbstract {
 				
 				indicationReceived=true;
 			
-				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBodyAsJson().toString());
+				SSAPBodyReturnMessage indicationMessage=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(ssapMessage.getBody());
 				
 				assertNotSame(indicationMessage.getData(), null);
 				assertTrue(indicationMessage.isOk());
@@ -261,7 +320,7 @@ public abstract class KpFunctionalAbstract {
 		
 		SSAPMessage msgSubscribe = kp.send(msg);
 		
-		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBodyAsJson().toString());
+		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
 		
 		assertNotSame(responseSubscribeBody.getData(), null);
 		assertTrue(responseSubscribeBody.isOk());
@@ -274,7 +333,7 @@ public abstract class KpFunctionalAbstract {
 		
 		SSAPMessage responseInsert=kp.send(msgInsert);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBodyAsJson().toString());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseInsert.getBody());
 		assertTrue(returned.isOk());
 				
 		Thread.sleep(5000);
@@ -283,7 +342,7 @@ public abstract class KpFunctionalAbstract {
 		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey, ONTOLOGY_NAME, subscriptionId);
 		
 		SSAPMessage responseUnsubscribe=kp.send(msgUnsubscribe);
-		SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBodyAsJson().toString());
+		SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
 		 
 		assertEquals(responseUnSubscribeBody.getData(), "");
 		assertTrue(responseUnSubscribeBody.isOk());
@@ -300,20 +359,24 @@ public abstract class KpFunctionalAbstract {
 		SSAPMessage msgUpate1=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, ONTOLOGY_UPDATE.toString(), ONTOLOGY_UPDATE_WHERE);
 		SSAPMessage msgUpate2=SSAPMessageGenerator.getInstance().generateUpdateMessage(sessionKey, ONTOLOGY_NAME, null, ONTOLOGY_UPDATE_SQLLIKE, SSAPQueryType.SQLLIKE);
 		
-		SSAPBulkMessage bulkMessage = SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey);
+		SSAPBulkMessage request = SSAPMessageGenerator.getInstance().generateBulkMessage(sessionKey);
 		
-		bulkMessage.addMessage(msgInsert1);
-		bulkMessage.addMessage(msgInsert2);
-		bulkMessage.addMessage(msgInsert3);
-		bulkMessage.addMessage(msgUpate1);
-		bulkMessage.addMessage(msgUpate2);
-		String jValue = bulkMessage.toJson();
+		request.addMessage(msgInsert1);
+		request.addMessage(msgInsert2);
+		request.addMessage(msgInsert3);
+		request.addMessage(msgUpate1);
+		request.addMessage(msgUpate2);
+			
+		log.info(String.format(LogMessages.LOG_REQUEST_DATA, request.toJson()));
+		SSAPMessage response=kp.send(request);
+		JsonNode jBody = response.getBodyAsJsonObject();
+		if(jBody.isArray()) {
+			 for (final JsonNode objNode : jBody) {
+			        System.out.println(objNode.toString());
+			    }
+		}
 		
-		
-		log.info(String.format(LogMessages.LOG_REQUEST_DATA, bulkMessage.toJson()));
-		SSAPMessage respuesta=kp.send(bulkMessage);
-		
-		SSAPBodyReturnMessage bodyBulkReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(respuesta.getBodyAsJson().toString());
+		SSAPBodyReturnMessage bodyBulkReturn=SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		SSAPBodyBulkReturnMessage summary=SSAPBodyBulkReturnMessage.fromJsonToSSAPBodyBulkReturnMessage(bodyBulkReturn.getData());
 		
 		assertEquals(3, summary.getInsertSummary().getObjectIds().size());
@@ -333,10 +396,15 @@ public abstract class KpFunctionalAbstract {
 		
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgLog.toJson()));
 		
-		SSAPMessage responseLog=kp.send(msgLog);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseLog.getBody());
+		SSAPMessage response=kp.send(msgLog);
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
 	}
 	
 	@Test
@@ -349,14 +417,19 @@ public abstract class KpFunctionalAbstract {
 		
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgError.toJson()));
 		
-		SSAPMessage responseError=kp.send(msgError);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseError.getBody());
+		SSAPMessage response=kp.send(msgError);
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
 	}
 	
 	@Test
-	public void testStatus() {		
+	public void testStatus() throws Exception {		
 
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date());
 		
@@ -368,19 +441,15 @@ public abstract class KpFunctionalAbstract {
 
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgStatus.toJson()));
 		
-		SSAPMessage responseStatus;
-		try {
-			responseStatus = kp.send(msgStatus);
-			SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseStatus.getBody());
-			assertTrue(returned.isOk());
-			log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
-		} catch (ConnectionToSIBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SSAPResponseTimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		SSAPMessage response = kp.send(msgStatus);
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		assertTrue(returned.isOk());
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+		
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
 		
 	}
 	
@@ -391,13 +460,17 @@ public abstract class KpFunctionalAbstract {
 		SSAPMessage msgLocation=SSAPMessageGenerator.getInstance().generateLocationMessage(KP, KP_INSTANCE, TOKEN, Double.parseDouble("90"), Double.parseDouble("10"), Double.parseDouble("4.5"), Double.parseDouble("0.0"), Double.parseDouble("90.0"), Double.parseDouble("10"), timeStamp);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgLocation.toJson()));
 		
-		SSAPMessage responseLocation=kp.send(msgLocation);
+		SSAPMessage response=kp.send(msgLocation);
 		
-		SSAPMessage replica = SSAPMessage.fromJsonToSSAPMessage(responseLocation.toJson());
 		//Checks if location message was OK in SIB
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseLocation.getBody());
+		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		assertTrue(returned.isOk());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+				
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
 
 	}
 	
@@ -410,7 +483,17 @@ public abstract class KpFunctionalAbstract {
 		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		assertTrue(returned.isOk());
+		
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+				
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
+		
 		assertNotSame(null, returned.getData());
+		assertTrue(!jReturned.isNull());
+		
 	}
 	
 	boolean indicationTestSubscribeCommand = false;
@@ -428,9 +511,15 @@ public abstract class KpFunctionalAbstract {
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, request.toJson()));
 		SSAPMessage response = kp.send(request);
 		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
-		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		assertTrue(returned.isOk());
 		assertNotSame(null, returned.getData());
+		
+		JsonNode jBody = response.getBodyAsJsonObject();
+		assertTrue(jBody.path("ok").asBoolean());
+				
+		JsonNode jReturned = returned.getDataAsJsonObject();
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, jReturned.toString()));
+		
 		
 		SSAPMessage requestCmd = SSAPMessageGenerator.getInstance().generateCommandMessage(sessionKey, KP, KP_INSTANCE ,SSAPCommandType.STATUS, Collections.<String, String>emptyMap());		
 		SSAPMessage responseCmd = kp.send(requestCmd);
@@ -471,6 +560,9 @@ public abstract class KpFunctionalAbstract {
 			
 			SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseStatus.getBody());
 			assertTrue(returned.isOk());
+			
+			JsonNode jBody = responseStatus.getBodyAsJsonObject();
+			JsonNode jReturned = returned.getDataAsJsonObject();
 						
 			((KpToExtendApi)this.kp).setStatusReportPeriod(500);
 		}
