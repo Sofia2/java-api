@@ -31,6 +31,7 @@ public class KpApiUtils {
 		SSAPMessage response = kp.send(joinMessage);
 		assertNotSame(response.getSessionKey(), null);
 		sessionKey = response.getSessionKey();
+		String kk= joinMessage.toJson();
 		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
 		
 		assertTrue(bodyReturn.isOk());

@@ -379,7 +379,6 @@ public abstract class KpErrorsAbstract {
 		SSAPMessage request = new SSAPMessage();
 		request.setDirection(SSAPMessageDirection.REQUEST);
 		request.setSessionKey(sessionKey);
-		//request.setMessageType(SSAPMessageTypes.GETINDEXES);
 		request.setBody(unknownBody);
 		
 		SSAPMessage response = kp.send(request);

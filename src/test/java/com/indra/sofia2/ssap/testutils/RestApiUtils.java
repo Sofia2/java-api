@@ -14,6 +14,7 @@ import com.indra.sofia2.ssap.kp.implementations.rest.SSAPResourceAPI;
 import com.indra.sofia2.ssap.kp.implementations.rest.exception.ResponseMapperException;
 import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 import com.indra.sofia2.ssap.kp.logging.LogMessages;
+import com.indra.sofia2.ssap.ssap.SSAPVersion;
 
 public class RestApiUtils {
 	private static Logger log;
@@ -28,6 +29,8 @@ public class RestApiUtils {
 		ssapJoin.setJoin(true);
 		ssapJoin.setInstanceKP(kp_instance);
 		ssapJoin.setToken(token);
+		ssapJoin.setVersion(SSAPVersion.ONE);
+
 		
 		Response respJoin=api.insert(ssapJoin);
 		//getSSAPResource2(api, respJoin);

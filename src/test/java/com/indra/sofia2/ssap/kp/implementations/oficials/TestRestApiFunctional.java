@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +29,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.indra.sofia2.ssap.json.JSON;
 import com.indra.sofia2.ssap.kp.implementations.rest.SSAPResourceAPI;
 import com.indra.sofia2.ssap.kp.implementations.rest.resource.SSAPResource;
 import com.indra.sofia2.ssap.kp.logging.LogMessages;
@@ -41,6 +44,8 @@ import com.indra.sofia2.ssap.testutils.FixtureLoader;
 import com.indra.sofia2.ssap.testutils.LightHttpListener;
 import com.indra.sofia2.ssap.testutils.RestApiUtils;
 import com.indra.sofia2.ssap.testutils.TestProperties;
+
+import groovy.inspect.TextNode;
 
 import javax.ws.rs.core.Response;
 
@@ -54,11 +59,6 @@ public class TestRestApiFunctional {
 	private final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance");
 	
 	private final static String ONTOLOGY_NAME = TestProperties.getInstance().get("test.officials.ontology_name");
-
-	
-	//private final static String TOKEN = "2d0a1fd449074a2ab6dacafc5fd0a69c";
-	//private final static String KP_INSTANCE = "KP_APITesting:jj";
-		
 	
 	private final static String SERVICE_URL=TestProperties.getInstance().get("test.officials.rest.url");
 
@@ -172,7 +172,7 @@ public class TestRestApiFunctional {
 	}
 	
 	@Test
-	public void testUpdate() {
+	public void testUpdate() throws JsonProcessingException, IOException {
 		
 		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);	
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
@@ -184,32 +184,25 @@ public class TestRestApiFunctional {
 		
 		Response respInsert=this.api.insert(ssapInsert);		
 		String data = utils.getSSAPResource(api, respInsert).getData();
-				
-//		//TODO: Al no ser parseable toca realizar tratamiento de cadenas 
-		String objId = data.replace("{\"_id\":ObjectId(\"", "");
-		objId=objId.replace("\")}", "");
-//
-//		//TODO: Realizar utilidad para esto
-		JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-		ObjectNode child = nodeFactory.objectNode(); 
-		child.put("$oid", objId);
-		JsonNode updateData = ((ObjectNode)ONTOLOGY_UPDATE.deepCopy()).set("_id", child);
-		
+		JsonNode ObjectId = JSON.getObjectMapper().readTree(data);
+			
+		((ObjectNode)ONTOLOGY_UPDATE).replace("_id", ObjectId.at("/_id"));
+			
 		SSAPResource ssapUpdate=new SSAPResource();
 		ssapUpdate.setSessionKey(sessionkey);
 		ssapUpdate.setOntology(ONTOLOGY_NAME);
-		ssapUpdate.setData(updateData.toString());
+		ssapUpdate.setData(ONTOLOGY_UPDATE.toString());
 		
 		Response respUpdate=this.api.update(ssapUpdate);
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respUpdate.getStatus(), "UPDATE"));
-		utils.getSSAPResource2(api, respUpdate);
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, utils.getSSAPResource(api, respUpdate).getData()));
 		assertEquals(respUpdate.getStatus(), 200);
 
 		utils.leave(api, sessionkey);	
 	}
 	
 	@Test
-	public void testQueryByObjectId() {
+	public void testQueryByObjectId() throws JsonProcessingException, IOException {
 		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);	
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
 		
@@ -220,10 +213,9 @@ public class TestRestApiFunctional {
 		Response respInsert=this.api.insert(ssapInsert);		
 		String data = utils.getSSAPResource(api, respInsert).getData();				
 		//TODO: Al no ser parseable toca realizar tratamiento de cadenas 
-		String objId = data.replace("{\"_id\":ObjectId(\"", "");
-		objId=objId.replace("\")}", "");
+		JsonNode ObjectId = JSON.getObjectMapper().readTree(data);
 		
-		Response respQuery=this.api.query(objId, sessionkey, ONTOLOGY_NAME);
+		Response respQuery=this.api.query(ObjectId.at("/_id/$oid").asText(), sessionkey, ONTOLOGY_NAME);
 		assertEquals(200, respQuery.getStatus());
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respQuery.getStatus(), "QUERY_BY_ID"));
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, utils.getSSAPResource(api, respQuery).getData()));
@@ -302,7 +294,7 @@ public class TestRestApiFunctional {
 	}
 
 	@Test
-	public void testDeleteByObjectId() {
+	public void testDeleteByObjectId() throws JsonProcessingException, IOException {
 		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);	
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
 		
@@ -312,20 +304,19 @@ public class TestRestApiFunctional {
 		ssapInsert.setOntology(ONTOLOGY_NAME);
 		Response respInsert=this.api.insert(ssapInsert);
 		String data = utils.getSSAPResource(api, respInsert).getData();	
-		//TODO: Al no ser parseable toca realizar tratamiento de cadenas 
-		String objId = data.replace("{\"_id\":ObjectId(\"", "");
-		objId=objId.replace("\")}", "");
+		JsonNode ObjectId = JSON.getObjectMapper().readTree(data);
 		
-		Response respQuery=this.api.deleteOid(objId, sessionkey, ONTOLOGY_NAME);
+		Response respQuery=this.api.deleteOid(ObjectId.at("/_id/$oid").asText(), sessionkey, ONTOLOGY_NAME);
 		assertEquals(respQuery.getStatus(), 200);
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respQuery.getStatus(), "DELETE_BY_OBJECT_ID"));
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, respQuery.getStatus()));
+		//log.info(String.format(LogMessages.LOG_RESPONSE_DATA, utils.getSSAPResource(api, respQuery).getData()));
 		
 		utils.leave(api, sessionkey);
 	}
 	
 	@Test
-	public void testDelete() {
+	public void testDelete() throws  IOException {
 		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);	
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
 		
@@ -335,18 +326,10 @@ public class TestRestApiFunctional {
 		ssapInsert.setOntology(ONTOLOGY_NAME);
 		Response respInsert=this.api.insert(ssapInsert);		
 		String data = utils.getSSAPResource(api, respInsert).getData();				
-		//TODO: Al no ser parseable toca realizar tratamiento de cadenas 
-		String objId = data.replace("{\"_id\":ObjectId(\"", "");
-		objId=objId.replace("\")}", "");
 		
-		//TODO: Realizar utilidad para esto
-		JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-		ObjectNode child = nodeFactory.objectNode(); 
-		child.put("$oid", objId);
-		JsonNode deleteData = ((ObjectNode)ONTOLOGY_DELETE.deepCopy()).set("_id", child);
 		
 		SSAPResource ssapDelete=new SSAPResource();
-		ssapDelete.setData(deleteData.toString());
+		ssapDelete.setData(data);
 		ssapDelete.setSessionKey(sessionkey);
 		ssapDelete.setOntology(ONTOLOGY_NAME);
 		
