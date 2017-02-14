@@ -45,8 +45,6 @@ import com.indra.sofia2.ssap.testutils.LightHttpListener;
 import com.indra.sofia2.ssap.testutils.RestApiUtils;
 import com.indra.sofia2.ssap.testutils.TestProperties;
 
-import groovy.inspect.TextNode;
-
 import javax.ws.rs.core.Response;
 
 public class TestRestApiFunctional {
@@ -203,7 +201,8 @@ public class TestRestApiFunctional {
 	
 	@Test
 	public void testQueryByObjectId() throws JsonProcessingException, IOException {
-		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);	
+		Response respJoin = utils.join(this.api, KP_INSTANCE, TOKEN);
+
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
 		
 		SSAPResource ssapInsert=new SSAPResource();
@@ -273,6 +272,7 @@ public class TestRestApiFunctional {
 		Response respInsert=this.api.insert(ssapInsert);
 				
 		Response respQuery=this.api.query(sessionkey, ONTOLOGY_NAME, ONTOLOGY_QUERY_SQLLIKE, null, "SQLLIKE");
+		
 		assertEquals(respQuery.getStatus(), 200);
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respQuery.getStatus(), "QUERY_SQL_LIKE"));
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, utils.getSSAPResource(api,respQuery).getData()));

@@ -107,10 +107,11 @@ public abstract class KpErrorsAbstract {
 	@Test
 	public void renewSessionWithBadToken() throws Exception {
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN + "MALFORMED", KP_INSTANCE);
-		SSAPMessage response = kp.send(joinMessage);
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(joinMessage);
 		
 		assertEquals(response.getSessionKey(), null);
-		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		//SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyReturnMessage bodyReturn = response.getBodyAsObject();
 		assertEquals(bodyReturn.getData(), null);
 		assertFalse(bodyReturn.isOk());
 		//assertEquals(SSAPErrorCode.AUTENTICATION, bodyReturn.getErrorCode());
@@ -123,10 +124,11 @@ public abstract class KpErrorsAbstract {
 		//TODO: create inative token in sofia2.com
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN + "INACTIVE", KP_INSTANCE);
 		joinMessage.setSessionKey(sessionKey);
-		SSAPMessage response = kp.send(joinMessage);
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(joinMessage);
 		
 		assertEquals(response.getSessionKey(), null);
-		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		//SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyReturnMessage bodyReturn = response.getBodyAsObject();
 		assertEquals(bodyReturn.getData(), null);
 		assertFalse(bodyReturn.isOk());
 		//assertEquals(SSAPErrorCode.AUTENTICATION, bodyReturn.getErrorCode());
@@ -137,10 +139,11 @@ public abstract class KpErrorsAbstract {
 	public void renewSessionWithBadSessionKey() throws Exception {
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		joinMessage.setSessionKey(sessionKey + "BAD_SESSION");
-		SSAPMessage response = kp.send(joinMessage);
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(joinMessage);
 		
 		assertEquals(response.getSessionKey(), null);
-		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		//SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyReturnMessage bodyReturn = response.getBodyAsObject();
 		assertEquals(bodyReturn.getData(), null);
 		assertFalse(bodyReturn.isOk());
 		//assertEquals(SSAPErrorCode.AUTENTICATION, bodyReturn.getErrorCode());
@@ -151,11 +154,12 @@ public abstract class KpErrorsAbstract {
 	public void closeSessionWithBadSessionKey() throws Exception{
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
 		joinMessage.setSessionKey(sessionKey + "BAD_SESSION");
-		SSAPMessage respJoin = kp.send(joinMessage);
+		SSAPMessage<SSAPBodyReturnMessage> respJoin = kp.send(joinMessage);
 			
 		SSAPMessage leaveMessage = SSAPMessageGenerator.getInstance().generateLeaveMessage(respJoin.getSessionKey() + "BAD_SESSION");
-		SSAPMessage respLeave = kp.send(leaveMessage);
-		SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(respLeave.getBody());
+		SSAPMessage<SSAPBodyReturnMessage> respLeave = kp.send(leaveMessage);
+		//SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(respLeave.getBody());
+		SSAPBodyReturnMessage bodyReturn = respLeave.getBodyAsObject();
 		assertEquals(bodyReturn.getData(), null);
 		//assertEquals(SSAPErrorCode.AUTENTICATION, bodyReturn.getErrorCode());
 		assertFalse(bodyReturn.isOk());
@@ -169,9 +173,10 @@ public abstract class KpErrorsAbstract {
 		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		
-		SSAPMessage responseQuery=kp.send(msgQuery);
+		SSAPMessage<SSAPBodyReturnMessage> responseQuery=kp.send(msgQuery);
 		
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
+		SSAPBodyReturnMessage returned = responseQuery.getBodyAsObject();
 		assertFalse(returned.isOk());
 		//assertEquals(SSAPErrorCode.AUTENTICATION, bodyReturn.getErrorCode());
 		assertNotEquals(returned.getError(), null);
@@ -184,9 +189,9 @@ public abstract class KpErrorsAbstract {
 		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey, ONTOLOGY_NAME, MALFORMED_ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		
+		SSAPMessage<SSAPBodyReturnMessage> responseQuery=kp.send(msgQuery);
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
+		SSAPBodyReturnMessage returned = responseQuery.getBodyAsObject();
 		assertFalse(returned.isOk());
 		assertNotEquals(returned.getError(), null);
 		assertNotEquals(returned.getErrorCode(), null);
@@ -214,9 +219,9 @@ public abstract class KpErrorsAbstract {
 		
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		
+		SSAPMessage<SSAPBodyReturnMessage> responseQuery=kp.send(msgQuery);
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
+		SSAPBodyReturnMessage returned = responseQuery.getBodyAsObject();
 		assertFalse(returned.isOk());
 		assertNotEquals(returned.getError(), null);
 		assertNotEquals(returned.getErrorCode(), null);
@@ -231,9 +236,9 @@ public abstract class KpErrorsAbstract {
 		
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		
-		SSAPMessage responseQuery=kp.send(msgQuery);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
-		
+		SSAPMessage<SSAPBodyReturnMessage> responseQuery=kp.send(msgQuery);
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseQuery.getBody());
+		SSAPBodyReturnMessage returned = responseQuery.getBodyAsObject();
 		assertFalse(returned.isOk());
 		assertNotEquals(returned.getError(), null);
 		assertNotEquals(returned.getErrorCode(), null);
@@ -250,9 +255,10 @@ public abstract class KpErrorsAbstract {
 		});
 		
 		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
-		SSAPMessage msgSubscribe = kp.send(msg);
+		SSAPMessage<SSAPBodyReturnMessage> msgSubscribe = kp.send(msg);
 		
-		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
+		//SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
+		SSAPBodyReturnMessage responseSubscribeBody = msgSubscribe.getBodyAsObject();
 		
 		assertSame(responseSubscribeBody.getData(), null);
 		assertNotEquals(true, responseSubscribeBody.isOk());
@@ -272,15 +278,16 @@ public abstract class KpErrorsAbstract {
 		});
 		
 		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey , ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
-		SSAPMessage msgSubscribe = kp.send(msg);
+		SSAPMessage<SSAPBodyReturnMessage> msgSubscribe = kp.send(msg);
 		
 		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
 		String subscriptionId=responseSubscribeBody.getData();
 		
 		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, subscriptionId);
 		
-		SSAPMessage responseUnsubscribe=kp.send(msgUnsubscribe);
-		SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
+		SSAPMessage<SSAPBodyReturnMessage> responseUnsubscribe=kp.send(msgUnsubscribe);
+		//SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
+		SSAPBodyReturnMessage responseUnSubscribeBody = responseUnsubscribe.getBodyAsObject();
 		
 		assertNotEquals(true, responseUnSubscribeBody.isOk());
 		assertNotEquals(null, responseUnSubscribeBody.getError());
@@ -299,15 +306,16 @@ public abstract class KpErrorsAbstract {
 		});
 		
 		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey , ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
-		SSAPMessage msgSubscribe = kp.send(msg);
+		SSAPMessage<SSAPBodyReturnMessage> msgSubscribe = kp.send(msg);
 		
 		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
 		String subscriptionId=responseSubscribeBody.getData();
 		
 		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey, ONTOLOGY_NAME, subscriptionId + "BAD_ID");
 		
-		SSAPMessage responseUnsubscribe=kp.send(msgUnsubscribe);
-		SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
+		SSAPMessage<SSAPBodyReturnMessage> responseUnsubscribe=kp.send(msgUnsubscribe);
+		//SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
+		SSAPBodyReturnMessage responseUnSubscribeBody = responseUnsubscribe.getBodyAsObject();
 		
 		assertNotEquals(true, responseUnSubscribeBody.isOk());
 		assertNotEquals(null, responseUnSubscribeBody.getError());
@@ -330,14 +338,15 @@ public abstract class KpErrorsAbstract {
 			}
 		});
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, request.toJson()));
-		SSAPMessage response = kp.send(request);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(request);
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyReturnMessage returned = response.getBodyAsObject();
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		assertTrue(returned.isOk());
 		assertNotSame(null, returned.getData());
 		
 		SSAPMessage requestCmd = SSAPMessageGenerator.getInstance().generateCommandMessage(sessionKey, KP, KP_INSTANCE + "NOT_MATCH" ,SSAPCommandType.STATUS, Collections.<String, String>emptyMap());		
-		SSAPMessage responseCmd = kp.send(requestCmd);
+		SSAPMessage<SSAPBodyReturnMessage> responseCmd = kp.send(requestCmd);
 		
 		Thread.sleep(5000);
 		
@@ -357,14 +366,16 @@ public abstract class KpErrorsAbstract {
 			}
 		});
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, request.toJson()));
-		SSAPMessage response = kp.send(request);
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(request);
 		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		
+		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		assertTrue(returned.isOk());
 		assertNotSame(null, returned.getData());
 		
 		SSAPMessage requestCmd = SSAPMessageGenerator.getInstance().generateCommandMessage(sessionKey, KP, KP_INSTANCE , null, Collections.<String, String>emptyMap());		
-		SSAPMessage responseCmd = kp.send(requestCmd);
+		SSAPMessage<SSAPBodyReturnMessage> responseCmd = kp.send(requestCmd);
 		
 		Thread.sleep(5000);
 		
@@ -381,8 +392,9 @@ public abstract class KpErrorsAbstract {
 		request.setSessionKey(sessionKey);
 		request.setBody(unknownBody);
 		
-		SSAPMessage response = kp.send(request);
-		SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(request);
+		//SSAPBodyReturnMessage returned = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
+		SSAPBodyReturnMessage returned = response.getBodyAsObject();
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, returned.getData()));
 		assertFalse(returned.isOk());
 		assertEquals(SSAPErrorCode.OTHER, returned.getErrorCode());
