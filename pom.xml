@@ -19,7 +19,7 @@
 	<groupId>com.indra.sofia2.ssap</groupId>
 	<artifactId>client-api</artifactId>
 	<packaging>jar</packaging>
-	<version>3.4.7-SNAPSHOT</version>
+	<version>3.4.7</version>
 	<name>client-api</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -42,7 +42,7 @@
 		<dependency>
 		    <groupId>com.indra.sofia2</groupId>
 		    <artifactId>ssap</artifactId>
-		    <version>3.4.7-SNAPSHOT</version>
+		    <version>3.4.7</version>
 		</dependency>
 		<!-- Common dependencies -->
 		<dependency>
