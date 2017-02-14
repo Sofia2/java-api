@@ -133,10 +133,9 @@ public class TestRestApiFunctional {
 		String sessionkey = utils.getSSAPResource(api, respJoin).getSessionKey();
 		
 		Response respSubscribe = this.api.subscribe(sessionkey, ONTOLOGY_NAME, "select * from " + ONTOLOGY_NAME, 0, null, "SQLLIKE", "http://localhost:10080/ReceptorSuscripcionesRest/SubscriptionReceiver");
-		String subscriptionId = "ggfgfgsglsfdfdfd";//utils.getSSAPResource(api, respSubscribe).getData();
+		String subscriptionId = utils.getSSAPResource(api, respSubscribe).getData();
 		assertEquals(200, respSubscribe.getStatus());
 		
-		//TODO: Si hay conexion siempre devuelve 200 aunque el subscriptionId no exista. En cambio el sessionKey si que lo tiene en cuenta
 		Response respUnsubscribe = this.api.unsubscribe(sessionkey, subscriptionId);
 		assertEquals(200, respUnsubscribe.getStatus());
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respUnsubscribe.getStatus(), "UNSUBSCRIBE"));
@@ -161,9 +160,8 @@ public class TestRestApiFunctional {
 		log.info(String.format(LogMessages.LOG_HHTP_RESPONSE_CODE, respInsert.getStatus(), "INSERT"));
 		
 		String data = utils.getSSAPResource(api, respInsert).getData();
-		//TODO: Respuesta no parseable
-		//JsonObject jRespInsert = Json.createReader(new StringReader(data)).readObject();
-		//assertEquals(true, jRespInsert.containsKey("ObjectId"));	
+		
+		assertEquals(true, data.contains("$oid"));	
 		log.info(String.format(LogMessages.LOG_RESPONSE_DATA, data));
 		
 		utils.leave(api, sessionkey);		
@@ -211,7 +209,6 @@ public class TestRestApiFunctional {
 		ssapInsert.setOntology(ONTOLOGY_NAME);
 		Response respInsert=this.api.insert(ssapInsert);		
 		String data = utils.getSSAPResource(api, respInsert).getData();				
-		//TODO: Al no ser parseable toca realizar tratamiento de cadenas 
 		JsonNode ObjectId = JSON.getObjectMapper().readTree(data);
 		
 		Response respQuery=this.api.query(ObjectId.at("/_id/$oid").asText(), sessionkey, ONTOLOGY_NAME);
@@ -469,11 +466,6 @@ public class TestRestApiFunctional {
 		indicationStr = indication.get(5, TimeUnit.SECONDS);
 		assertFalse(indicationStr.isEmpty());
 		System.out.println(indicationStr);
-		//SSAPResource resource =
-		//JsonNode indicationJson = JSON.deserializeToJson(JSON.deserializeToJson(indicationStr).path("body").asText());
-		//JsonNode b = indicationJson.path("data");
-		//System.out.println(b.asText());
-		
 		
 	}
 }
