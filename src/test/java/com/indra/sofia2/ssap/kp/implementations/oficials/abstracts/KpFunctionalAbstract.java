@@ -61,8 +61,8 @@ public abstract class KpFunctionalAbstract {
 	private final static String ONTOLOGY_QUERY_SQLLIKE = "select * from TestSensorTemperatura where Sensor.assetId = 'S_Temperatura_00066'";
 	private final static String ONTOLOGY_INSERT_SQLLIKE = "insert into TestSensorTemperatura(geometry, assetId, measure, timestamp) values (\"{ 'coordinates': [ 40.512967, -3.67495 ], 'type': 'Point' }\", \"S_Temperatura_00067\", 15, \"{ '$date': '2014-04-29T08:24:54.005Z'}\")";
 	
-	private final static String ONTOLOGY_UPDATE_WHERE = "{Sensor.assetId:\"S_Temperatura_00066\"}";
-	private final static String ONTOLOGY_QUERY_NATIVE = "{Sensor.assetId:\"S_Temperatura_00066\"}";
+	private final static String ONTOLOGY_UPDATE_WHERE = "{Sensor.assetId:\"S_Temperatura_00067\"}";
+	private final static String ONTOLOGY_QUERY_NATIVE = "{Sensor.assetId:\"S_Temperatura_00067\"}";
 	
 	private final static String ONTOLOGY_UPDATE_SQLLIKE = "update TestSensorTemperatura set measure = 15 where Sensor.assetId = \"S_Temperatura_00067\"";
 	
@@ -552,7 +552,7 @@ public abstract class KpFunctionalAbstract {
 			}
 		});
 		
-		for(int i = 0; i < 20; i++) {
+		for(int i = 0; i < 5; i++) {
 			Thread.sleep(500);
 			String timeStamp = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").format(new Date());
 			

@@ -7,7 +7,7 @@
       ],
       'type':'Point'
     },
-    'assetId': 'S_Temperatura_00066',
+    'assetId': 'S_Temperatura_00067',
     'measure':25,
     'timestamp':{
       '$date': '2014-04-29T08:24:54.005Z'
