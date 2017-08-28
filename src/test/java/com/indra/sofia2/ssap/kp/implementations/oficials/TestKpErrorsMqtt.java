@@ -10,7 +10,7 @@ import com.indra.sofia2.ssap.kp.implementations.mqtt.KpMQTTClient;
 import com.indra.sofia2.ssap.kp.implementations.oficials.abstracts.KpErrorsAbstract;
 import com.indra.sofia2.ssap.testutils.TestProperties;
 
-public class TestKpErrosMqtt extends KpErrorsAbstract {
+public class TestKpErrorsMqtt extends KpErrorsAbstract {
 	
 	private final static String HOST = TestProperties.getInstance().get("test.officials.mqtt.url");
 	private final static int PORT = Integer.parseInt(TestProperties.getInstance().get("test.officials.mqtt.port"));
