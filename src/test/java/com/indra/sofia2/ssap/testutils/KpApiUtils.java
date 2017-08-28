@@ -47,8 +47,8 @@ public class KpApiUtils {
 		SSAPMessage leaveMessage = SSAPMessageGenerator.getInstance().generateLeaveMessage(sessionKey);
 		SSAPMessage response = kp.send(leaveMessage);
 		SSAPBodyReturnMessage responseBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(response.getBody());
-		assertEquals(responseBody.getData(), sessionKey);
 		assertTrue(responseBody.isOk());
+		assertEquals(responseBody.getData(), sessionKey);
 		assertSame(responseBody.getError(), null);
 		
 		JsonNode jbody = response.getBodyAsJsonObject();

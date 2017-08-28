@@ -1,9 +1,6 @@
 package com.indra.sofia2.ssap.kp.implementations.oficials;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
@@ -20,6 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.Response;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.indra.sofia2.ssap.json.JSON;
 import com.indra.sofia2.ssap.kp.implementations.rest.SSAPResourceAPI;
@@ -45,8 +43,6 @@ import com.indra.sofia2.ssap.testutils.LightHttpListener;
 import com.indra.sofia2.ssap.testutils.RestApiUtils;
 import com.indra.sofia2.ssap.testutils.TestProperties;
 
-import javax.ws.rs.core.Response;
-
 public class TestRestApiFunctional {
 
 	private static Logger log =  LoggerFactory.getLogger(TestRestApiFunctional.class);
@@ -54,7 +50,7 @@ public class TestRestApiFunctional {
 
 	private final static String TOKEN = TestProperties.getInstance().get("test.officials.token");
 	private final static String KP = TestProperties.getInstance().get("test.officials.kp");
-	private final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance");
+	private final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance") + System.currentTimeMillis();
 	
 	private final static String ONTOLOGY_NAME = TestProperties.getInstance().get("test.officials.ontology_name");
 	

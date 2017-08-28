@@ -4,14 +4,13 @@ import org.atmosphere.wasync.Request.METHOD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.indra.sofia2.ssap.kp.Kp;
 import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.config.WebSocketConnectionConfig;
 import com.indra.sofia2.ssap.kp.implementations.oficials.abstracts.KpErrorsAbstract;
 import com.indra.sofia2.ssap.kp.implementations.websockets.KpWebSocketClient;
 import com.indra.sofia2.ssap.testutils.TestProperties;
 
-public class TestKpErrosWebSoscket extends KpErrorsAbstract {
+public class TestKpErrorsWebSocket extends KpErrorsAbstract {
 	@Override
 	public KpToExtendApi getImplementation() {
 		

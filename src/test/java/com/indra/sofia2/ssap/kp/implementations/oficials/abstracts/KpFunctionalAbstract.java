@@ -16,12 +16,10 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.indra.sofia2.ssap.json.JSON;
 import com.indra.sofia2.ssap.kp.KpToExtendApi;
 import com.indra.sofia2.ssap.kp.Listener4SIBIndicationNotifications;
 import com.indra.sofia2.ssap.kp.SSAPMessageGenerator;
@@ -47,7 +45,7 @@ public abstract class KpFunctionalAbstract {
 	
 	protected final static String TOKEN = TestProperties.getInstance().get("test.officials.token");
 	protected final static String KP = TestProperties.getInstance().get("test.officials.kp");
-	protected final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance");
+	protected final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance") + System.currentTimeMillis();
 	
 	private final static String ONTOLOGY_NAME = TestProperties.getInstance().get("test.officials.ontology_name");
 	

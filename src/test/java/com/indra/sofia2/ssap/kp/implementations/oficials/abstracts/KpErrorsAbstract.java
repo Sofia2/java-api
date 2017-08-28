@@ -8,6 +8,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,7 +42,7 @@ public abstract class KpErrorsAbstract {
 	
 	protected final static String TOKEN = TestProperties.getInstance().get("test.officials.token");
 	protected final static String KP = TestProperties.getInstance().get("test.officials.kp");
-	protected final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance");
+	protected final static String KP_INSTANCE = TestProperties.getInstance().get("test.officials.kp_instance") + System.currentTimeMillis();
 	
 	private final static String ONTOLOGY_NAME = TestProperties.getInstance().get("test.officials.ontology_name");
 	
@@ -138,7 +139,7 @@ public abstract class KpErrorsAbstract {
 	@Test
 	public void renewSessionWithBadSessionKey() throws Exception {
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		joinMessage.setSessionKey(sessionKey + "BAD_SESSION");
+		joinMessage.setSessionKey(sessionKey + UUID.randomUUID().toString());
 		SSAPMessage<SSAPBodyReturnMessage> response = kp.send(joinMessage);
 		
 		assertEquals(response.getSessionKey(), null);
@@ -153,10 +154,10 @@ public abstract class KpErrorsAbstract {
 	@Test
 	public void closeSessionWithBadSessionKey() throws Exception{
 		SSAPMessage joinMessage = SSAPMessageGenerator.getInstance().generateJoinByTokenMessage(TOKEN, KP_INSTANCE);
-		joinMessage.setSessionKey(sessionKey + "BAD_SESSION");
+		joinMessage.setSessionKey(sessionKey + UUID.randomUUID().toString());
 		SSAPMessage<SSAPBodyReturnMessage> respJoin = kp.send(joinMessage);
 			
-		SSAPMessage leaveMessage = SSAPMessageGenerator.getInstance().generateLeaveMessage(respJoin.getSessionKey() + "BAD_SESSION");
+		SSAPMessage leaveMessage = SSAPMessageGenerator.getInstance().generateLeaveMessage(respJoin.getSessionKey() + UUID.randomUUID().toString());
 		SSAPMessage<SSAPBodyReturnMessage> respLeave = kp.send(leaveMessage);
 		//SSAPBodyReturnMessage bodyReturn = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(respLeave.getBody());
 		SSAPBodyReturnMessage bodyReturn = respLeave.getBodyAsObject();
@@ -170,7 +171,7 @@ public abstract class KpErrorsAbstract {
 	@Test
 	public void queryNativeBadSessionKey() throws Exception
 	{
-		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
+		SSAPMessage msgQuery=SSAPMessageGenerator.getInstance().generateQueryMessage(sessionKey + UUID.randomUUID().toString(), ONTOLOGY_NAME, ONTOLOGY_QUERY_NATIVE, SSAPQueryType.NATIVE);
 		log.info(String.format(LogMessages.LOG_REQUEST_DATA, msgQuery.toJson()));
 		
 		SSAPMessage<SSAPBodyReturnMessage> responseQuery=kp.send(msgQuery);
@@ -254,7 +255,7 @@ public abstract class KpErrorsAbstract {
 			public void onIndication(String idNotifition, SSAPMessage message) {}
 		});
 		
-		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
+		SSAPMessage msg=SSAPMessageGenerator.getInstance().generateSubscribeMessage(sessionKey + UUID.randomUUID().toString(), ONTOLOGY_NAME, 0, "", SSAPQueryType.SQLLIKE);
 		SSAPMessage<SSAPBodyReturnMessage> msgSubscribe = kp.send(msg);
 		
 		//SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
@@ -283,7 +284,7 @@ public abstract class KpErrorsAbstract {
 		SSAPBodyReturnMessage responseSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(msgSubscribe.getBody());
 		String subscriptionId=responseSubscribeBody.getData();
 		
-		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey + "BAD_SESSION", ONTOLOGY_NAME, subscriptionId);
+		SSAPMessage msgUnsubscribe=SSAPMessageGenerator.getInstance().generateUnsubscribeMessage(sessionKey + UUID.randomUUID().toString(), ONTOLOGY_NAME, subscriptionId);
 		
 		SSAPMessage<SSAPBodyReturnMessage> responseUnsubscribe=kp.send(msgUnsubscribe);
 		//SSAPBodyReturnMessage responseUnSubscribeBody = SSAPBodyReturnMessage.fromJsonToSSAPBodyReturnMessage(responseUnsubscribe.getBody());
